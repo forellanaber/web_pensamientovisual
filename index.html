@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fstudent - Uso del Tiempo y Bienestar</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Tipografías de Google Fonts: Libre Baskerville y Jost -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navegación superior -->
+  <header class="navbar">
+    <div class="logo">Fstudent</div>
+    <nav>
+      <a href="#test">Hacer el test</a>
+      <a href="#resultado">Tu resultado</a>
+      <a href="#simulador">Simulador</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- Héroe inicial -->
+    <section class="hero">
+      <span class="badge">PARA ESTUDIANTES UNIVERSITARIOS</span>
+      <h1>¿Tu día te alcanza?</h1>
+      <p>Descubre cómo distribuyes tu tiempo en comparación con estudiantes universitarios en Chile y cómo mejorar tu bienestar.</p>
+    </section>
+
+    <!-- ETAPA 1: TEST INTERACTIVO -->
+    <section id="test" class="card">
+      <h2>1. Test de Uso del Tiempo</h2>
+      <p>Ajusta las horas de tu rutina diaria normal:</p>
+
+      <div class="test-grid">
+        <div class="controls">
+          <div class="slider-group">
+            <label>Sueño (Recomendado 7-9h): <span id="val-sueno">7</span> h</label>
+            <input type="range" id="sueno" min="0" max="16" value="7" class="slider-sueno">
+          </div>
+
+          <div class="slider-group">
+            <label>Clases y estudio: <span id="val-estudio">7</span> h</label>
+            <input type="range" id="estudio" min="0" max="16" value="7" class="slider-estudio">
+          </div>
+
+          <div class="slider-group">
+            <label>Trabajo remunerado: <span id="val-trabajo">2</span> h</label>
+            <input type="range" id="trabajo" min="0" max="16" value="2" class="slider-trabajo">
+          </div>
+
+          <div class="slider-group">
+            <label>Traslado: <span id="val-traslado">2</span> h</label>
+            <input type="range" id="traslado" min="0" max="8" value="2" class="slider-traslado">
+          </div>
+
+          <div class="slider-group">
+            <label>Ocio y descanso: <span id="val-ocio">4</span> h</label>
+            <input type="range" id="ocio" min="0" max="12" value="4" class="slider-ocio">
+          </div>
+        </div>
+
+        <!-- Reloj / Indicador de 24h -->
+        <div class="clock-box" id="clock-box">
+          <h3>Horas asignadas</h3>
+          <div class="clock-display" id="clock-display">22.0 / 24 hrs</div>
+          <p id="clock-status">¡Día dentro del límite permitido!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ETAPA 2: TU RESULTADO -->
+    <section id="resultado" class="card">
+      <h2>2. Tu Resultado</h2>
+      <div class="result-box">
+        <div class="score-card">
+          <span>Tu puntaje general</span>
+          <div class="score" id="total-score">6.8 / 10</div>
+          <span class="status-tag status-good" id="score-tag">Puede mejorar</span>
+        </div>
+
+        <div class="breakdown">
+          <div class="area-item">
+            <span>Sueño</span>
+            <span class="tag status-good" id="tag-sueno">Bien (8/10)</span>
+          </div>
+          <div class="area-item">
+            <span>Estudio / Trabajo</span>
+            <span class="tag status-good" id="tag-estudio">Bien (7/10)</span>
+          </div>
+          <div class="area-item">
+            <span>Traslado</span>
+            <span class="tag status-warn" id="tag-traslado">Puede mejorar (6/10)</span>
+          </div>
+          <div class="area-item">
+            <span>Ocio</span>
+            <span class="tag status-good" id="tag-ocio">Bien (7/10)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ETAPA 4: SIMULADOR Y GUÍA -->
+    <section id="simulador" class="card">
+      <h2>3. Tres cambios para tu día</h2>
+      <p>Prueba activar pequeños ajustes y observa cómo cambia tu puntaje de bienestar:</p>
+
+      <div class="switches">
+        <div class="switch-item">
+          <label>
+            <input type="checkbox" id="change-sueno">
+            <span>Duerme 1 hora más por la noche</span>
+          </label>
+        </div>
+        <div class="switch-item">
+          <label>
+            <input type="checkbox" id="change-celular">
+            <span>Deja el celular 30 min antes de dormir</span>
+          </label>
+        </div>
+        <div class="switch-item">
+          <label>
+            <input type="checkbox" id="change-deporte">
+            <span>Camina 20 minutos al día</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="sim-result">
+        <p>Puntaje simulado con cambios: <strong id="sim-score">6.8</strong> / 10</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
