@@ -26,14 +26,17 @@ body {
 
 /* Header */
 .header-principal {
-    display: flex; justify-content: space-between; align-items: center;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
     padding: 1.5rem 3rem; background-color: var(--bg-card);
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     position: fixed; top: 0; width: 100%; box-sizing: border-box; z-index: 100;
 }
-.logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-blue); }
-.navegacion a { margin: 0 1rem; text-decoration: none; color: var(--text-light); font-weight: 600; }
-.navegacion a:hover { color: var(--accent-blue); }
+.redes { justify-self: end; }
+.logo { font-size: 1.5rem; font-weight: 800; color: var(--accent-blue); cursor: pointer; }
+.navegacion a { margin: 0 1rem; text-decoration: none; color: var(--text-light); font-weight: 600; transition: color 0.2s; }
+.navegacion a:hover, .navegacion a.activo { color: var(--accent-blue); }
 .redes a { color: var(--text-light); font-size: 1.2rem; margin-left: 1rem; }
 .redes a:hover { color: var(--accent-purple); }
 
@@ -193,3 +196,101 @@ input:checked + .slider.round:before { transform: translateX(22px); }
 .btn-share.ws { background: #25D366; color: white; }
 .btn-share.ig { background: #E1306C; color: white; }
 .btn-share:hover { filter: brightness(1.1); transform: translateY(-2px); }
+/* --- Explorar Chile --- */
+.contenedor-explorar { max-width: 1100px; justify-content: flex-start; }
+.encabezado-explorar h2 { margin-bottom: 0.5rem; }
+.encabezado-explorar .texto-secundario { margin-top: 0; }
+
+.temas-explorar { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin: 1.5rem 0 2.5rem; }
+.tema-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem; margin: 0;
+    font-size: 0.95rem; padding: 0.7rem 1.5rem;
+    background: var(--bg-card); color: var(--text-light);
+    border: 2px solid #e2e8f0; box-shadow: none;
+}
+.tema-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+.tema-btn.activo {
+    background: var(--accent-blue); border-color: var(--accent-blue); color: white;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
+.layout-explorar { display: grid; grid-template-columns: 210px 190px 1fr; gap: 2rem; align-items: start; }
+
+/* Lista de regiones */
+.lista-regiones {
+    background: var(--bg-card); border-radius: 16px; padding: 1rem 0.6rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.lista-regiones ul { list-style: none; margin: 0; padding: 0; }
+.item-region {
+    display: flex; align-items: center; gap: 0.6rem; width: 100%; margin: 0;
+    padding: 0.42rem 0.8rem; border-radius: 10px;
+    font-size: 0.85rem; font-weight: 400; text-align: left;
+    background: transparent; color: var(--text-main); box-shadow: none;
+}
+.item-region:hover { background: var(--bg-color); }
+.item-region.activo { background: var(--accent-purple); color: white; font-weight: 600; }
+.muestra-color { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; background: #e2e8f0; }
+.item-region.activo .muestra-color { box-shadow: 0 0 0 2px white; }
+
+/* Mapa */
+.columna-mapa { position: relative; display: flex; flex-direction: column; align-items: center; }
+#mapa-chile { width: 100%; max-width: 180px; height: auto; overflow: visible; }
+.region-mapa {
+    stroke: #ffffff; stroke-width: 0.8; cursor: pointer;
+    transition: fill 0.5s ease, opacity 0.2s;
+    outline: none;
+}
+.region-mapa:hover, .region-mapa:focus-visible { opacity: 0.8; }
+.region-mapa.activa {
+    stroke: var(--accent-purple); stroke-width: 2.5;
+    filter: drop-shadow(0 3px 4px rgba(139, 92, 246, 0.45));
+}
+.tooltip-mapa {
+    position: absolute; pointer-events: none; z-index: 5;
+    background: var(--text-main); color: white; font-size: 0.8rem; font-weight: 600;
+    padding: 0.4rem 0.7rem; border-radius: 8px; white-space: nowrap;
+    transform: translate(-50%, -130%); transition: opacity 0.15s;
+}
+.oculta-tooltip { opacity: 0; }
+.leyenda-mapa { display: flex; align-items: center; gap: 0.6rem; margin-top: 1.2rem; font-size: 0.8rem; color: var(--text-light); }
+.leyenda-barra { width: 120px; height: 10px; border-radius: 5px; background: linear-gradient(to right, #dbeafe, #1e40af); }
+
+/* Tarjeta de región */
+.tarjeta-region {
+    position: sticky; top: 110px;
+    background: var(--bg-card); border-radius: 16px; padding: 2rem;
+    border-top: 5px solid var(--accent-purple);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+.etiqueta-ejemplo {
+    display: inline-block; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text-light); background: var(--bg-color); padding: 0.25rem 0.7rem; border-radius: 20px;
+}
+.tarjeta-region h3 { font-size: 2rem; font-weight: 800; margin: 0.6rem 0 0.2rem; color: var(--text-main); }
+.dato-estudiantes { color: var(--text-light); margin: 0 0 1.5rem; }
+#total-estudiantes { color: var(--text-main); font-weight: 800; font-size: 1.3rem; }
+
+.fila-indicador { padding: 0.9rem 0; border-top: 1px solid #f1f5f9; }
+.fila-indicador .fila-texto { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 0.45rem; }
+.fila-indicador .frase { font-size: 0.95rem; font-weight: 600; }
+.fila-indicador .frase i { width: 1.4rem; }
+.fila-indicador .pct { font-size: 0.8rem; color: var(--text-light); white-space: nowrap; }
+.hilera-personas { display: flex; gap: 0.35rem; font-size: 1.15rem; }
+.hilera-personas i { color: #e2e8f0; transition: color 0.4s ease; }
+
+.fuentes-region { font-size: 0.75rem; color: var(--text-light); margin: 1.2rem 0 1.5rem; }
+#btn-explorar-test { font-size: 1rem; padding: 0.9rem 1.8rem; width: 100%; }
+
+/* Responsive */
+@media (max-width: 900px) {
+    .header-principal { grid-template-columns: 1fr; justify-items: center; gap: 0.6rem; padding: 1rem; }
+    .redes { justify-self: center; }
+    .contenedor { padding-top: 11rem; }
+    .layout-explorar { grid-template-columns: 1fr; }
+    .lista-regiones { order: 2; }
+    .lista-regiones ul { display: grid; grid-template-columns: repeat(2, 1fr); }
+    .columna-mapa { order: 1; }
+    #mapa-chile { max-width: 160px; }
+    .tarjeta-region { order: 3; position: static; }
+}

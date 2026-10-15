@@ -248,3 +248,165 @@ $(document).ready(function() {
         });
     });
 });
+// =====================================================================
+// --- 7. Explorar Chile: mapa interactivo por región ---
+// =====================================================================
+$(document).ready(function() {
+
+    // DATOS DE EJEMPLO: reemplazar por los valores reales procesados
+    // desde CASEN 2022 (estudiantes, trabaja, solo), ENUT 2023 (sueño, traslado)
+    // y ENJUV 2022 (deporte). Los porcentajes van de 0 a 100.
+    const datosRegiones = {
+        15: { nombre: "Arica y Parinacota", estudiantes: 14000,  sueno: 38, deporte: 34, trabaja: 31, solo: 12, traslado: 28 },
+        1:  { nombre: "Tarapacá",           estudiantes: 22000,  sueno: 40, deporte: 33, trabaja: 33, solo: 13, traslado: 30 },
+        2:  { nombre: "Antofagasta",        estudiantes: 45000,  sueno: 36, deporte: 37, trabaja: 29, solo: 15, traslado: 32 },
+        3:  { nombre: "Atacama",            estudiantes: 15000,  sueno: 37, deporte: 32, trabaja: 30, solo: 11, traslado: 27 },
+        4:  { nombre: "Coquimbo",           estudiantes: 52000,  sueno: 39, deporte: 31, trabaja: 32, solo: 14, traslado: 34 },
+        5:  { nombre: "Valparaíso",         estudiantes: 140000, sueno: 42, deporte: 30, trabaja: 31, solo: 22, traslado: 41 },
+        13: { nombre: "Metropolitana",      estudiantes: 620000, sueno: 45, deporte: 29, trabaja: 35, solo: 16, traslado: 52 },
+        6:  { nombre: "O'Higgins",          estudiantes: 48000,  sueno: 38, deporte: 28, trabaja: 34, solo: 10, traslado: 38 },
+        7:  { nombre: "Maule",              estudiantes: 62000,  sueno: 37, deporte: 27, trabaja: 33, solo: 12, traslado: 36 },
+        16: { nombre: "Ñuble",              estudiantes: 30000,  sueno: 36, deporte: 28, trabaja: 30, solo: 15, traslado: 33 },
+        8:  { nombre: "Biobío",             estudiantes: 120000, sueno: 41, deporte: 31, trabaja: 29, solo: 19, traslado: 47 },
+        9:  { nombre: "La Araucanía",       estudiantes: 60000,  sueno: 38, deporte: 30, trabaja: 28, solo: 18, traslado: 35 },
+        14: { nombre: "Los Ríos",           estudiantes: 28000,  sueno: 35, deporte: 33, trabaja: 27, solo: 21, traslado: 29 },
+        10: { nombre: "Los Lagos",          estudiantes: 50000,  sueno: 36, deporte: 32, trabaja: 31, solo: 14, traslado: 31 },
+        11: { nombre: "Aysén",              estudiantes: 5000,   sueno: 33, deporte: 38, trabaja: 35, solo: 17, traslado: 18 },
+        12: { nombre: "Magallanes",         estudiantes: 10000,  sueno: 32, deporte: 40, trabaja: 34, solo: 20, traslado: 20 }
+    };
+
+    // Indicadores que aparecen en la tarjeta (en este orden)
+    const indicadores = [
+        { clave: "sueno",    icono: "fa-moon",        color: "var(--c-sueno)",     frase: "duermen menos de 6 horas" },
+        { clave: "deporte",  icono: "fa-heart-pulse", color: "#ec4899",            frase: "hacen deporte cada semana" },
+        { clave: "trabaja",  icono: "fa-briefcase",   color: "var(--c-trabajo)",   frase: "estudian y trabajan" },
+        { clave: "solo",     icono: "fa-house-user",  color: "var(--accent-purple)", frase: "viven solos" },
+        { clave: "traslado", icono: "fa-bus",         color: "var(--c-traslado)",  frase: "tardan más de 1 hora en trasladarse" }
+    ];
+
+    const nombresTema = { sueno: "duermen poco", deporte: "hacen deporte", trabaja: "estudian y trabajan", solo: "viven solos" };
+
+    let temaActual = "sueno";
+    let regionActual = 8; // Biobío por defecto
+
+    // Escala de color: de azul muy pálido a azul profundo
+    const colorMin = [219, 234, 254]; // #dbeafe
+    const colorMax = [30, 64, 175];   // #1e40af
+
+    function colorEscala(valor, min, max) {
+        let t = (max === min) ? 0.5 : (valor - min) / (max - min);
+        let rgb = colorMin.map((c, i) => Math.round(c + (colorMax[i] - c) * t));
+        return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+    }
+
+    function pintarMapa() {
+        let valores = Object.values(datosRegiones).map(r => r[temaActual]);
+        let min = Math.min(...valores), max = Math.max(...valores);
+
+        for (const [codigo, region] of Object.entries(datosRegiones)) {
+            let color = colorEscala(region[temaActual], min, max);
+            $(`.region-mapa[data-region="${codigo}"]`).css("fill", color);
+            $(`.item-region[data-region="${codigo}"] .muestra-color`).css("background", color);
+        }
+    }
+
+    function mostrarRegion(codigo) {
+        regionActual = codigo;
+        let region = datosRegiones[codigo];
+
+        // Resaltar en el mapa (se mueve al final para quedar por encima de las vecinas)
+        $(".region-mapa").removeClass("activa");
+        let pathActivo = $(`.region-mapa[data-region="${codigo}"]`).addClass("activa");
+        pathActivo.appendTo("#mapa-chile");
+
+        // Resaltar en la lista
+        $(".item-region").removeClass("activo");
+        $(`.item-region[data-region="${codigo}"]`).addClass("activo");
+
+        // Tarjeta
+        $("#nombre-region").text(region.nombre);
+        $("#total-estudiantes").text(region.estudiantes.toLocaleString("es-CL"));
+
+        let html = "";
+        indicadores.forEach(ind => {
+            let pct = region[ind.clave];
+            let deDiez = Math.round(pct / 10);
+            let personas = "";
+            for (let i = 0; i < 10; i++) {
+                let estilo = i < deDiez ? `style="color: ${ind.color}"` : "";
+                personas += `<i class="fa-solid fa-person" ${estilo}></i>`;
+            }
+            html += `
+                <div class="fila-indicador">
+                    <div class="fila-texto">
+                        <span class="frase"><i class="fa-solid ${ind.icono}" style="color: ${ind.color}"></i> ${deDiez} de cada 10 ${ind.frase}</span>
+                        <span class="pct">${pct}%</span>
+                    </div>
+                    <div class="hilera-personas" aria-hidden="true">${personas}</div>
+                </div>`;
+        });
+        $("#filas-indicadores").html(html);
+    }
+
+    // Botones de tema
+    $(".tema-btn").click(function() {
+        $(".tema-btn").removeClass("activo");
+        $(this).addClass("activo");
+        temaActual = $(this).data("tema");
+        pintarMapa();
+    });
+
+    // Clic en el mapa o en la lista
+    $("#mapa-chile").on("click", ".region-mapa", function() {
+        mostrarRegion($(this).data("region"));
+    });
+    $("#mapa-chile").on("keydown", ".region-mapa", function(e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); mostrarRegion($(this).data("region")); }
+    });
+    $(".item-region").click(function() {
+        mostrarRegion($(this).data("region"));
+    });
+
+    // Tooltip al pasar el cursor por el mapa
+    $("#mapa-chile").on("mousemove", ".region-mapa", function(e) {
+        let region = datosRegiones[$(this).data("region")];
+        let caja = $(".columna-mapa")[0].getBoundingClientRect();
+        $("#tooltip-mapa")
+            .text(`${region.nombre}: ${region[temaActual]}% ${nombresTema[temaActual]}`)
+            .css({ left: e.clientX - caja.left, top: e.clientY - caja.top })
+            .removeClass("oculta-tooltip");
+    });
+    $("#mapa-chile").on("mouseleave", ".region-mapa", function() {
+        $("#tooltip-mapa").addClass("oculta-tooltip");
+    });
+
+    // Navegación: abrir Explorar Chile desde el menú
+    $("#link-explorar").click(function(e) {
+        e.preventDefault();
+        $("section").removeClass("seccion-activa").addClass("seccion-oculta");
+        $("#pantalla-explorar").removeClass("seccion-oculta").addClass("seccion-activa");
+        $(".navegacion a").removeClass("activo");
+        $(this).addClass("activo");
+        $("html, body").scrollTop(0);
+    });
+
+    // Volver al inicio desde el logo
+    $("#logo-inicio").click(function() {
+        $("section").removeClass("seccion-activa").addClass("seccion-oculta");
+        $("#pantalla-bienvenida").removeClass("seccion-oculta").addClass("seccion-activa");
+        $(".navegacion a").removeClass("activo");
+        $("html, body").scrollTop(0);
+    });
+
+    // Botón de la tarjeta: ir al test
+    $("#btn-explorar-test").click(function() {
+        $(".navegacion a").removeClass("activo");
+        $("section").removeClass("seccion-activa").addClass("seccion-oculta");
+        $("#pantalla-contexto").removeClass("seccion-oculta").addClass("seccion-activa");
+        $("html, body").scrollTop(0);
+    });
+
+    // Estado inicial
+    pintarMapa();
+    mostrarRegion(regionActual);
+});
