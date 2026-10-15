@@ -38,8 +38,9 @@ $(document).ready(function() {
         let trabajo = parseFloat($("#horas-trabajo").val());
         let traslado = parseFloat($("#horas-traslado").val());
         let ocio = parseFloat($("#horas-ocio").val());
+        let deporte = parseFloat($("#horas-deporte").val()) || 0;
         
-        let sum = sueno + estudio + trabajo + traslado + ocio;
+        let sum = sueno + estudio + trabajo + traslado + ocio + deporte;
 
         if (sum > 24) {
             // Bloqueo: revertir valor
