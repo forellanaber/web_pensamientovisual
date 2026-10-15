@@ -159,7 +159,7 @@
             
             <div class="grid-categorias">
                 <!-- Tarjeta Sueño -->
-                <div class="tarjeta-categoria" style="border-top: 5px solid var(--c-sueno);">
+                <div class="tarjeta-categoria" data-area="sueno" style="border-top: 5px solid var(--c-sueno);">
                     <div class="tarjeta-header">
                         <h4><i class="fa-solid fa-moon" style="color: var(--c-sueno)"></i> Descanso</h4>
                         <span class="nota-cat">4.0/10</span>
@@ -170,7 +170,7 @@
                 </div>
 
                 <!-- Tarjeta Estudio -->
-                <div class="tarjeta-categoria" style="border-top: 5px solid var(--c-estudio);">
+                <div class="tarjeta-categoria" data-area="estudio" style="border-top: 5px solid var(--c-estudio);">
                     <div class="tarjeta-header">
                         <h4><i class="fa-solid fa-book" style="color: var(--c-estudio)"></i> Estudio</h4>
                         <span class="nota-cat">8.5/10</span>
@@ -181,7 +181,7 @@
                 </div>
 
                 <!-- Tarjeta Trabajo -->
-                <div class="tarjeta-categoria" style="border-top: 5px solid var(--c-trabajo);">
+                <div class="tarjeta-categoria" data-area="trabajo" style="border-top: 5px solid var(--c-trabajo);">
                     <div class="tarjeta-header">
                         <h4><i class="fa-solid fa-briefcase" style="color: var(--c-trabajo)"></i> Trabajo</h4>
                         <span class="nota-cat">6.0/10</span>
@@ -192,7 +192,7 @@
                 </div>
 
                 <!-- Tarjeta Traslado -->
-                <div class="tarjeta-categoria" style="border-top: 5px solid var(--c-traslado);">
+                <div class="tarjeta-categoria" data-area="traslado" style="border-top: 5px solid var(--c-traslado);">
                     <div class="tarjeta-header">
                         <h4><i class="fa-solid fa-bus" style="color: var(--c-traslado)"></i> Traslado</h4>
                         <span class="nota-cat">5.0/10</span>
@@ -203,7 +203,7 @@
                 </div>
 
                 <!-- Tarjeta Ocio -->
-                <div class="tarjeta-categoria" style="border-top: 5px solid var(--c-ocio);">
+                <div class="tarjeta-categoria" data-area="ocio" style="border-top: 5px solid var(--c-ocio);">
                     <div class="tarjeta-header">
                         <h4><i class="fa-solid fa-gamepad" style="color: var(--c-ocio)"></i> Ocio</h4>
                         <span class="nota-cat">3.5/10</span>
@@ -214,7 +214,7 @@
                 </div>
                 
                 <!-- Tarjeta Deporte (Placeholder extra) -->
-                <div class="tarjeta-categoria" style="border-top: 5px solid #ec4899;">
+                <div class="tarjeta-categoria" data-area="deporte" style="border-top: 5px solid #ec4899;">
                     <div class="tarjeta-header">
                         <h4><i class="fa-solid fa-heart-pulse" style="color: #ec4899"></i> Deporte/Salud</h4>
                         <span class="nota-cat">2.0/10</span>
@@ -225,11 +225,62 @@
                 </div>
             </div>
 
-            <!-- Espacio para futuros gráficos -->
-            <div class="espacio-graficos">
-                <h3>Aquí irá el comparador visual (Gráficos)</h3>
-                <p>En la siguiente etapa programaremos el diagrama de flujo y los puntos con tu ubicación frente al resto de Chile.</p>
+            <!-- Un día que te alcanza: recorrido ilustrado con scroll -->
+            <div class="dia-intro">
+                <h2>Un día que te alcanza</h2>
+                <p>Baja para recorrer un día completo de un estudiante, de la mañana a la madrugada. A la izquierda, lo que te quita tiempo y energía; a la derecha, lo que te lo devuelve.</p>
+                <div class="dia-flecha"><i class="fa-solid fa-chevron-down"></i></div>
             </div>
+
+            <div id="dia-scroll" class="dia-scroll">
+                <div class="dia-escenario">
+                    <div class="dia-divisor" aria-hidden="true"></div>
+
+                    <span class="dia-pill mal"><i class="fa-solid fa-xmark"></i> Mal hábito</span>
+                    <span class="dia-pill bien"><i class="fa-solid fa-check"></i> Buen hábito</span>
+
+                    <article id="dia-tarjeta" class="dia-tarjeta">
+                        <button type="button" id="dia-plegar" class="dia-plegar" aria-expanded="true" aria-label="Plegar o desplegar la información">
+                            <i class="fa-solid fa-chevron-up"></i>
+                        </button>
+                        <div class="dia-resumen">
+                            <div id="dia-hora" class="dia-hora">23:00</div>
+                            <h3 id="dia-titulo" class="dia-titulo">Antes de dormir</h3>
+                            <div id="dia-dato" class="dia-dato">+59%</div>
+                            <p id="dia-texto" class="dia-texto"></p>
+                            <div id="dia-barras" class="dia-barras"></div>
+                            <span id="dia-ejemplo" class="dia-ejemplo">Dato de ejemplo</span>
+                        </div>
+                        <div class="dia-detalle">
+                            <div class="dia-columnas">
+                                <div class="dia-col">
+                                    <span class="dia-sello mal"><i class="fa-solid fa-xmark"></i></span>
+                                    <h4 id="dia-mal-titulo"></h4>
+                                    <ul id="dia-mal-lista"></ul>
+                                </div>
+                                <div class="dia-col">
+                                    <span class="dia-sello bien"><i class="fa-solid fa-check"></i></span>
+                                    <h4 id="dia-bien-titulo"></h4>
+                                    <ul id="dia-bien-lista"></ul>
+                                </div>
+                            </div>
+                            <p id="dia-fuente" class="dia-fuente"></p>
+                        </div>
+                    </article>
+
+                    <nav id="dia-linea" class="dia-linea" aria-label="Momentos del día">
+                        <div class="dia-linea-extremo"><i class="fa-solid fa-sun"></i><span>Mañana</span></div>
+                        <ol id="dia-puntos"></ol>
+                        <div class="dia-linea-extremo"><i class="fa-solid fa-moon"></i><span>Madrugada</span></div>
+                    </nav>
+
+                    <div id="dia-sigue" class="dia-sigue"><i class="fa-solid fa-chevron-down"></i><span>Sigue bajando</span></div>
+                </div>
+
+                <!-- Ilustraciones de fondo: una pantalla por momento, se recorren con el scroll -->
+                <div id="dia-fondos" class="dia-fondos"></div>
+            </div>
+
     <div class="cta-guia centrado">
                 <h2 style="font-size: 3rem; margin-top: 4rem;">¿Y qué puedo hacer?</h2>
                 <button id="btn-descubrelo" class="boton-gigante">Descúbrelo</button>

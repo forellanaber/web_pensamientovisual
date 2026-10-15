@@ -410,3 +410,222 @@ $(document).ready(function() {
     pintarMapa();
     mostrarRegion(regionActual);
 });
+
+// =====================================================================
+// --- 8. Un día que te alcanza: recorrido ilustrado con scroll ---
+// =====================================================================
+$(document).ready(function() {
+
+    // Cada momento usa como fondo la ilustración "img/dia-HHMM.jpg"
+    // (por ejemplo img/dia-2300.jpg). Mientras no exista, se ve un fondo provisorio.
+    // "ejemplo: true" marca los datos que hay que reemplazar por el valor real.
+    const momentos = [
+        {
+            archivo: "dia-0800.jpg", hora: "08:00", titulo: "Traslado",
+            dato: "5 de 10", texto: "estudiantes tardan más de 1 hora en trasladarse", ejemplo: true,
+            fuente: "ENUT 2023",
+            cielo: ["#fbcfe8", "#fed7aa"],
+            mal:  { titulo: "Si viajas pegado al celular", icono: "fa-mobile-screen",
+                    lista: ["Llegas con la cabeza saturada", "Sientes que el viaje fue tiempo perdido"] },
+            bien: { titulo: "Si escuchas un podcast", icono: "fa-headphones",
+                    lista: ["El viaje se vuelve un rato útil", "Repasas sin darte cuenta"] }
+        },
+        {
+            archivo: "dia-1030.jpg", hora: "10:30", titulo: "Clases y estudio",
+            dato: "59%", texto: "de los universitarios de un estudio se pone objetivos de estudio",
+            fuente: "Reyes-González, Meneses-Báez y Díaz-Mujica (2022)",
+            cielo: ["#bae6fd", "#e0f2fe"],
+            mal:  { titulo: "Si estudias con todo abierto", icono: "fa-bell",
+                    lista: ["Saltas entre pestañas y notificaciones", "Estudiar te toma más tiempo"] },
+            bien: { titulo: "Si planificas la semana", icono: "fa-list-check",
+                    lista: ["Sabes qué hacer y cuándo", "Los que rinden mejor priorizan y descansan"] }
+        },
+        {
+            archivo: "dia-1330.jpg", hora: "13:30", titulo: "Almuerzo y pausa",
+            dato: "1 h", texto: "al día dedican los estudiantes a comer", ejemplo: true,
+            fuente: "ENUT 2023",
+            cielo: ["#7dd3fc", "#bae6fd"],
+            mal:  { titulo: "Si comes frente al computador", icono: "fa-laptop",
+                    lista: ["No hay una pausa real", "La tarde se hace más pesada"] },
+            bien: { titulo: "Si almuerzas con otros", icono: "fa-utensils",
+                    lista: ["Recargas energía para la tarde", "Compartes y bajas el estrés"] }
+        },
+        {
+            archivo: "dia-1600.jpg", hora: "16:00", titulo: "Tareas pendientes",
+            dato: "4 de 6", texto: "áreas del bienestar son más bajas en quienes más postergan",
+            fuente: "Cordovez, Ramírez y Villafaña (2023), estudiantes chilenos",
+            cielo: ["#bae6fd", "#fde68a"],
+            mal:  { titulo: "Si lo dejas para después", icono: "fa-hourglass-end",
+                    lista: ["Se acumula el estrés", "Baja tu sensación de propósito"] },
+            bien: { titulo: "Si partes por lo más corto", icono: "fa-list-check",
+                    lista: ["Empezar se hace más fácil", "Avanzas y te queda tiempo libre"] }
+        },
+        {
+            archivo: "dia-1930.jpg", hora: "19:30", titulo: "Deporte",
+            dato: "150 min", texto: "de actividad física a la semana recomienda la OMS",
+            fuente: "Organización Mundial de la Salud (2020)",
+            cielo: ["#fb7185", "#7c3aed"],
+            mal:  { titulo: "Si pasas todo el día sentado", icono: "fa-couch",
+                    lista: ["Aumenta el cansancio", "Cuesta más soltar el estrés"] },
+            bien: { titulo: "Si sales a moverte", icono: "fa-person-running",
+                    lista: ["Bastan 20 a 30 minutos al día", "Mejora tu ánimo y tu descanso"] }
+        },
+        {
+            archivo: "dia-2100.jpg", hora: "21:00", titulo: "Celular y redes",
+            dato: "66,8%", texto: "de los jóvenes de 16 a 29 años está más de 4 h al día en internet",
+            fuente: "SUBTEL y Cadem (2024)",
+            cielo: ["#4c1d95", "#312e81"],
+            mal:  { titulo: "Si scrolleas sin parar", icono: "fa-mobile-screen",
+                    lista: ["El tiempo se escapa sin darte cuenta", "Se te pasa la hora de dormir"] },
+            bien: { titulo: "Si te pones un límite", icono: "fa-guitar",
+                    lista: ["Recuperas tiempo para lo que te gusta", "Llegas más tranquilo a la hora de dormir"] }
+        },
+        {
+            archivo: "dia-2300.jpg", hora: "23:00", titulo: "Antes de dormir",
+            dato: "+59%", texto: "más riesgo de insomnio por cada hora de pantalla en la cama",
+            fuente: "Hjetland et al. (2025), Frontiers in Psychiatry",
+            cielo: ["#1e1b4b", "#312e81"],
+            mal:  { titulo: "Si usas el celular", icono: "fa-mobile-screen",
+                    lista: ["Duermes 24 minutos menos", "Te cuesta más concentrarte al otro día"] },
+            bien: { titulo: "Si lo dejas 30 min antes", icono: "fa-book-open",
+                    lista: ["Te duermes más rápido", "Descansas mejor y rindes más"] }
+        },
+        {
+            archivo: "dia-0030.jpg", hora: "00:30", titulo: "Pasada la medianoche",
+            dato: "−36 min", texto: "de sueño ya perdió quien lleva 1 h y media con el celular en la cama",
+            fuente: "Hjetland et al. (2025): cerca de 24 min menos de sueño por cada hora de pantalla en la cama",
+            cielo: ["#0f172a", "#1e1b4b"],
+            mal:  { titulo: "Si sigues con el celular", icono: "fa-mobile-screen",
+                    lista: ["Te dijiste que a las 23:30 te dormías", "Cada video te quita un poco más de sueño"] },
+            bien: { titulo: "Si cumpliste tu hora", icono: "fa-bed",
+                    lista: ["Ya llevas 1 hora durmiendo", "Tu cuerpo empezó a recuperarse"] }
+        },
+        {
+            archivo: "dia-0030.jpg", estilo: "madrugada", hora: "02:00", titulo: "Madrugada",
+            dato: "2,5 h", texto: "menos de sueño por quedarte con el celular hasta las 02:00",
+            barras: [
+                { etiqueta: "Te dormiste a las 23:30", horas: 7.5, tipo: "bien" },
+                { etiqueta: "Te dormiste a las 02:00", horas: 5,   tipo: "mal" }
+            ],
+            fuente: "National Sleep Foundation (Hirshkowitz et al., 2015). Cálculo con alarma a las 07:00",
+            cielo: ["#0f172a", "#0f172a"],
+            mal:  { titulo: "Si te duermes a las 02:00", icono: "fa-mobile-screen",
+                    lista: ["Dormirás 5 h, bajo lo recomendado", "Mañana partes cansado y con sueño"] },
+            bien: { titulo: "Si te dormiste a tu hora", icono: "fa-moon",
+                    lista: ["Dormirás 7,5 h, dentro de lo recomendado", "Mañana partes con energía"] }
+        }
+    ];
+
+    // Etapa de las 18:00 (Trabajo): se activa al tener la ilustración img/dia-1800.jpg.
+    // Para usarla, pega este bloque dentro de "momentos", entre la de las 16:00 y la de las 19:30.
+    /*
+        {
+            archivo: "dia-1800.jpg", hora: "18:00", titulo: "Trabajo",
+            dato: "3 de 10", texto: "estudiantes estudian y trabajan", ejemplo: true,
+            fuente: "CASEN 2022",
+            cielo: ["#fdba74", "#fb7185"],
+            mal:  { titulo: "Si trabajas sin ordenar la semana", icono: "fa-battery-quarter",
+                    lista: ["Terminas restando horas de sueño", "Todo se junta al final"] },
+            bien: { titulo: "Si fijas bloques en la semana", icono: "fa-calendar-days",
+                    lista: ["Sabes cuándo estudias y cuándo trabajas", "Baja el estrés"] }
+        }
+    */
+
+    const CARPETA = "img/";
+    const $seccion = $("#dia-scroll");
+    if (!$seccion.length) return;
+
+    // Fondos (ilustración o fondo provisorio) y puntos de la línea del día
+    momentos.forEach((m, i) => {
+        let fondo = $(`
+            <div class="dia-fondo ${m.estilo || ""}" data-i="${i}" style="background-image:url('${CARPETA + m.archivo}')">
+                <img src="${CARPETA + m.archivo}" alt="Ilustración: ${m.titulo}, mal hábito a la izquierda y buen hábito a la derecha">
+            </div>`);
+        fondo.find("img").on("error", function() {
+            fondo.addClass("provisorio").css("background", `linear-gradient(to bottom, ${m.cielo[0]}, ${m.cielo[1]})`);
+            fondo.append(`
+                <div class="mitad-provisoria mal"><i class="fa-solid ${m.mal.icono}"></i><small>Falta ${CARPETA + m.archivo}</small></div>
+                <div class="mitad-provisoria bien"><i class="fa-solid ${m.bien.icono}"></i></div>`);
+        });
+        $("#dia-fondos").append(fondo);
+
+        $("#dia-puntos").append(
+            `<li><button type="button" class="dia-punto" data-i="${i}"><span>${m.hora} · ${m.titulo}</span></button></li>`);
+    });
+
+    // Mostrar un momento en el escenario
+    let actual = -1;
+    function mostrarMomento(i) {
+        if (i === actual) return;
+        actual = i;
+        let m = momentos[i];
+
+        $(".dia-punto").removeClass("activo");
+        $(`.dia-punto[data-i="${i}"]`).addClass("activo");
+
+        let $t = $("#dia-tarjeta").addClass("cambiando");
+        setTimeout(() => {
+            $("#dia-hora").text(m.hora);
+            $("#dia-titulo").text(m.titulo);
+            $("#dia-dato").text(m.dato);
+            $("#dia-texto").text(m.texto);
+            $("#dia-ejemplo").toggle(!!m.ejemplo);
+            $("#dia-mal-titulo").text(m.mal.titulo);
+            $("#dia-bien-titulo").text(m.bien.titulo);
+            $("#dia-mal-lista").html(m.mal.lista.map(t => `<li>${t}</li>`).join(""));
+            $("#dia-bien-lista").html(m.bien.lista.map(t => `<li>${t}</li>`).join(""));
+            $("#dia-fuente").text("Fuente: " + m.fuente);
+            if (m.barras) {
+                const MAX = 9; // escala de 0 a 9 horas
+                let filas = m.barras.map(br => `
+                    <div class="barra-sueno ${br.tipo}">
+                        <span class="barra-etiqueta">${br.etiqueta}</span>
+                        <div class="barra-pista">
+                            <div class="barra-zona" style="left:${7 / MAX * 100}%; width:${2 / MAX * 100}%"></div>
+                            <div class="barra-relleno" style="width:${br.horas / MAX * 100}%"></div>
+                        </div>
+                        <span class="barra-valor">${String(br.horas).replace(".", ",")} h</span>
+                    </div>`).join("");
+                $("#dia-barras").html(filas + '<p class="barra-nota"><span></span> Lo recomendado: 7 a 9 h</p>').show();
+            } else {
+                $("#dia-barras").empty().hide();
+            }
+            $t.removeClass("cambiando");
+        }, 250);
+
+        $("#dia-sigue").css("visibility", i === momentos.length - 1 ? "hidden" : "visible");
+    }
+
+    // Qué momento corresponde según cuánto se ha bajado
+    function alHacerScroll() {
+        if (!$seccion.is(":visible")) return;
+        let alto = $(window).height();
+        let avance = $(window).scrollTop() - $seccion.offset().top;
+        let i = Math.round(avance / alto);
+        i = Math.max(0, Math.min(momentos.length - 1, i));
+        mostrarMomento(i);
+    }
+    $(window).on("scroll resize", alHacerScroll);
+
+    // Clic en la línea del día: salta a ese momento
+    $("#dia-puntos").on("click", ".dia-punto", function() {
+        let i = $(this).data("i");
+        let destino = $seccion.offset().top + i * $(window).height();
+        $("html, body").animate({ scrollTop: destino }, 700);
+    });
+
+    // Plegar y desplegar la tarjeta
+    $("#dia-plegar").click(function() {
+        let plegada = $("#dia-tarjeta").toggleClass("plegada").hasClass("plegada");
+        $(this).attr("aria-expanded", !plegada);
+    });
+
+    // En celular la tarjeta parte plegada para dejar ver la ilustración
+    if (window.matchMedia("(max-width: 700px)").matches) {
+        $("#dia-tarjeta").addClass("plegada");
+        $("#dia-plegar").attr("aria-expanded", false);
+    }
+
+    // Al entrar a la pantalla de resultados, dejar listo el primer momento
+    mostrarMomento(0);
+});

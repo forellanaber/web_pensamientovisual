@@ -294,3 +294,235 @@ input:checked + .slider.round:before { transform: translateX(22px); }
     #mapa-chile { max-width: 160px; }
     .tarjeta-region { order: 3; position: static; }
 }
+
+/* =====================================================================
+   Un día que te alcanza: recorrido ilustrado con scroll
+   ===================================================================== */
+.dia-intro {
+    width: 100vw; margin-left: calc(50% - 50vw); margin-top: 4rem;
+    padding: 7rem 1.5rem 5rem; box-sizing: border-box; text-align: center; color: white;
+    background:
+        radial-gradient(1.5px 1.5px at 10% 20%, #fff, transparent),
+        radial-gradient(1px 1px at 30% 70%, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 55% 30%, #fff, transparent),
+        radial-gradient(1px 1px at 75% 60%, #fff, transparent),
+        radial-gradient(1.5px 1.5px at 90% 25%, #fff, transparent),
+        linear-gradient(to bottom, #1e1b4b, #312e81);
+}
+.dia-intro h2 { color: white; font-size: 3rem; font-weight: 800; margin: 0 0 1rem; }
+.dia-intro p { max-width: 640px; margin: 0 auto; font-size: 1.1rem; line-height: 1.6; opacity: 0.9; }
+.dia-flecha { font-size: 1.6rem; margin-top: 1.5rem; animation: rebote 1.8s infinite; }
+@keyframes rebote { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+
+/* Contenedor alto: cada momento ocupa una pantalla de scroll */
+.dia-scroll {
+    position: relative;
+    width: 100vw; margin-left: calc(50% - 50vw);
+    background: #1e1b4b;
+}
+
+/* Escenario fijo mientras se recorre el día */
+.dia-escenario {
+    position: sticky; top: 0; height: 100vh; overflow: hidden;
+    z-index: 2; pointer-events: none;
+}
+.dia-escenario .dia-tarjeta, .dia-escenario .dia-linea { pointer-events: auto; }
+
+/* Fondos ilustrados: uno por momento, se cruzan con un fundido */
+/* Las ilustraciones van una debajo de otra y suben con el scroll;
+   el escenario (tarjeta, etiquetas y línea del día) queda fijo encima */
+.dia-fondos { position: relative; margin-top: -100vh; }
+.dia-fondo { position: relative; height: 100vh; overflow: hidden; }
+.dia-fondo img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+/* Oscurece apenas los bordes para que se lean los textos */
+.dia-fondo::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to bottom, rgba(15,23,42,0.35), transparent 25%, transparent 75%, rgba(15,23,42,0.45));
+}
+
+/* Fondo provisorio cuando aún no está la ilustración */
+.dia-fondo.provisorio { display: grid; grid-template-columns: 1fr 1fr; }
+.dia-fondo.provisorio img { display: none; }
+.mitad-provisoria { position: relative; display: flex; align-items: center; justify-content: center; }
+.mitad-provisoria i { font-size: 9rem; color: rgba(255,255,255,0.18); }
+.mitad-provisoria.mal { filter: saturate(0.5) brightness(0.8); }
+.mitad-provisoria small {
+    position: absolute; bottom: 5.5rem; left: 50%; transform: translateX(-50%);
+    font-size: 0.75rem; color: rgba(255,255,255,0.55); white-space: nowrap;
+}
+
+/* Línea divisoria central */
+.dia-divisor {
+    position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; transform: translateX(-50%);
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.6) 15%, rgba(255,255,255,0.6) 85%, transparent);
+    pointer-events: none;
+}
+
+/* Etiquetas Mal hábito / Buen hábito */
+.dia-pill {
+    position: absolute; top: 112px; z-index: 3;
+    display: inline-flex; align-items: center; gap: 0.7rem;
+    padding: 0.7rem 1.8rem; border-radius: 50px;
+    font-size: 1.3rem; font-weight: 800; color: white;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.25);
+}
+.dia-pill.mal { left: 25%; transform: translateX(-50%); background: var(--accent-coral); }
+.dia-pill.bien { left: 75%; transform: translateX(-50%); background: var(--success-green); }
+
+/* Tarjeta central plegable */
+.dia-tarjeta {
+    position: absolute; left: 50%; top: 52%; z-index: 4;
+    width: min(420px, 86vw); box-sizing: border-box;
+    transform: translate(-50%, -50%);
+    background: rgba(255,255,255,0.97); color: var(--text-main);
+    border-radius: 22px; padding: 1.8rem 1.8rem 1.4rem;
+    box-shadow: 0 25px 50px rgba(15,23,42,0.35);
+    text-align: center;
+    transition: width 0.4s ease, padding 0.4s ease, top 0.4s ease;
+}
+.dia-plegar {
+    position: absolute; top: 12px; right: 12px; margin: 0;
+    width: 36px; height: 36px; padding: 0; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; background: var(--bg-color); color: var(--text-light); box-shadow: none;
+}
+.dia-plegar:hover { background: #e2e8f0; color: var(--text-main); }
+.dia-plegar i { transition: transform 0.3s ease; }
+
+.dia-resumen, .dia-detalle { transition: opacity 0.35s ease; }
+.dia-tarjeta.cambiando .dia-resumen, .dia-tarjeta.cambiando .dia-detalle { opacity: 0; }
+
+.dia-hora { font-size: 3.4rem; font-weight: 800; line-height: 1; color: var(--accent-blue); font-variant-numeric: tabular-nums; }
+.dia-titulo { font-size: 1.8rem; font-weight: 800; margin: 0.3rem 0 0.4rem; }
+.dia-dato {
+    font-size: 3.6rem; font-weight: 800; line-height: 1.05;
+    background: linear-gradient(90deg, #6d28d9, var(--accent-purple)); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.dia-texto { font-size: 1rem; font-weight: 600; line-height: 1.4; margin: 0.4rem 0 0; }
+.dia-ejemplo {
+    display: inline-block; margin-top: 0.6rem; font-size: 0.65rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px; padding: 0.15rem 0.6rem;
+    border-radius: 20px; border: 1px solid #cbd5e1; color: var(--text-light);
+}
+
+.dia-detalle { overflow: hidden; max-height: 400px; transition: max-height 0.45s ease, opacity 0.35s ease, margin 0.45s ease; margin-top: 1.2rem; }
+.dia-columnas { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid #e2e8f0; padding-top: 1rem; }
+.dia-col { padding: 0 0.7rem; }
+.dia-col + .dia-col { border-left: 1px solid #e2e8f0; }
+.dia-sello {
+    width: 38px; height: 38px; border-radius: 50%; margin: 0 auto 0.4rem;
+    display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem;
+}
+.dia-sello.mal { background: var(--accent-coral); }
+.dia-sello.bien { background: var(--success-green); }
+.dia-col h4 { font-size: 0.9rem; font-weight: 800; margin: 0 0 0.5rem; }
+.dia-col ul { list-style: none; margin: 0; padding: 0; text-align: left; }
+.dia-col li { font-size: 0.88rem; line-height: 1.4; padding: 0.5rem 0; }
+.dia-col li + li { border-top: 1px solid #f1f5f9; }
+.dia-fuente { font-size: 0.72rem; color: var(--text-light); margin: 0.8rem 0 0; }
+
+/* Estado plegado: queda solo la hora, el título y el dato */
+.dia-tarjeta.plegada { width: min(320px, 80vw); padding: 1.1rem 1.4rem; top: auto; bottom: 7rem; transform: translate(-50%, 0); }
+.dia-tarjeta.plegada .dia-detalle { max-height: 0; opacity: 0; margin-top: 0; }
+.dia-tarjeta.plegada .dia-plegar i { transform: rotate(180deg); }
+.dia-tarjeta.plegada .dia-hora { font-size: 1.6rem; }
+.dia-tarjeta.plegada .dia-titulo { font-size: 1.15rem; margin: 0.15rem 0; }
+.dia-tarjeta.plegada .dia-dato { font-size: 1.9rem; }
+.dia-tarjeta.plegada .dia-texto { font-size: 0.85rem; }
+.dia-tarjeta.plegada .dia-ejemplo { display: none; }
+
+/* Línea del día a la derecha */
+.dia-linea {
+    position: absolute; right: 0; top: 96px; bottom: 24px; width: 150px; z-index: 3;
+    display: flex; flex-direction: column; align-items: flex-start; padding-left: 1.2rem;
+    background: linear-gradient(to left, rgba(15,23,42,0.45), transparent);
+    color: white;
+}
+.dia-linea-extremo { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; width: 44px; font-size: 0.75rem; font-weight: 600; }
+.dia-linea-extremo i { font-size: 1.3rem; }
+.dia-linea ol {
+    position: relative; flex: 1; list-style: none; margin: 0.6rem 0; padding: 0;
+    display: flex; flex-direction: column; justify-content: space-around;
+}
+.dia-linea ol::before {
+    content: ""; position: absolute; left: 21px; top: 0; bottom: 0; width: 2px;
+    background: rgba(255,255,255,0.45);
+}
+.dia-punto {
+    position: relative; display: flex; align-items: center; gap: 0.6rem; margin: 0; padding: 0;
+    background: none; box-shadow: none; color: white; font-size: 0.8rem; font-weight: 600;
+    text-align: left; border-radius: 0; cursor: pointer;
+}
+.dia-punto::before {
+    content: ""; width: 14px; height: 14px; margin-left: 15px; border-radius: 50%; flex-shrink: 0;
+    background: white; transition: all 0.3s ease;
+}
+.dia-punto span { opacity: 0.85; transition: all 0.3s ease; padding: 0.15rem 0.4rem; border-radius: 8px; }
+.dia-punto:hover span { opacity: 1; }
+.dia-punto.activo::before { width: 20px; height: 20px; margin-left: 12px; background: var(--accent-blue); box-shadow: 0 0 0 4px rgba(255,255,255,0.9); }
+.dia-punto.activo span { background: var(--accent-blue); opacity: 1; }
+
+/* Indicador de scroll */
+.dia-sigue {
+    position: absolute; left: 50%; bottom: 1.6rem; transform: translateX(-50%); z-index: 3;
+    display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+    color: white; font-size: 0.9rem; font-weight: 600; text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    transition: opacity 0.3s;
+}
+.dia-sigue i { animation: rebote 1.8s infinite; }
+.dia-tarjeta.plegada ~ .dia-sigue { opacity: 0; }
+
+@media (max-width: 900px) {
+    .dia-intro h2 { font-size: 2.1rem; }
+    .dia-pill { top: auto; bottom: 1.2rem; font-size: 0.85rem; padding: 0.45rem 1rem; gap: 0.4rem; }
+    .dia-linea { width: 46px; padding-left: 0; background: linear-gradient(to left, rgba(15,23,42,0.45), transparent); }
+    .dia-punto span, .dia-linea-extremo span { display: none; }
+    .dia-punto::before { margin-left: 15px; }
+    .dia-tarjeta { top: 50%; padding: 1.3rem 1.2rem 1rem; width: min(360px, 78vw); }
+    .dia-hora { font-size: 2.4rem; }
+    .dia-titulo { font-size: 1.3rem; }
+    .dia-dato { font-size: 2.5rem; }
+    .dia-col li { font-size: 0.8rem; }
+    .dia-tarjeta.plegada { bottom: 4.5rem; }
+    .dia-sigue { display: none; }
+}
+
+/* Comparación de horas de sueño en la tarjeta (etapa de la madrugada) */
+.dia-barras { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.7rem; text-align: left; }
+.barra-sueno { display: grid; grid-template-columns: 1fr auto; gap: 0.25rem 0.6rem; align-items: center; }
+.barra-etiqueta { grid-column: 1 / -1; font-size: 0.8rem; font-weight: 600; color: var(--text-light); }
+.barra-pista { position: relative; height: 14px; border-radius: 7px; background: #f1f5f9; overflow: hidden; }
+.barra-zona { position: absolute; top: 0; bottom: 0; background: rgba(46, 213, 115, 0.22); }
+.barra-relleno { position: relative; height: 100%; border-radius: 7px; transition: width 0.8s ease; }
+.barra-sueno.bien .barra-relleno { background: var(--success-green); }
+.barra-sueno.mal .barra-relleno { background: var(--accent-coral); }
+.barra-valor { font-size: 1rem; font-weight: 800; }
+.barra-sueno.bien .barra-valor { color: #16a34a; }
+.barra-sueno.mal .barra-valor { color: var(--accent-coral); }
+.barra-nota { margin: 0; font-size: 0.72rem; color: var(--text-light); display: flex; align-items: center; gap: 0.4rem; }
+.barra-nota span { width: 14px; height: 10px; border-radius: 3px; background: rgba(46, 213, 115, 0.35); }
+.dia-tarjeta.plegada .dia-barras { display: none !important; }
+
+/* Fondos con ilustración: la misma imagen difuminada rellena los bordes */
+.dia-fondo { background-size: cover; background-position: center; }
+.dia-fondo::before {
+    content: ""; position: absolute; inset: -30px; z-index: 0;
+    background: inherit; filter: blur(24px) brightness(0.55);
+}
+.dia-fondo img { position: relative; z-index: 1; }
+.dia-fondo::after { z-index: 2; }
+.dia-fondo.provisorio::before { display: none; }
+
+/* Etapa de las 02:00: misma pieza, más oscura y más cerca */
+.dia-fondo.madrugada img { filter: brightness(0.62) saturate(0.85); transform: scale(1.12); }
+
+/* Celular: se ve la ilustración completa, con las dos mitades */
+@media (max-width: 900px) and (orientation: portrait) {
+    .dia-fondo img { object-fit: contain; }
+    .dia-fondo.madrugada img { transform: none; }
+    .dia-divisor { display: none; }
+}
+@media (max-width: 900px) and (orientation: portrait) {
+    /* Etiquetas justo encima de la ilustración, cada una sobre su mitad */
+    .dia-pill { top: calc(50vh - 28vw - 46px); bottom: auto; white-space: nowrap; }
+}
