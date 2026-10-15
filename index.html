@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HazteElTiempo.cl</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header-principal">
+        <div class="logo">HazteElTiempo.cl</div>
+        <nav class="navegacion">
+            <a href="#">Quiénes somos</a>
+            <a href="#">Contacto</a>
+        </nav>
+        <div class="redes">
+            <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+        </div>
+    </header>
+
+    <!-- Pantalla 1: Bienvenida -->
+    <section id="pantalla-bienvenida" class="seccion-activa">
+        <div class="contenedor centrado">
+            <h1 class="titulo-principal">¿Eres estudiante y tienes problemas en manejar tu tiempo?</h1>
+            <button id="btn-comenzar" class="boton-primario">Sí</button>
+        </div>
+    </section>
+
+    <!-- Pantalla 2: Contexto -->
+    <section id="pantalla-contexto" class="seccion-oculta">
+        <div class="contenedor centrado">
+            <h2>¿Sabías que...</h2>
+            <p class="dato-impacto">un <span class="destacado">66.8%</span> de los jóvenes en Chile pasa más de 4 horas al día conectado a internet?</p>
+            <p class="texto-secundario">¡Eso es más de 2 meses seguidos pegado a una pantalla al año!</p>
+            
+            <div class="tarjeta-info">
+                <h3>Responde este breve test de solo <span class="resaltado">3 minutos</span></h3>
+                <p>Te pediremos estimar tus horas diarias, nivel de cansancio y estado de ánimo. Tus datos son anónimos. Al finalizar, descubrirás maneras de mejorar tu organización y calidad de vida con datos reales.</p>
+            </div>
+            <button id="btn-ir-al-test" class="boton-primario">Empezar el test</button>
+        </div>
+    </section>
+
+    <!-- Pantalla 3: El Test Completo -->
+    <section id="pantalla-test" class="seccion-oculta">
+        <div class="contenedor">
+            
+            <div class="progreso-test">
+                <div class="circulo activo" id="dot-1">1</div>
+                <div class="linea"></div>
+                <div class="circulo" id="dot-2">2</div>
+                <div class="linea"></div>
+                <div class="circulo" id="dot-3">3</div>
+            </div>
+
+            <!-- Paso 1: Horas y Gráfico -->
+            <div id="paso-1" class="paso-activo">
+                <h2 class="centrado">¿Cuántas horas dedicas a cada actividad?</h2>
+                <p id="alerta-horas" class="alerta oculta"><i class="fa-solid fa-triangle-exclamation"></i> ¡Llegaste al límite de 24 horas diarias!</p>
+                
+                <div class="layout-grafico-sliders">
+                    <div class="columna-sliders">
+                        <div class="grupo-slider">
+                            <label style="color: var(--c-sueno)"><i class="fa-solid fa-moon"></i> Sueño: <span id="val-sueno">8</span>h</label>
+                            <input type="range" id="horas-sueno" class="slider-tiempo slider-sueno" min="0" max="24" value="8" step="0.5">
+                        </div>
+                        <div class="grupo-slider">
+                            <label style="color: var(--c-estudio)"><i class="fa-solid fa-book"></i> Clases/Estudio: <span id="val-estudio">6</span>h</label>
+                            <input type="range" id="horas-estudio" class="slider-tiempo slider-estudio" min="0" max="24" value="6" step="0.5">
+                        </div>
+                        <div class="grupo-slider">
+                            <label style="color: var(--c-trabajo)"><i class="fa-solid fa-briefcase"></i> Trabajo: <span id="val-trabajo">2</span>h</label>
+                            <input type="range" id="horas-trabajo" class="slider-tiempo slider-trabajo" min="0" max="24" value="2" step="0.5">
+                        </div>
+                        <div class="grupo-slider">
+                            <label style="color: var(--c-traslado)"><i class="fa-solid fa-bus"></i> Traslado: <span id="val-traslado">2</span>h</label>
+                            <input type="range" id="horas-traslado" class="slider-tiempo slider-traslado" min="0" max="24" value="2" step="0.5">
+                        </div>
+                        <div class="grupo-slider">
+                            <label style="color: var(--c-ocio)"><i class="fa-solid fa-gamepad"></i> Ocio/Descanso: <span id="val-ocio">2</span>h</label>
+                            <input type="range" id="horas-ocio" class="slider-tiempo slider-ocio" min="0" max="24" value="2" step="0.5">
+                        </div>
+                    </div>
+
+                    <div class="columna-grafico">
+                        <div id="reloj-dona" class="reloj-dona">
+                            <div class="centro-dona">
+                                <span id="total-horas-dona" class="numero-grande">20</span>
+                                <span class="texto-chico">de 24h</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="btn-paso-2" class="boton-secundario">Siguiente <i class="fa-solid fa-arrow-down"></i></button>
+            </div>
+
+            <!-- Paso 2: Estado de Ánimo -->
+            <div id="paso-2" class="paso-oculto">
+                <div class="espaciador-scroll"></div>
+                <h2 class="centrado">¿Cuál suele ser tu estado de ánimo la mayoría del tiempo?</h2>
+                <div class="contenedor-caritas">
+                    <div class="carita" data-valor="1">😞</div>
+                    <div class="carita" data-valor="2">😕</div>
+                    <div class="carita" data-valor="3">😐</div>
+                    <div class="carita" data-valor="4">🙂</div>
+                    <div class="carita" data-valor="5">😄</div>
+                </div>
+                <button id="btn-paso-3" class="boton-secundario">Siguiente <i class="fa-solid fa-arrow-down"></i></button>
+            </div>
+
+            <!-- Paso 3: Batería -->
+            <div id="paso-3" class="paso-oculto">
+                <div class="espaciador-scroll"></div>
+                <h2 class="centrado">¿Qué tan cansado sientes que terminas tu día?</h2>
+                <p class="centrado">Llena la batería según tu energía sobrante (0% = Agotado, 100% = Lleno de energía)</p>
+                
+                <div class="contenedor-bateria">
+                    <div class="bateria-cuerpo">
+                        <div id="nivel-bateria" class="bateria-nivel"></div>
+                    </div>
+                    <div class="bateria-punta"></div>
+                </div>
+                <input type="range" id="slider-bateria" min="0" max="100" value="50" class="slider-bateria">
+                
+                <button id="btn-ver-resultados" class="boton-gigante">VER MIS RESULTADOS</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Pantalla 4: Carga -->
+    <section id="pantalla-carga" class="seccion-oculta">
+        <div class="contenedor centrado">
+            <div class="spinner"></div>
+            <h2 class="titulo-carga">Calculando tu panorama...</h2>
+            <p id="frase-carga" class="frase-informativa">Analizando tu rutina frente a miles de estudiantes chilenos...</p>
+        </div>
+    </section>
+
+    <!-- Pantalla 5: Resultados Globales -->
+    <section id="pantalla-resultados" class="seccion-oculta">
+        <div class="contenedor">
+            <div class="resultado-global-box">
+                <h2>Tu Calificación General</h2>
+                <div class="nota-global" id="nota-final-global">5.2</div>
+                <p class="texto-resultado" id="texto-diagnostico">En términos generales, tienes mucho por mejorar. Tu rutina actual no es sostenible a largo plazo.</p>
+            </div>
+
+            <h3 class="centrado" style="margin-top: 3rem;">Desglose por Áreas</h3>
+            <p class="centrado texto-secundario">Pasa el ratón sobre cada tarjeta para entender por qué te dimos este puntaje.</p>
+            
+            <div class="grid-categorias">
+                <!-- Tarjeta Sueño -->
+                <div class="tarjeta-categoria" style="border-top: 5px solid var(--c-sueno);">
+                    <div class="tarjeta-header">
+                        <h4><i class="fa-solid fa-moon" style="color: var(--c-sueno)"></i> Descanso</h4>
+                        <span class="nota-cat">4.0/10</span>
+                    </div>
+                    <div class="tarjeta-detalle">
+                        <p>Dormir menos de 7 horas detiene la recuperación metabólica. Los datos de la ENS advierten que esta falta prolongada eleva el estrés y afecta la concentración.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Estudio -->
+                <div class="tarjeta-categoria" style="border-top: 5px solid var(--c-estudio);">
+                    <div class="tarjeta-header">
+                        <h4><i class="fa-solid fa-book" style="color: var(--c-estudio)"></i> Estudio</h4>
+                        <span class="nota-cat">8.5/10</span>
+                    </div>
+                    <div class="tarjeta-detalle">
+                        <p>Estás dentro del promedio saludable nacional (CASEN). Mantienes un volumen de estudio adecuado sin llegar a la sobrecarga extrema.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Trabajo -->
+                <div class="tarjeta-categoria" style="border-top: 5px solid var(--c-trabajo);">
+                    <div class="tarjeta-header">
+                        <h4><i class="fa-solid fa-briefcase" style="color: var(--c-trabajo)"></i> Trabajo</h4>
+                        <span class="nota-cat">6.0/10</span>
+                    </div>
+                    <div class="tarjeta-detalle">
+                        <p>El trabajo remunerado quita horas críticas. Si bien aporta ingresos, debes vigilar que no erosione tus horas de descanso y salud mental.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Traslado -->
+                <div class="tarjeta-categoria" style="border-top: 5px solid var(--c-traslado);">
+                    <div class="tarjeta-header">
+                        <h4><i class="fa-solid fa-bus" style="color: var(--c-traslado)"></i> Traslado</h4>
+                        <span class="nota-cat">5.0/10</span>
+                    </div>
+                    <div class="tarjeta-detalle">
+                        <p>Pasas mucho tiempo viajando. Considera usar este tiempo como "Ocio activo" (escuchar música o podcasts) para reducir la percepción de pérdida de tiempo.</p>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Ocio -->
+                <div class="tarjeta-categoria" style="border-top: 5px solid var(--c-ocio);">
+                    <div class="tarjeta-header">
+                        <h4><i class="fa-solid fa-gamepad" style="color: var(--c-ocio)"></i> Ocio</h4>
+                        <span class="nota-cat">3.5/10</span>
+                    </div>
+                    <div class="tarjeta-detalle">
+                        <p>Estás sacrificando tu tiempo personal. El ocio no es perder el tiempo, es una necesidad biológica para prevenir el Burnout académico.</p>
+                    </div>
+                </div>
+                
+                <!-- Tarjeta Deporte (Placeholder extra) -->
+                <div class="tarjeta-categoria" style="border-top: 5px solid #ec4899;">
+                    <div class="tarjeta-header">
+                        <h4><i class="fa-solid fa-heart-pulse" style="color: #ec4899"></i> Deporte/Salud</h4>
+                        <span class="nota-cat">2.0/10</span>
+                    </div>
+                    <div class="tarjeta-detalle">
+                        <p>Tu nivel de actividad física es nulo. Según datos médicos, moverte al menos 20 minutos al día es el mejor protector natural contra la depresión.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Espacio para futuros gráficos -->
+            <div class="espacio-graficos">
+                <h3>Aquí irá el comparador visual (Gráficos)</h3>
+                <p>En la siguiente etapa programaremos el diagrama de flujo y los puntos con tu ubicación frente al resto de Chile.</p>
+            </div>
+    <div class="cta-guia centrado">
+                <h2 style="font-size: 3rem; margin-top: 4rem;">¿Y qué puedo hacer?</h2>
+                <button id="btn-descubrelo" class="boton-gigante">Descúbrelo</button>
+            </div>
+        </div>
+    </section>
+<!-- Pantalla 6: Guía y Simulador -->
+    <section id="pantalla-guia" class="seccion-oculta">
+        <div class="contenedor">
+            <h2 class="titulo-principal centrado">Tu Plan de Acción</h2>
+            <p class="centrado texto-secundario">Pequeños ajustes pueden generar grandes cambios. Activa los interruptores para simular cómo mejoraría tu día.</p>
+
+            <!-- Simulador Interactivo -->
+            <div class="simulador-box">
+                <div class="columna-interruptores">
+                    
+                    <div class="interruptor-item">
+                        <div class="texto-interruptor">
+                            <h4><i class="fa-solid fa-moon"></i> Duerme 1 hora más</h4>
+                            <p>Restando 1h de pantalla en la noche.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-sueno" class="toggle-mejora">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    <div class="interruptor-item">
+                        <div class="texto-interruptor">
+                            <h4><i class="fa-solid fa-heart-pulse"></i> 20 min de caminata</h4>
+                            <p>Usar parte del traslado o tiempo libre.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-deporte" class="toggle-mejora">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    <div class="interruptor-item">
+                        <div class="texto-interruptor">
+                            <h4><i class="fa-solid fa-book-open"></i> Bloques Pomodoro</h4>
+                            <p>Estudio más eficiente, libera 30 min de ocio.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-estudio" class="toggle-mejora">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                </div>
+
+                <div class="columna-barras">
+                    <h3>Impacto en tu Día</h3>
+                    
+                    <div class="barra-label">Tu día actual</div>
+                    <div class="barra-apilada" id="barra-actual">
+                        <!-- Se llena con JS -->
+                    </div>
+
+                    <div class="barra-label">Tu día proyectado</div>
+                    <div class="barra-apilada" id="barra-proyectada">
+                        <!-- Se llena con JS -->
+                    </div>
+
+                    <div class="caja-puntaje-proyectado">
+                        Tu puntaje subiría a: <br>
+                        <span id="nota-proyectada">5.2</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profundización y Recursos -->
+            <div class="seccion-recursos">
+                <h3 class="centrado">Herramientas para lograrlo</h3>
+                <div class="grid-categorias">
+                    
+                    <div class="tarjeta-recurso">
+                        <i class="fa-solid fa-podcast icono-recurso"></i>
+                        <h4>Podcast: Hábitos Atómicos</h4>
+                        <p>Aprende cómo pequeñas mejoras del 1% diario transforman tu vida sin requerir motivación extrema.</p>
+                        <a href="#" class="link-recurso">Escuchar en Spotify <i class="fa-solid fa-external-link"></i></a>
+                    </div>
+
+                    <div class="tarjeta-recurso">
+                        <i class="fa-brands fa-youtube icono-recurso"></i>
+                        <h4>Técnica Pomodoro</h4>
+                        <p>Un video de 5 minutos que explica cómo estudiar en bloques de 25 minutos para evitar la fatiga mental.</p>
+                        <a href="#" class="link-recurso">Ver tutorial <i class="fa-solid fa-external-link"></i></a>
+                    </div>
+
+                    <div class="tarjeta-recurso">
+                        <i class="fa-solid fa-brain icono-recurso"></i>
+                        <h4>Salud Responde</h4>
+                        <p>Si sientes que el agobio te supera, no estás solo. Habla gratis con profesionales de la salud mental.</p>
+                        <a href="#" class="link-recurso">Visitar web oficial <i class="fa-solid fa-external-link"></i></a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Mensaje Motivacional y Footer -->
+            <div class="mensaje-final centrado">
+                <h3><i class="fa-solid fa-seedling"></i> Tu salud es tu recurso más valioso</h3>
+                <p>Priorizar tu descanso no es perder el tiempo, es afilar el hacha. Comparte esta herramienta con ese amigo o amiga que sabes que necesita un respiro.</p>
+                
+                <div class="botones-compartir">
+                    <button class="btn-share ws"><i class="fa-brands fa-whatsapp"></i> Compartir</button>
+                    <button class="btn-share ig"><i class="fa-brands fa-instagram"></i> Etiquetar</button>
+                </div>
+            </div>
+
+            <button id="btn-reiniciar" class="boton-secundario" style="margin: 4rem auto 2rem auto;">
+                <i class="fa-solid fa-rotate-right"></i> Volver a hacer el test
+            </button>
+
+        </div>
+    </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
