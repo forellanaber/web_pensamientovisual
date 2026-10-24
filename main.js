@@ -1,123 +1,499 @@
+// =====================================================================
+// --- 0. Idioma: los textos salen de textos.js ---
+// =====================================================================
+let idioma = "es";
+try { idioma = localStorage.getItem("idioma") === "en" ? "en" : "es"; } catch (e) { /* sin almacenamiento */ }
+
+// Texto por clave, con valores opcionales: t("test.quedan", { n: 3 })
+function t(clave, valores) {
+    let texto = TEXTOS[idioma][clave];
+    if (texto === undefined) texto = TEXTOS.es[clave];
+    if (texto === undefined) return clave;
+    if (valores) texto = texto.replace(/\{(\w+)\}/g, (m, k) => (valores[k] !== undefined ? valores[k] : m));
+    return texto;
+}
+// Listas y objetos de textos (momentos, consejos, etc.)
+function lista(clave) {
+    return TEXTOS[idioma][clave] !== undefined ? TEXTOS[idioma][clave] : TEXTOS.es[clave];
+}
+// Números: coma decimal en español ("5,2"), punto en inglés ("5.2")
+function formatoNumero(n, decimales) {
+    let texto = (decimales === undefined) ? String(Math.round(n * 10) / 10) : n.toFixed(decimales);
+    return idioma === "es" ? texto.replace(".", ",") : texto;
+}
+
+// Pone en la página los textos del idioma actual y avisa al resto del código
+function aplicarIdioma() {
+    document.documentElement.lang = idioma;
+    $("[data-t]").each(function() { $(this).text(t(this.getAttribute("data-t"))); });
+    $("[data-t-html]").each(function() { $(this).html(t(this.getAttribute("data-t-html"))); });
+    $("[data-t-aria]").each(function() { this.setAttribute("aria-label", t(this.getAttribute("data-t-aria"))); });
+    $(".btn-idioma [data-idioma]").each(function() {
+        $(this).toggleClass("activo", this.getAttribute("data-idioma") === idioma);
+    });
+    $(document).trigger("cambioIdioma");
+}
+
+$(document).on("click", "#btn-idioma", function() {
+    idioma = (idioma === "es") ? "en" : "es";
+    try { localStorage.setItem("idioma", idioma); } catch (e) { /* sin almacenamiento */ }
+    aplicarIdioma();
+});
+
+// =====================================================================
+// Apoyo estudiantil por región: servicios de apoyo psicológico o de bienestar
+// de cada universidad, IP y CFT. PENDIENTE (lo entrega el equipo).
+// Formato: { 13: [ { nombre: "Universidad X, apoyo psicológico", url: "https://..." } ], ... }
+// Mientras esté vacío, el sitio muestra un texto general.
+// =====================================================================
+const APOYO_ESTUDIANTIL = {};
+
 $(document).ready(function() {
 
-    // --- 1. Scrollytelling Navegación ---
+    // --- 1. Navegación entre pantallas ---
     function revelarYScrollear(ocultar, mostrar) {
         $(ocultar).addClass("seccion-oculta").removeClass("seccion-activa");
         $(mostrar).removeClass("seccion-oculta").addClass("seccion-activa");
-        
+
         // Scroll suave al top de la nueva sección
         $('html, body').animate({
             scrollTop: $(mostrar).offset().top - 80 // Descuento de 80px por el Header fijo
         }, 800);
     }
 
-    function mostrarPasoScroll(mostrar, dotId) {
-        $(mostrar).removeClass("paso-oculto").addClass("paso-activo");
-        $(dotId).addClass("activo");
-        
-        $('html, body').animate({
-            scrollTop: $(mostrar).offset().top - 100
-        }, 800);
+    // Menú: muestra una sección y marca su enlace
+    function mostrarSeccion(selector, $enlace) {
+        $("section").removeClass("seccion-activa").addClass("seccion-oculta");
+        $(selector).removeClass("seccion-oculta").addClass("seccion-activa");
+        $(".navegacion a").removeClass("activo");
+        if ($enlace) $enlace.addClass("activo");
+        $("html, body").scrollTop(0);
+        $(window).trigger("scroll");
     }
 
-    $("#btn-comenzar").click(function() { revelarYScrollear("#pantalla-bienvenida", "#pantalla-contexto"); });
-    $("#btn-ir-al-test").click(function() { revelarYScrollear("#pantalla-contexto", "#pantalla-test"); });
-    $("#btn-paso-2").click(function() { mostrarPasoScroll("#paso-2", "#dot-2"); });
-    $("#btn-paso-3").click(function() { mostrarPasoScroll("#paso-3", "#dot-3"); });
+    $("#link-explorar").click(function(e) {
+        e.preventDefault();
+        mostrarSeccion("#pantalla-explorar", $(this));
+    });
+    $("#link-vive").click(function(e) {
+        e.preventDefault();
+        mostrarSeccion("#pantalla-vive", $(this));
+    });
+    $(".btn-ir-vive").click(function() {
+        mostrarSeccion("#pantalla-vive", $("#link-vive"));
+    });
+    $("#logo-inicio").click(function(e) {
+        e.preventDefault();
+        mostrarSeccion("#pantalla-bienvenida");
+    });
+    // Botones que llevan al test (ficha de región y cierre de Vive un día)
+    $("#btn-explorar-test, #btn-vive-test").click(function() {
+        mostrarSeccion("#pantalla-contexto");
+    });
 
-    // --- 2. Lógica de Sliders y Gráfico Dona (Reloj Visual) ---
-    $(".slider-tiempo").each(function() { $(this).data("old", $(this).val()); });
+    // El alto del header cambia en celular (el menú puede ocupar dos líneas): se mide y se guarda en --alto-header
+    function medirHeader() {
+        document.documentElement.style.setProperty("--alto-header", $(".header-principal").outerHeight() + "px");
+    }
+    medirHeader();
+    $(window).on("resize load", medirHeader);
+    $(document).on("cambioIdioma", medirHeader);
+
+    $("#btn-comenzar").click(function() { revelarYScrollear("#pantalla-bienvenida", "#pantalla-contexto"); });
+    $("#btn-ir-al-test").click(function() {
+        revelarYScrollear("#pantalla-contexto", "#pantalla-test");
+        empezarTest();
+    });
+
+    // --- 2. Sliders del día y gráfico de dona (reloj) ---
+    const CLAVES = ["sueno", "estudio", "trabajo", "traslado", "ocio", "deporte", "celular"];
+    const VALORES_INICIALES = { sueno: 7, estudio: 6, trabajo: 2, traslado: 2, ocio: 1, deporte: 1, celular: 3 };
+
+    function leerHoras() {
+        let h = {};
+        CLAVES.forEach(k => { h[k] = parseFloat($("#horas-" + k).val()) || 0; });
+        return h;
+    }
+    function sumaHoras(h) {
+        return CLAVES.reduce((total, k) => total + (h[k] || 0), 0);
+    }
+
+    // Pinta la parte llena del slider (ver .slider-tiempo en style.css)
+    function llenarSlider(el) {
+        let min = parseFloat(el.min) || 0, max = parseFloat(el.max) || 100;
+        el.style.setProperty("--lleno", ((parseFloat(el.value) - min) / (max - min)) * 100 + "%");
+    }
+
+    function pintarDona(h) {
+        let total = sumaHoras(h);
+        let grados = 0;
+        let tramos = CLAVES.map(k => {
+            let desde = grados;
+            grados += (h[k] / 24) * 360;
+            return `var(--c-${k}) ${desde}deg ${grados}deg`;
+        });
+        tramos.push(`var(--gris-vacio) ${grados}deg 360deg`);
+        $("#reloj-dona").css("background", `conic-gradient(${tramos.join(", ")})`);
+
+        $("#total-horas-dona").text(formatoNumero(total)).css("color", total === 24 ? "var(--bien-texto)" : "var(--texto)");
+        let libres = 24 - total;
+        $("#horas-libres").text(libres > 0 ? t("dona.sinAsignar", { n: formatoNumero(libres) }) : t("dona.completo"));
+    }
+
+    function pintarValoresSliders() {
+        CLAVES.forEach(k => {
+            $("#val-" + k).text(formatoNumero(parseFloat($("#horas-" + k).val())));
+            llenarSlider($("#horas-" + k)[0]);
+        });
+    }
 
     $(".slider-tiempo").on("input", function() {
-        let currentSlider = $(this);
-        let idSpan = currentSlider.attr("id").replace("horas-", "val-");
-        
-        // Recalcular total
-        let sueno = parseFloat($("#horas-sueno").val());
-        let estudio = parseFloat($("#horas-estudio").val());
-        let trabajo = parseFloat($("#horas-trabajo").val());
-        let traslado = parseFloat($("#horas-traslado").val());
-        let ocio = parseFloat($("#horas-ocio").val());
-        let deporte = parseFloat($("#horas-deporte").val()) || 0;
-        
-        let sum = sueno + estudio + trabajo + traslado + ocio + deporte;
+        let clave = $(this).data("clave");
+        let h = leerHoras();
+        let maximo = 24 - (sumaHoras(h) - h[clave]);
 
-        if (sum > 24) {
-            // Bloqueo: revertir valor
-            currentSlider.val(currentSlider.data("old"));
+        if (h[clave] > maximo) {
+            // No se puede pasar de 24 horas: el slider se queda en el máximo posible
+            h[clave] = maximo;
+            $(this).val(maximo);
             $("#alerta-horas").removeClass("oculta");
-        } else {
-            // Permitir cambio
-            currentSlider.data("old", currentSlider.val());
-            $("#" + idSpan).text(currentSlider.val());
-            $("#total-horas-dona").text(sum);
+        } else if (sumaHoras(h) < 24) {
             $("#alerta-horas").addClass("oculta");
-            
-            // Si llega a 24 exacto, texto en verde
-            if(sum === 24) {
-                $("#total-horas-dona").css("color", "var(--success-green)");
-            } else {
-                $("#total-horas-dona").css("color", "var(--text-main)");
-            }
-
-            // ACTUALIZAR GRÁFICO CIRCULAR CON CSS CONIC-GRADIENT
-            let degSueno = (sueno / 24) * 360;
-            let degEstudio = degSueno + ((estudio / 24) * 360);
-            let degTrabajo = degEstudio + ((trabajo / 24) * 360);
-            let degTraslado = degTrabajo + ((traslado / 24) * 360);
-            let degOcio = degTraslado + ((ocio / 24) * 360);
-
-            let gradientStr = `conic-gradient(
-                var(--c-sueno) 0deg ${degSueno}deg,
-                var(--c-estudio) ${degSueno}deg ${degEstudio}deg,
-                var(--c-trabajo) ${degEstudio}deg ${degTrabajo}deg,
-                var(--c-traslado) ${degTrabajo}deg ${degTraslado}deg,
-                var(--c-ocio) ${degTraslado}deg ${degOcio}deg,
-                #e2e8f0 ${degOcio}deg 360deg
-            )`;
-            
-            $("#reloj-dona").css("background", gradientStr);
         }
+
+        $("#val-" + clave).text(formatoNumero(h[clave]));
+        llenarSlider(this);
+        pintarDona(h);
     });
 
-    // Disparar evento para pintar gráfico inicial al cargar la web
-    $("#horas-sueno").trigger("input");
+    function reiniciarSliders() {
+        CLAVES.forEach(k => { $("#horas-" + k).val(VALORES_INICIALES[k]); });
+        pintarValoresSliders();
+        $("#alerta-horas").addClass("oculta");
+        pintarDona(leerHoras());
+    }
+    reiniciarSliders();
 
-    // --- 3. Caritas y Batería ---
-    $(".carita").click(function() {
-        $(".carita").removeClass("seleccionada");
-        $(this).addClass("seleccionada");
+    // --- 3. Test paso a paso ---
+    // Cada .test-pantalla es una pregunta. Las opciones guardan la respuesta y avanzan solas.
+    let respuestas = {};
+    let historial = [];   // pantallas visitadas, para el botón Volver
+    let actual = 0;
+    const $pantallas = $(".test-pantalla");
+
+    // Paso 5: solo si el ánimo es bajo (carita 1 o 2) o la batería está bajo 30%
+    function necesitaPaso5() {
+        return (respuestas.animo !== undefined && respuestas.animo <= 2) ||
+               (respuestas.bateria !== undefined && respuestas.bateria < 30);
+    }
+
+    function pantallaCuenta(i) {
+        return $pantallas.eq(i).data("paso") !== 5 || necesitaPaso5();
+    }
+
+    function siguienteIndice(desde) {
+        for (let i = desde + 1; i < $pantallas.length; i++) {
+            if (pantallaCuenta(i)) return i;
+        }
+        return -1;
+    }
+
+    function actualizarAvance() {
+        let $p = $pantallas.eq(actual);
+        $("#test-paso-num").text("0" + $p.data("paso"));
+
+        // Tiempo: lo que queda desde esta pantalla, y avance hecho para la barra
+        let restante = 0, hecho = 0;
+        $pantallas.each(function(i) {
+            if (!pantallaCuenta(i)) return;
+            let seg = $(this).data("segundos") || 10;
+            if (i >= actual) restante += seg; else hecho += seg;
+        });
+        $("#test-tiempo").text(restante >= 60 ? t("test.quedan", { n: Math.round(restante / 60) }) : t("test.quedaMenos"));
+        $("#test-barra-relleno").css("width", (hecho / (hecho + restante)) * 100 + "%");
+        $("#test-volver").toggleClass("invisible", historial.length === 0);
+
+        // El botón de la batería dice "Seguir" si viene el paso 5
+        if ($p.data("id") === "bateria") actualizarBotonBateria();
+    }
+
+    function mostrarPantalla(i) {
+        actual = i;
+        $pantallas.removeClass("activa").eq(i).addClass("activa");
+        actualizarAvance();
+        let arriba = $("#pantalla-test").offset().top;
+        if ($(window).scrollTop() > arriba) $("html, body").scrollTop(arriba);
+    }
+
+    function empezarTest() {
+        historial = [];
+        mostrarPantalla(0);
+    }
+
+    function siguiente() {
+        let i = siguienteIndice(actual);
+        if (i === -1) { terminarTest(); return; }
+        historial.push(actual);
+        mostrarPantalla(i);
+    }
+
+    $("#test-volver").click(function() {
+        if (historial.length) mostrarPantalla(historial.pop());
     });
 
+    $("#pantalla-test").on("click", "[data-siguiente]", siguiente);
+
+    // Tocar una opción: guarda la respuesta y avanza
+    let avanzando = null;
+    $("#pantalla-test").on("click", ".opcion", function() {
+        let $opcion = $(this);
+        let campo = $opcion.closest(".opciones").data("campo");
+        let valor = $opcion.data("valor");
+
+        $opcion.siblings().removeClass("elegida");
+        $opcion.addClass("elegida");
+        respuestas[campo] = valor;
+
+        if (campo === "ocupacion") {
+            // Si solo estudia, el slider de trabajo no aplica
+            let soloEstudia = valor === "estudia";
+            $("#grupo-trabajo").toggle(!soloEstudia);
+            if (soloEstudia) $("#horas-trabajo").val(0).trigger("input");
+            else if (parseFloat($("#horas-trabajo").val()) === 0) $("#horas-trabajo").val(VALORES_INICIALES.trabajo).trigger("input");
+        }
+
+        clearTimeout(avanzando);
+        avanzando = setTimeout(siguiente, 350);
+    });
+
+    // Batería
+    function pintarBateria(nivel) {
+        $("#nivel-bateria").css("width", nivel + "%");
+        $("#valor-bateria").text(nivel + "%");
+        llenarSlider($("#slider-bateria")[0]);
+        let color = nivel < 30 ? "var(--estado-atencion)" : (nivel < 60 ? "var(--estado-mejorar)" : "var(--estado-bien)");
+        $("#nivel-bateria").css("background", color);
+    }
+    function actualizarBotonBateria() {
+        respuestas.bateria = parseInt($("#slider-bateria").val(), 10);
+        let clave = necesitaPaso5() ? "test.seguirCorto" : "test.verResultados";
+        $("#texto-btn-bateria").attr("data-t", clave).text(t(clave));
+    }
     $("#slider-bateria").on("input", function() {
-        let nivel = $(this).val();$("#nivel-bateria").css("width", nivel + "%");
-        if(nivel < 20) { $("#nivel-bateria").css("background", "var(--accent-coral)"); } 
-        else if (nivel < 60) { $("#nivel-bateria").css("background", "#fbbf24"); } 
-        else { $("#nivel-bateria").css("background", "var(--success-green)"); }
+        pintarBateria(parseInt($(this).val(), 10));
+        actualizarBotonBateria();
     });
+    pintarBateria(50);
 
-    // --- 4. Pantalla de Carga y Resultados ---
-    const frasesCarga = [
-        "¿Sabías que dormir bien consolida la memoria de estudio?",
-        "El ocio no es pérdida de tiempo, previene el 'Burnout' académico.",
-        "Cruzando tu nivel de estrés con la Encuesta Nacional de Salud...",
-        "Calculando tu índice de calidad de vida..."
-    ];
+    // --- 4. Puntaje: "Equilibrio de tu día" (de 0 a 10) ---
+    // Cada área va de 0 a 10 y pesa distinto en el total.
+    // Referencias para los cortes: sueño de 7 a 9 h (National Sleep Foundation) y
+    // 150 min de actividad física a la semana (OMS). Los pesos y cortes son una
+    // propuesta del equipo: conviene revisarlos antes de publicar.
+    const PESOS = { sueno: 0.22, carga: 0.12, celular: 0.14, movimiento: 0.14, organizacion: 0.14, animo: 0.24 };
+    const PUNTOS_DIAS_DEPORTE = { 0: 2, 1: 5, 3: 8, 5: 10 };
+    const PUNTOS_PLANIFICAR = { 2: 10, 1: 6, 0: 3 };
+    const PUNTOS_POSTERGAR = { 0: 10, 1: 6, 2: 3 };
+    const limitar = n => Math.max(0, Math.min(10, n));
 
-    $("#btn-ver-resultados").click(function() {
+    function puntajeAreas(r) {
+        let h = r.horas;
+
+        let sueno = (h.sueno >= 7 && h.sueno <= 9) ? 10
+                  : (h.sueno < 7 ? 10 - (7 - h.sueno) * 2.5 : 10 - (h.sueno - 9) * 2);
+        sueno -= (r.celularCama || 0); // celular en la cama: resta 1 o 2
+
+        let horasCarga = h.estudio + h.trabajo + h.traslado;
+        let carga = horasCarga <= 10 ? 10 : 10 - (horasCarga - 10) * 1.5;
+        if (h.ocio === 0) carga -= 1; // nada de descanso sin pantalla
+
+        let celular = h.celular <= 2 ? 10 : 10 - (h.celular - 2) * 1.5;
+
+        let movimiento = PUNTOS_DIAS_DEPORTE[r.diasDeporte] ?? 5;
+
+        let organizacion = ((PUNTOS_PLANIFICAR[r.planificar] ?? 6) + (PUNTOS_POSTERGAR[r.postergar] ?? 6)) / 2;
+
+        let animo = (((r.animo ?? 3) - 1) * 2.5 + (r.bateria ?? 50) / 10) / 2;
+
+        return {
+            sueno: limitar(sueno), carga: limitar(carga), celular: limitar(celular),
+            movimiento: limitar(movimiento), organizacion: limitar(organizacion), animo: limitar(animo)
+        };
+    }
+
+    function puntajeTotal(r) {
+        let areas = puntajeAreas(r);
+        let total = 0;
+        for (const k in PESOS) total += areas[k] * PESOS[k];
+        return Math.round(total * 10) / 10;
+    }
+
+    // Franjas de la barra: atención (0 a 4), puede mejorar (4 a 7), bien (7 a 10)
+    function nivel(p) { return p < 4 ? "atencion" : (p < 7 ? "mejorar" : "bien"); }
+
+    // Cambios del simulador: cada uno modifica una copia de las respuestas
+    function quitarHoras(h, cantidad, desde) {
+        desde.forEach(k => {
+            let quita = Math.min(cantidad, h[k]);
+            h[k] -= quita;
+            cantidad -= quita;
+        });
+    }
+    const MEJORAS = {
+        sueno: {
+            aplicar(r) {
+                r.horas.sueno += 1;
+                quitarHoras(r.horas, 1, ["celular", "ocio", "traslado", "estudio"]);
+                r.celularCama = Math.max(0, (r.celularCama || 0) - 1);
+            }
+        },
+        deporte: {
+            aplicar(r) {
+                r.diasDeporte = Math.max(r.diasDeporte || 0, 3);
+                r.horas.deporte += 0.5;
+                quitarHoras(r.horas, 0.5, ["celular", "ocio", "traslado"]);
+            }
+        },
+        estudio: {
+            aplicar(r) {
+                r.postergar = Math.max(0, (r.postergar ?? 1) - 1);
+                let libera = Math.min(0.5, r.horas.estudio);
+                r.horas.estudio -= libera;
+                r.horas.ocio += libera;
+            }
+        },
+        planificar: {
+            aplicar(r) { r.planificar = 2; }
+        }
+    };
+
+    function conMejoras(r, ids) {
+        let copia = JSON.parse(JSON.stringify(r));
+        ids.forEach(id => MEJORAS[id].aplicar(copia));
+        return copia;
+    }
+
+    // El par de cambios que más sube el puntaje
+    function mejorPar(r) {
+        let ids = Object.keys(MEJORAS);
+        let mejor = { ids: [], total: puntajeTotal(r) };
+        for (let i = 0; i < ids.length; i++) {
+            for (let j = i + 1; j < ids.length; j++) {
+                let total = puntajeTotal(conMejoras(r, [ids[i], ids[j]]));
+                if (total > mejor.total) mejor = { ids: [ids[i], ids[j]], total: total };
+            }
+        }
+        return mejor;
+    }
+
+    // Mensaje de bienestar (paso 5). La web no diagnostica: orienta y deriva.
+    function htmlContactos() {
+        return `
+            <ul class="contactos-ayuda">
+                <li><i class="fa-solid fa-phone"></i> <span><strong>Salud Responde</strong> <a href="tel:6003607777">600 360 7777</a></span></li>
+                <li><i class="fa-solid fa-phone"></i> <span><strong>${t("bien.linea")} <a href="tel:*4141">*4141</a></strong> ${t("bien.linea4141")}</span></li>
+            </ul>`;
+    }
+
+    function htmlApoyoInstitucion() {
+        let apoyos = APOYO_ESTUDIANTIL[respuestas.region] || [];
+        if (apoyos.length) {
+            let items = apoyos.map(a => `<li><a href="${a.url}" target="_blank" rel="noopener">${a.nombre} <i class="fa-solid fa-arrow-up-right-from-square"></i></a></li>`).join("");
+            return `<p>${t("bien.apoyoRegion")}</p><ul class="apoyo-instituciones">${items}</ul>`;
+        }
+        return `<p>${t("bien.apoyoGeneral")}</p>`;
+    }
+
+    function mostrarBienestar() {
+        let $caja = $("#caja-bienestar");
+        if (!necesitaPaso5() || !respuestas.bienApoyo) { $caja.prop("hidden", true).empty(); return; }
+
+        let derivar = respuestas.bienDuracion === "mes" || respuestas.bienApoyo === "no";
+        let consejos = lista("consejos");
+        let html = "";
+
+        if (derivar) {
+            html += `<h3><i class="fa-solid fa-hand-holding-heart"></i> ${t("bien.tituloDerivar")}</h3>`;
+            if (respuestas.bienFactor === "lejos") html += `<p>${t("bien.contextoLejos")}</p>`;
+            html += `<p>${t("bien.derivar")}</p>`;
+            html += htmlApoyoInstitucion();
+            html += `<p>${t("bien.tambienLlamar")}</p>` + htmlContactos();
+        } else {
+            html += `<h3><i class="fa-solid fa-seedling"></i> ${t("bien.tituloConsejo")}</h3>`;
+            if (respuestas.bienFactor === "lejos") html += `<p>${t("bien.contextoLejos")}</p>`;
+            html += `<p>${consejos[respuestas.bienFactor] || consejos.otro}</p>`;
+            if (respuestas.bienApoyo === "aveces") html += `<p>${t("bien.aVeces")}</p>`;
+            html += `<p class="nota-contactos">${t("bien.siSigue")}</p>` + htmlContactos();
+        }
+
+        $caja.html(html).prop("hidden", false).toggleClass("derivar", derivar);
+    }
+
+    // "Así repartes tu día": una barra por actividad, con los colores de arena
+    function pintarReparto() {
+        let h = respuestas.horas;
+        let max = Math.max(1, ...CLAVES.map(k => h[k]));
+        let filas = CLAVES.filter(k => h[k] > 0).map(k => `
+            <div class="reparto-fila">
+                <span class="reparto-nombre">${t("act." + k)}</span>
+                <div class="reparto-pista"><div class="reparto-barra" style="width: ${h[k] / max * 100}%; background: var(--c-${k});"></div></div>
+                <span class="reparto-horas">${formatoNumero(h[k])} h</span>
+            </div>`).join("");
+        $("#reparto-filas").html(filas);
+    }
+
+    function mostrarResultados(animar) {
+        let total = puntajeTotal(respuestas);
+        let areas = puntajeAreas(respuestas);
+        let textosAreas = lista("textosAreas");
+
+        mostrarBienestar();
+        pintarReparto();
+        $("#nota-final-global").text(formatoNumero(total, 1));
+        $("#texto-diagnostico").text(lista("diagnostico")[nivel(total)]);
+
+        // La marca parte en 0 y se desliza hasta el puntaje
+        if (animar) {
+            $("#escala-marca").css("left", "0%");
+            setTimeout(() => $("#escala-marca").css("left", total * 10 + "%"), 400);
+        } else {
+            $("#escala-marca").css("left", total * 10 + "%");
+        }
+
+        let par = mejorPar(respuestas);
+        if (par.ids.length && par.total - total >= 0.3) {
+            let cambios = par.ids.map(id => t(`mejora.${id}Nombre`)).join(t("res.y"));
+            $("#frase-adelante").html(t("res.frase", { nota: formatoNumero(par.total, 1), cambios: cambios }));
+        } else {
+            $("#frase-adelante").text(t("res.fraseMantener"));
+        }
+
+        for (const k in areas) {
+            let $tarjeta = $(`.tarjeta-categoria[data-area="${k}"]`);
+            $tarjeta.removeClass("nivel-atencion nivel-mejorar nivel-bien").addClass("nivel-" + nivel(areas[k]));
+            $tarjeta.find(".nota-cat").text(t("res.puntaje", { nota: formatoNumero(areas[k], 1) }));
+            $tarjeta.find(".tarjeta-detalle").text(textosAreas[k][nivel(areas[k])]);
+        }
+    }
+
+    // --- 5. Pantalla de carga ---
+    function terminarTest() {
+        respuestas.horas = leerHoras();
+
         // En lugar de scrollear, la carga la ponemos arriba reemplazando todo para concentrar al usuario
         $("#pantalla-test").addClass("seccion-oculta").removeClass("seccion-activa");
         $("#pantalla-carga").removeClass("seccion-oculta").addClass("seccion-activa");
         $('html, body').scrollTop(0);
 
+        let frases = lista("carga.frases");
         let fraseIndex = 0;
-        $("#frase-carga").text(frasesCarga[0]);
+        $("#frase-carga").text(frases[0]);
 
         let intervalo = setInterval(() => {
             fraseIndex++;
-            if (fraseIndex < frasesCarga.length) {
+            if (fraseIndex < frases.length) {
                 $("#frase-carga").fadeOut(300, function() {
-                    $(this).text(frasesCarga[fraseIndex]).fadeIn(300);
+                    $(this).text(lista("carga.frases")[fraseIndex]).fadeIn(300);
                 });
             }
         }, 1800);
@@ -125,255 +501,342 @@ $(document).ready(function() {
         // Termina la carga y muestra resultados
         setTimeout(() => {
             clearInterval(intervalo);
+            mostrarResultados(true);
             revelarYScrollear("#pantalla-carga", "#pantalla-resultados");
         }, 7000);
-    });
-// --- 5. Simulador y Plan de Acción ---
-    
-    $("#btn-descubrelo").click(function() {
-        revelarYScrollear("#pantalla-resultados", "#pantalla-guia");
-        dibujarBarras(); // Llenar barras al entrar a la vista
-    });
+    }
 
-    // Variables de colores para la barra
-    const colores = {
-        sueno: "var(--c-sueno)",
-        estudio: "var(--c-estudio)",
-        trabajo: "var(--c-trabajo)",
-        traslado: "var(--c-traslado)",
-        ocio: "var(--c-ocio)"
-    };
+    // --- 6. Simulador y plan de acción ---
+    function irAlPlan() {
+        revelarYScrollear("#pantalla-resultados", "#pantalla-guia");
+        dibujarBarras();
+    }
+    $("#btn-descubrelo, #btn-ver-plan").click(irAlPlan);
 
     function dibujarBarras() {
-        // Leer valores reales de los sliders
-        let h = {
-            sueno: parseFloat($("#horas-sueno").val()),
-            estudio: parseFloat($("#horas-estudio").val()),
-            trabajo: parseFloat($("#horas-trabajo").val()),
-            traslado: parseFloat($("#horas-traslado").val()),
-            ocio: parseFloat($("#horas-ocio").val())
-        };
-
-        // Crear la barra original
-        construirBarra("#barra-actual", h);
-        actualizarProyeccion(h);
+        if (!respuestas.horas) respuestas.horas = leerHoras();
+        construirBarra("#barra-actual", respuestas.horas);
+        actualizarProyeccion();
     }
 
-    function construirBarra(selector, valores) {
+    function construirBarra(selector, horas) {
         $(selector).empty();
-        for (const [actividad, horas] of Object.entries(valores)) {
-            if(horas > 0) {
-                let porcentaje = (horas / 24) * 100;
+        CLAVES.forEach(k => {
+            if (horas[k] > 0) {
                 $(selector).append(
-                    `<div class="segmento-barra" style="width: ${porcentaje}%; background-color: ${colores[actividad]};" title="${actividad}: ${horas}h"></div>`
+                    `<div class="segmento-barra" style="width: ${(horas[k] / 24) * 100}%; background-color: var(--c-${k});" title="${t("act." + k)}: ${formatoNumero(horas[k])} h"></div>`
                 );
             }
-        }
+        });
     }
 
-    // Escuchar los interruptores
+    function mejorasActivas() {
+        return $(".toggle-mejora:checked").map(function() { return $(this).data("mejora"); }).get();
+    }
+
+    function actualizarProyeccion() {
+        let proyectado = conMejoras(respuestas, mejorasActivas());
+        construirBarra("#barra-proyectada", proyectado.horas);
+        $("#nota-proyectada").text(formatoNumero(puntajeTotal(proyectado), 1));
+    }
+
     $(".toggle-mejora").change(function() {
-        let h = {
-            sueno: parseFloat($("#horas-sueno").val()),
-            estudio: parseFloat($("#horas-estudio").val()),
-            trabajo: parseFloat($("#horas-trabajo").val()),
-            traslado: parseFloat($("#horas-traslado").val()),
-            ocio: parseFloat($("#horas-ocio").val())
-        };
-        actualizarProyeccion(h);
+        pintarOpcionesCalendario($(this).data("mejora"), this.checked);
+        actualizarProyeccion();
     });
 
-    function actualizarProyeccion(h) {
-        let notaBase = 5.2; // La nota que sacó en el ejemplo
-        let bonus = 0;
+    // --- Calendario: cada cambio activado se puede agregar como evento semanal ---
+    // dias: días de la semana en formato iCalendar (MO, TU, WE, TH, FR, SA, SU).
+    // Los títulos y descripciones de los eventos están en textos.js ("eventos").
+    const EVENTOS = {
+        sueno:      { dias: ["SU", "MO", "TU", "WE", "TH"], hora: "23:00", minutos: 30, archivo: "dormir" },
+        deporte:    { dias: ["MO", "TU", "WE", "TH", "FR"], hora: "18:30", minutos: 20, archivo: "caminata" },
+        estudio:    { dias: ["MO", "TU", "WE", "TH", "FR"], hora: "16:00", minutos: 60, archivo: "pomodoro" },
+        planificar: { dias: ["SU"], hora: "20:00", minutos: 20, archivo: "planificar" }
+    };
+    const DIAS_ICAL = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 
-        // Reglas de simulación
-        if ($("#toggle-sueno").is(":checked")) {
-            h.sueno += 1;
-            h.ocio = Math.max(0, h.ocio - 1); // Quita de ocio/pantalla
-            bonus += 0.8;
+    // Próxima fecha (desde hoy) que cae en uno de los días del evento
+    function primeraFecha(evento) {
+        let [hh, mm] = evento.hora.split(":").map(Number);
+        let ahora = new Date();
+        for (let i = 0; i < 8; i++) {
+            let candidata = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + i, hh, mm);
+            if (evento.dias.includes(DIAS_ICAL[candidata.getDay()]) && candidata > ahora) return candidata;
         }
-        
-        if ($("#toggle-deporte").is(":checked")) {
-            h.ocio += 0.3; // Representa tiempo activo
-            h.traslado = Math.max(0, h.traslado - 0.3);
-            bonus += 0.5;
-        }
+        return new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + 1, hh, mm);
+    }
+    const dosDigitos = n => String(n).padStart(2, "0");
+    function formatoIcal(d) {
+        return `${d.getFullYear()}${dosDigitos(d.getMonth() + 1)}${dosDigitos(d.getDate())}T${dosDigitos(d.getHours())}${dosDigitos(d.getMinutes())}00`;
+    }
+    function fechasEvento(evento) {
+        let inicio = primeraFecha(evento);
+        let fin = new Date(inicio.getTime() + evento.minutos * 60000);
+        return { inicio: formatoIcal(inicio), fin: formatoIcal(fin) };
+    }
+    const reglaSemanal = evento => `RRULE:FREQ=WEEKLY;BYDAY=${evento.dias.join(",")}`;
+    // Escapa barras, comas y punto y coma, como pide el formato iCalendar
+    const textoIcal = s => s.replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1");
 
-        if ($("#toggle-estudio").is(":checked")) {
-            h.estudio = Math.max(0, h.estudio - 0.5); // Más eficiente
-            h.ocio += 0.5; // Libera ocio
-            bonus += 0.6;
-        }
-
-        // Evitar pasarse de 24 en las sumas por decimales
-        construirBarra("#barra-proyectada", h);
-        
-        // Animación de la nota
-        let nuevaNota = (notaBase + bonus).toFixed(1);
-        $("#nota-proyectada").text(nuevaNota);
-        
-        // Feedback de color en la nota
-        if(nuevaNota >= 6.5) {
-            $("#nota-proyectada").css("color", "var(--success-green)");
-        } else {
-            $("#nota-proyectada").css("color", "#fbbf24");
-        }
+    function descargarIcs(id) {
+        let ev = EVENTOS[id];
+        let txt = lista("eventos")[id];
+        let f = fechasEvento(ev);
+        let ahora = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+        let lineas = [
+            "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//HazteElTiempo.cl//Plan de accion//ES", "CALSCALE:GREGORIAN",
+            "BEGIN:VEVENT",
+            `UID:${id}-${Date.now()}@hazteeltiempo.cl`,
+            `DTSTAMP:${ahora}`,
+            `DTSTART:${f.inicio}`,
+            `DTEND:${f.fin}`,
+            reglaSemanal(ev),
+            `SUMMARY:${textoIcal(txt.titulo)}`,
+            `DESCRIPTION:${textoIcal(txt.detalle + " (HazteElTiempo.cl)")}`,
+            "BEGIN:VALARM", "ACTION:DISPLAY", "TRIGGER:-PT10M", `DESCRIPTION:${textoIcal(txt.titulo)}`, "END:VALARM",
+            "END:VEVENT", "END:VCALENDAR", ""
+        ];
+        let blob = new Blob([lineas.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+        let enlace = document.createElement("a");
+        enlace.href = URL.createObjectURL(blob);
+        enlace.download = `hazteeltiempo-${ev.archivo}.ics`;
+        document.body.appendChild(enlace);
+        enlace.click();
+        setTimeout(() => { URL.revokeObjectURL(enlace.href); enlace.remove(); }, 1000);
     }
 
-    // --- 6. Reiniciar Todo ---
+    function enlaceGoogle(id) {
+        let ev = EVENTOS[id];
+        let txt = lista("eventos")[id];
+        let f = fechasEvento(ev);
+        let params = {
+            action: "TEMPLATE",
+            text: txt.titulo,
+            dates: `${f.inicio}/${f.fin}`,
+            details: txt.detalle + " (HazteElTiempo.cl)",
+            recur: reglaSemanal(ev),
+            ctz: "America/Santiago"
+        };
+        let consulta = Object.entries(params).map(([k, v]) => k + "=" + encodeURIComponent(v)).join("&");
+        return "https://calendar.google.com/calendar/render?" + consulta;
+    }
+
+    function pintarOpcionesCalendario(id, activo) {
+        let $caja = $(`.calendario-opciones[data-mejora="${id}"]`);
+        if (!activo) { $caja.prop("hidden", true); return; }
+        $caja.html(`
+            <span class="calendario-titulo"><i class="fa-regular fa-calendar-plus"></i> ${t("cal.titulo")}</span>
+            <div class="calendario-botones">
+                <button type="button" class="btn-cal btn-ics" data-mejora="${id}"><i class="fa-solid fa-download"></i> ${t("cal.ics")}</button>
+                <a class="btn-cal" href="${enlaceGoogle(id)}" target="_blank" rel="noopener"><i class="fa-brands fa-google"></i> ${t("cal.google")}</a>
+            </div>`).prop("hidden", false);
+    }
+    $("#pantalla-guia").on("click", ".btn-ics", function() { descargarIcs($(this).data("mejora")); });
+
+    // --- Compartir con texto ya escrito ---
+    // URL_SITIO: dirección pública del sitio. Pendiente mientras no esté publicado.
+    const URL_SITIO = "";
+    function direccionSitio() {
+        if (URL_SITIO) return URL_SITIO;
+        if (location.protocol.startsWith("http")) return location.origin + location.pathname;
+        return "HazteElTiempo.cl";
+    }
+    function textoCompartir(red) {
+        let resultado = respuestas.horas
+            ? t("compartir.resultado", { nota: formatoNumero(puntajeTotal(respuestas), 1) })
+            : t("compartir.sinResultado");
+        return t(red === "ig" ? "compartir.textoIg" : "compartir.textoWs", { resultado: resultado, url: direccionSitio() });
+    }
+
+    $("#btn-compartir-ws").click(function() {
+        window.open("https://wa.me/?text=" + encodeURIComponent(textoCompartir("ws")), "_blank", "noopener");
+    });
+
+    // Instagram no permite abrirse con un texto desde la web: se copia el texto para pegarlo
+    // y, en celular, además se abre el menú de compartir del teléfono.
+    $("#btn-compartir-ig").click(function() {
+        let texto = textoCompartir("ig");
+        $("#texto-compartir-ig").text(texto);
+        if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {
+            navigator.share({ text: texto }).catch(() => {});
+        }
+        $("#aviso-compartir-ig").text(t("compartir.copia"));
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(texto)
+                .then(() => $("#aviso-compartir-ig").text(t("compartir.copiado")))
+                .catch(() => {});
+        }
+        $("#caja-compartir-ig").prop("hidden", false);
+    });
+
+    // --- 7. Reiniciar todo ---
     $("#btn-reiniciar").click(function() {
         // Apagar todos los interruptores
         $(".toggle-mejora").prop("checked", false);
-        
-        // Volver a valores por defecto en sliders
-        $("#horas-sueno").val(8).trigger('input');
-        $("#horas-estudio").val(6).trigger('input');
-        $("#horas-trabajo").val(2).trigger('input');
-        $("#horas-traslado").val(2).trigger('input');
-        $("#horas-ocio").val(2).trigger('input');
-        
-        // Reset de Caritas y Batería
-        $(".carita").removeClass("seleccionada");
-        $("#slider-bateria").val(50).trigger('input');
+        $(".calendario-opciones, #caja-compartir-ig").prop("hidden", true);
+
+        // Respuestas y sliders a cero
+        respuestas = {};
+        historial = [];
+        $(".opcion").removeClass("elegida");
+        $("#grupo-trabajo").show();
+        reiniciarSliders();
+        $("#slider-bateria").val(50);
+        pintarBateria(50);
 
         // Scroll top y esconder secciones
-        $('html, body').animate({ scrollTop: 0 }, 500, function() {$("section").removeClass("seccion-activa").addClass("seccion-oculta");
+        $('html, body').animate({ scrollTop: 0 }, 500, function() {
+            $("section").removeClass("seccion-activa").addClass("seccion-oculta");
             $("#pantalla-bienvenida").removeClass("seccion-oculta").addClass("seccion-activa");
-            
-            // Reset de los pasos internos del test
-            $(".paso-activo").removeClass("paso-activo").addClass("paso-oculto");
-            $("#paso-1").removeClass("paso-oculto").addClass("paso-activo");
-            $(".circulo").removeClass("activo");
-            $("#dot-1").addClass("activo");
         });
     });
+
+    // Al cambiar de idioma: volver a escribir todo lo que arma el JS
+    $(document).on("cambioIdioma", function() {
+        pintarValoresSliders();
+        pintarDona(leerHoras());
+        actualizarAvance();
+        if (respuestas.horas) {
+            mostrarResultados(false);
+            dibujarBarras();
+        }
+        $(".toggle-mejora:checked").each(function() { pintarOpcionesCalendario($(this).data("mejora"), true); });
+        if (!$("#caja-compartir-ig").prop("hidden")) {
+            $("#texto-compartir-ig").text(textoCompartir("ig"));
+            $("#aviso-compartir-ig").text(t("compartir.copia"));
+        }
+    });
 });
+
 // =====================================================================
-// --- 7. Explorar Chile: mapa interactivo por región ---
+// --- 8. Explorar Chile: mapa por cantidad de estudiantes y ficha por región ---
 // =====================================================================
+
+// DATOS POR REGIÓN: PENDIENTES (los entrega el equipo).
+// Mientras un valor sea null, la ficha muestra [DATO PENDIENTE] y el mapa queda gris.
+//  estudiantes:     matrícula total de educación superior en la región (SIES)
+//  estudiaYTrabaja: % de estudiantes que estudia y trabaja (CASEN 2022)
+//  duermePoco:      % de estudiantes que duerme poco (ENUT 2023). Definir el corte, por ejemplo menos de 7 h
+//  universidades, ip, cft: número de instituciones con sede en la región (SIES)
+//  instituciones:   [ { nombre: "Universidad X", url: "https://..." }, ... ]
+// Los servicios de apoyo estudiantil van en APOYO_ESTUDIANTIL (al inicio de este archivo).
+const DATOS_REGIONES = {
+    15: { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Arica y Parinacota
+    1:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Tarapacá
+    2:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Antofagasta
+    3:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Atacama
+    4:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Coquimbo
+    5:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Valparaíso
+    13: { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Metropolitana
+    6:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // O'Higgins
+    7:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Maule
+    16: { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Ñuble
+    8:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Biobío
+    9:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // La Araucanía
+    14: { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Los Ríos
+    10: { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Los Lagos
+    11: { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Aysén
+    12: { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }  // Magallanes
+};
+
 $(document).ready(function() {
 
-    // DATOS DE EJEMPLO: reemplazar por los valores reales procesados
-    // desde CASEN 2022 (estudiantes, trabaja, solo), ENUT 2023 (sueño, traslado)
-    // y ENJUV 2022 (deporte). Los porcentajes van de 0 a 100.
-    const datosRegiones = {
-        15: { nombre: "Arica y Parinacota", estudiantes: 14000,  sueno: 38, deporte: 34, trabaja: 31, solo: 12, traslado: 28 },
-        1:  { nombre: "Tarapacá",           estudiantes: 22000,  sueno: 40, deporte: 33, trabaja: 33, solo: 13, traslado: 30 },
-        2:  { nombre: "Antofagasta",        estudiantes: 45000,  sueno: 36, deporte: 37, trabaja: 29, solo: 15, traslado: 32 },
-        3:  { nombre: "Atacama",            estudiantes: 15000,  sueno: 37, deporte: 32, trabaja: 30, solo: 11, traslado: 27 },
-        4:  { nombre: "Coquimbo",           estudiantes: 52000,  sueno: 39, deporte: 31, trabaja: 32, solo: 14, traslado: 34 },
-        5:  { nombre: "Valparaíso",         estudiantes: 140000, sueno: 42, deporte: 30, trabaja: 31, solo: 22, traslado: 41 },
-        13: { nombre: "Metropolitana",      estudiantes: 620000, sueno: 45, deporte: 29, trabaja: 35, solo: 16, traslado: 52 },
-        6:  { nombre: "O'Higgins",          estudiantes: 48000,  sueno: 38, deporte: 28, trabaja: 34, solo: 10, traslado: 38 },
-        7:  { nombre: "Maule",              estudiantes: 62000,  sueno: 37, deporte: 27, trabaja: 33, solo: 12, traslado: 36 },
-        16: { nombre: "Ñuble",              estudiantes: 30000,  sueno: 36, deporte: 28, trabaja: 30, solo: 15, traslado: 33 },
-        8:  { nombre: "Biobío",             estudiantes: 120000, sueno: 41, deporte: 31, trabaja: 29, solo: 19, traslado: 47 },
-        9:  { nombre: "La Araucanía",       estudiantes: 60000,  sueno: 38, deporte: 30, trabaja: 28, solo: 18, traslado: 35 },
-        14: { nombre: "Los Ríos",           estudiantes: 28000,  sueno: 35, deporte: 33, trabaja: 27, solo: 21, traslado: 29 },
-        10: { nombre: "Los Lagos",          estudiantes: 50000,  sueno: 36, deporte: 32, trabaja: 31, solo: 14, traslado: 31 },
-        11: { nombre: "Aysén",              estudiantes: 5000,   sueno: 33, deporte: 38, trabaja: 35, solo: 17, traslado: 18 },
-        12: { nombre: "Magallanes",         estudiantes: 10000,  sueno: 32, deporte: 40, trabaja: 34, solo: 20, traslado: 20 }
-    };
+    let regionActual = null;
+    const hayDato = v => typeof v === "number" && !isNaN(v);
+    const nombreRegion = codigo => t("region." + codigo);
+    const pendiente = () => `<span class="pendiente">${t("explorar.pendiente")}</span>`;
+    const miles = n => n.toLocaleString(idioma === "es" ? "es-CL" : "en-US");
 
-    // Indicadores que aparecen en la tarjeta (en este orden)
-    const indicadores = [
-        { clave: "sueno",    icono: "fa-moon",        color: "var(--c-sueno)",     frase: "duermen menos de 6 horas" },
-        { clave: "deporte",  icono: "fa-heart-pulse", color: "#ec4899",            frase: "hacen deporte cada semana" },
-        { clave: "trabaja",  icono: "fa-briefcase",   color: "var(--c-trabajo)",   frase: "estudian y trabajan" },
-        { clave: "solo",     icono: "fa-house-user",  color: "var(--accent-purple)", frase: "viven solos" },
-        { clave: "traslado", icono: "fa-bus",         color: "var(--c-traslado)",  frase: "tardan más de 1 hora en trasladarse" }
-    ];
-
-    const nombresTema = { sueno: "duermen poco", deporte: "hacen deporte", trabaja: "estudian y trabajan", solo: "viven solos" };
-
-    let temaActual = "sueno";
-    let regionActual = 8; // Biobío por defecto
-
-    // Escala de color: de azul muy pálido a azul profundo
-    const colorMin = [219, 234, 254]; // #dbeafe
-    const colorMax = [30, 64, 175];   // #1e40af
-
+    // Escala de color entre --mapa-min y --mapa-max (definidos en style.css).
+    // Es logarítmica: la Región Metropolitana tiene muchos más estudiantes que el resto
+    // y con una escala lineal casi todas las demás quedarían del mismo color.
+    function colorCss(variable) {
+        let hex = getComputedStyle(document.documentElement).getPropertyValue(variable).trim().replace("#", "");
+        if (hex.length === 3) hex = hex.split("").map(c => c + c).join("");
+        return [0, 2, 4].map(i => parseInt(hex.substr(i, 2), 16));
+    }
     function colorEscala(valor, min, max) {
-        let t = (max === min) ? 0.5 : (valor - min) / (max - min);
-        let rgb = colorMin.map((c, i) => Math.round(c + (colorMax[i] - c) * t));
+        let desde = colorCss("--mapa-min"), hasta = colorCss("--mapa-max");
+        let t01 = (max === min) ? 0.5 : (Math.log(valor) - Math.log(min)) / (Math.log(max) - Math.log(min));
+        let rgb = desde.map((c, i) => Math.round(c + (hasta[i] - c) * t01));
         return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
     }
 
     function pintarMapa() {
-        let valores = Object.values(datosRegiones).map(r => r[temaActual]);
+        let valores = Object.values(DATOS_REGIONES).map(r => r.estudiantes).filter(hayDato);
         let min = Math.min(...valores), max = Math.max(...valores);
+        $("#mapa-sin-datos").prop("hidden", valores.length > 0);
 
-        for (const [codigo, region] of Object.entries(datosRegiones)) {
-            let color = colorEscala(region[temaActual], min, max);
+        for (const [codigo, region] of Object.entries(DATOS_REGIONES)) {
+            // Sin dato: color vacío que viene del CSS (--mapa-sin-dato)
+            let color = hayDato(region.estudiantes) ? colorEscala(region.estudiantes, min, max) : "";
             $(`.region-mapa[data-region="${codigo}"]`).css("fill", color);
             $(`.item-region[data-region="${codigo}"] .muestra-color`).css("background", color);
         }
     }
 
-    function mostrarRegion(codigo) {
+    function mostrarRegion(codigo, desplazar) {
         regionActual = codigo;
-        let region = datosRegiones[codigo];
+        let r = DATOS_REGIONES[codigo];
 
-        // Resaltar en el mapa (se mueve al final para quedar por encima de las vecinas)
+        // Resaltar en el mapa (se mueve al final para quedar por encima de las vecinas) y en la lista
         $(".region-mapa").removeClass("activa");
-        let pathActivo = $(`.region-mapa[data-region="${codigo}"]`).addClass("activa");
-        pathActivo.appendTo("#mapa-chile");
-
-        // Resaltar en la lista
+        $(`.region-mapa[data-region="${codigo}"]`).addClass("activa").appendTo("#mapa-chile");
         $(".item-region").removeClass("activo");
         $(`.item-region[data-region="${codigo}"]`).addClass("activo");
 
-        // Tarjeta
-        $("#nombre-region").text(region.nombre);
-        $("#total-estudiantes").text(region.estudiantes.toLocaleString("es-CL"));
+        $("#ficha-vacia").prop("hidden", true);
+        $("#ficha-contenido").prop("hidden", false);
+        $("#nombre-region").text(nombreRegion(codigo));
 
-        let html = "";
-        indicadores.forEach(ind => {
-            let pct = region[ind.clave];
-            let deDiez = Math.round(pct / 10);
-            let personas = "";
-            for (let i = 0; i < 10; i++) {
-                let estilo = i < deDiez ? `style="color: ${ind.color}"` : "";
-                personas += `<i class="fa-solid fa-person" ${estilo}></i>`;
-            }
-            html += `
-                <div class="fila-indicador">
-                    <div class="fila-texto">
-                        <span class="frase"><i class="fa-solid ${ind.icono}" style="color: ${ind.color}"></i> ${deDiez} de cada 10 ${ind.frase}</span>
-                        <span class="pct">${pct}%</span>
-                    </div>
-                    <div class="hilera-personas" aria-hidden="true">${personas}</div>
-                </div>`;
-        });
-        $("#filas-indicadores").html(html);
+        // 1. Cómo son los estudiantes
+        $("#dato-estudiantes").html(hayDato(r.estudiantes) ? miles(r.estudiantes) : pendiente());
+        $("#dato-trabaja").html(hayDato(r.estudiaYTrabaja) ? formatoNumero(r.estudiaYTrabaja) + "%" : pendiente());
+        $("#dato-duerme").html(hayDato(r.duermePoco) ? formatoNumero(r.duermePoco) + "%" : pendiente());
+
+        // 2. Dónde estudian
+        $("#dato-universidades").html(hayDato(r.universidades) ? r.universidades : pendiente());
+        $("#dato-ip").html(hayDato(r.ip) ? r.ip : pendiente());
+        $("#dato-cft").html(hayDato(r.cft) ? r.cft : pendiente());
+        $("#lista-instituciones").html(htmlEnlaces(t("explorar.sitios"), r.instituciones));
+
+        // 3. Dónde pedir apoyo (Salud Responde y *4141 están fijos en el HTML)
+        $("#apoyo-region").html(htmlEnlaces(t("explorar.apoyoEstudiantil"), APOYO_ESTUDIANTIL[codigo]));
+
+        // En celular la ficha queda bajo el mapa: bajar hasta ella
+        if (desplazar && window.matchMedia("(max-width: 900px)").matches) {
+            $("html, body").animate({ scrollTop: $("#ficha-region").offset().top - parseInt(getComputedStyle(document.documentElement).getPropertyValue("--alto-header")) - 12 }, 500);
+        }
     }
 
-    // Botones de tema
-    $(".tema-btn").click(function() {
-        $(".tema-btn").removeClass("activo");
-        $(this).addClass("activo");
-        temaActual = $(this).data("tema");
-        pintarMapa();
-    });
+    function htmlEnlaces(titulo, enlaces) {
+        if (!enlaces || !enlaces.length) return `<p>${titulo} ${pendiente()}</p>`;
+        let items = enlaces.map(e => `<li><a href="${e.url}" target="_blank" rel="noopener">${e.nombre} <i class="fa-solid fa-arrow-up-right-from-square"></i></a></li>`).join("");
+        return `<p>${titulo}</p><ul>${items}</ul>`;
+    }
 
     // Clic en el mapa o en la lista
     $("#mapa-chile").on("click", ".region-mapa", function() {
-        mostrarRegion($(this).data("region"));
+        mostrarRegion($(this).data("region"), true);
     });
     $("#mapa-chile").on("keydown", ".region-mapa", function(e) {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); mostrarRegion($(this).data("region")); }
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); mostrarRegion($(this).data("region"), true); }
     });
     $(".item-region").click(function() {
-        mostrarRegion($(this).data("region"));
+        mostrarRegion($(this).data("region"), true);
     });
 
-    // Tooltip al pasar el cursor por el mapa
+    // Tooltip al pasar el cursor: cantidad de estudiantes de la región
     $("#mapa-chile").on("mousemove", ".region-mapa", function(e) {
-        let region = datosRegiones[$(this).data("region")];
+        let codigo = $(this).data("region");
+        let n = DATOS_REGIONES[codigo].estudiantes;
+        let texto = hayDato(n)
+            ? t("explorar.tooltip", { region: nombreRegion(codigo), n: miles(n) })
+            : `${nombreRegion(codigo)}: ${t("explorar.pendiente")}`;
         let caja = $(".columna-mapa")[0].getBoundingClientRect();
         $("#tooltip-mapa")
-            .text(`${region.nombre}: ${region[temaActual]}% ${nombresTema[temaActual]}`)
+            .text(texto)
             .css({ left: e.clientX - caja.left, top: e.clientY - caja.top })
             .removeClass("oculta-tooltip");
     });
@@ -381,185 +844,87 @@ $(document).ready(function() {
         $("#tooltip-mapa").addClass("oculta-tooltip");
     });
 
-    // Navegación: abrir Explorar Chile desde el menú
-    $("#link-explorar").click(function(e) {
-        e.preventDefault();
-        $("section").removeClass("seccion-activa").addClass("seccion-oculta");
-        $("#pantalla-explorar").removeClass("seccion-oculta").addClass("seccion-activa");
-        $(".navegacion a").removeClass("activo");
-        $(this).addClass("activo");
-        $("html, body").scrollTop(0);
+    $(document).on("cambioIdioma", function() {
+        if (regionActual !== null) mostrarRegion(regionActual, false);
     });
 
-    // Volver al inicio desde el logo
-    $("#logo-inicio").click(function() {
-        $("section").removeClass("seccion-activa").addClass("seccion-oculta");
-        $("#pantalla-bienvenida").removeClass("seccion-oculta").addClass("seccion-activa");
-        $(".navegacion a").removeClass("activo");
-        $("html, body").scrollTop(0);
-    });
-
-    // Botón de la tarjeta: ir al test
-    $("#btn-explorar-test").click(function() {
-        $(".navegacion a").removeClass("activo");
-        $("section").removeClass("seccion-activa").addClass("seccion-oculta");
-        $("#pantalla-contexto").removeClass("seccion-oculta").addClass("seccion-activa");
-        $("html, body").scrollTop(0);
-    });
-
-    // Estado inicial
     pintarMapa();
-    mostrarRegion(regionActual);
 });
 
 // =====================================================================
-// --- 8. Un día que te alcanza: recorrido ilustrado con scroll ---
+// --- 9. Vive un día: recorrido ilustrado con scroll ---
 // =====================================================================
 $(document).ready(function() {
 
     // Cada momento usa como fondo la ilustración "img/dia-HHMM.jpg"
     // (por ejemplo img/dia-2300.jpg). Mientras no exista, se ve un fondo provisorio.
     // "ejemplo: true" marca los datos que hay que reemplazar por el valor real.
-    const momentos = [
-        {
-            archivo: "dia-0800.jpg", hora: "08:00", titulo: "Traslado",
-            dato: "5 de 10", texto: "estudiantes tardan más de 1 hora en trasladarse", ejemplo: true,
-            fuente: "ENUT 2023",
-            cielo: ["#fbcfe8", "#fed7aa"],
-            mal:  { titulo: "Si viajas pegado al celular", icono: "fa-mobile-screen",
-                    lista: ["Llegas con la cabeza saturada", "Sientes que el viaje fue tiempo perdido"] },
-            bien: { titulo: "Si escuchas un podcast", icono: "fa-headphones",
-                    lista: ["El viaje se vuelve un rato útil", "Repasas sin darte cuenta"] }
-        },
-        {
-            archivo: "dia-1030.jpg", hora: "10:30", titulo: "Clases y estudio",
-            dato: "59%", texto: "de los universitarios de un estudio se pone objetivos de estudio",
-            fuente: "Reyes-González, Meneses-Báez y Díaz-Mujica (2022)",
-            cielo: ["#bae6fd", "#e0f2fe"],
-            mal:  { titulo: "Si estudias con todo abierto", icono: "fa-bell",
-                    lista: ["Saltas entre pestañas y notificaciones", "Estudiar te toma más tiempo"] },
-            bien: { titulo: "Si planificas la semana", icono: "fa-list-check",
-                    lista: ["Sabes qué hacer y cuándo", "Los que rinden mejor priorizan y descansan"] }
-        },
-        {
-            archivo: "dia-1330.jpg", hora: "13:30", titulo: "Almuerzo y pausa",
-            dato: "1 h", texto: "al día dedican los estudiantes a comer", ejemplo: true,
-            fuente: "ENUT 2023",
-            cielo: ["#7dd3fc", "#bae6fd"],
-            mal:  { titulo: "Si comes frente al computador", icono: "fa-laptop",
-                    lista: ["No hay una pausa real", "La tarde se hace más pesada"] },
-            bien: { titulo: "Si almuerzas con otros", icono: "fa-utensils",
-                    lista: ["Recargas energía para la tarde", "Compartes y bajas el estrés"] }
-        },
-        {
-            archivo: "dia-1600.jpg", hora: "16:00", titulo: "Tareas pendientes",
-            dato: "4 de 6", texto: "áreas del bienestar son más bajas en quienes más postergan",
-            fuente: "Cordovez, Ramírez y Villafaña (2023), estudiantes chilenos",
-            cielo: ["#bae6fd", "#fde68a"],
-            mal:  { titulo: "Si lo dejas para después", icono: "fa-hourglass-end",
-                    lista: ["Se acumula el estrés", "Baja tu sensación de propósito"] },
-            bien: { titulo: "Si partes por lo más corto", icono: "fa-list-check",
-                    lista: ["Empezar se hace más fácil", "Avanzas y te queda tiempo libre"] }
-        },
-        {
-            archivo: "dia-1930.jpg", hora: "19:30", titulo: "Deporte",
-            dato: "150 min", texto: "de actividad física a la semana recomienda la OMS",
-            fuente: "Organización Mundial de la Salud (2020)",
-            cielo: ["#fb7185", "#7c3aed"],
-            mal:  { titulo: "Si pasas todo el día sentado", icono: "fa-couch",
-                    lista: ["Aumenta el cansancio", "Cuesta más soltar el estrés"] },
-            bien: { titulo: "Si sales a moverte", icono: "fa-person-running",
-                    lista: ["Bastan 20 a 30 minutos al día", "Mejora tu ánimo y tu descanso"] }
-        },
-        {
-            archivo: "dia-2100.jpg", hora: "21:00", titulo: "Celular y redes",
-            dato: "66,8%", texto: "de los jóvenes de 16 a 29 años está más de 4 h al día en internet",
-            fuente: "SUBTEL y Cadem (2024)",
-            cielo: ["#4c1d95", "#312e81"],
-            mal:  { titulo: "Si scrolleas sin parar", icono: "fa-mobile-screen",
-                    lista: ["El tiempo se escapa sin darte cuenta", "Se te pasa la hora de dormir"] },
-            bien: { titulo: "Si te pones un límite", icono: "fa-guitar",
-                    lista: ["Recuperas tiempo para lo que te gusta", "Llegas más tranquilo a la hora de dormir"] }
-        },
-        {
-            archivo: "dia-2300.jpg", hora: "23:00", titulo: "Antes de dormir",
-            dato: "+59%", texto: "más riesgo de insomnio por cada hora de pantalla en la cama",
-            fuente: "Hjetland et al. (2025), Frontiers in Psychiatry",
-            cielo: ["#1e1b4b", "#312e81"],
-            mal:  { titulo: "Si usas el celular", icono: "fa-mobile-screen",
-                    lista: ["Duermes 24 minutos menos", "Te cuesta más concentrarte al otro día"] },
-            bien: { titulo: "Si lo dejas 30 min antes", icono: "fa-book-open",
-                    lista: ["Te duermes más rápido", "Descansas mejor y rindes más"] }
-        },
-        {
-            archivo: "dia-0030.jpg", hora: "00:30", titulo: "Pasada la medianoche",
-            dato: "−36 min", texto: "de sueño ya perdió quien lleva 1 h y media con el celular en la cama",
-            fuente: "Hjetland et al. (2025): cerca de 24 min menos de sueño por cada hora de pantalla en la cama",
-            cielo: ["#0f172a", "#1e1b4b"],
-            mal:  { titulo: "Si sigues con el celular", icono: "fa-mobile-screen",
-                    lista: ["Te dijiste que a las 23:30 te dormías", "Cada video te quita un poco más de sueño"] },
-            bien: { titulo: "Si cumpliste tu hora", icono: "fa-bed",
-                    lista: ["Ya llevas 1 hora durmiendo", "Tu cuerpo empezó a recuperarse"] }
-        },
-        {
-            archivo: "dia-0030.jpg", estilo: "madrugada", hora: "02:00", titulo: "Madrugada",
-            dato: "2,5 h", texto: "menos de sueño por quedarte con el celular hasta las 02:00",
-            barras: [
-                { etiqueta: "Te dormiste a las 23:30", horas: 7.5, tipo: "bien" },
-                { etiqueta: "Te dormiste a las 02:00", horas: 5,   tipo: "mal" }
-            ],
-            fuente: "National Sleep Foundation (Hirshkowitz et al., 2015). Cálculo con alarma a las 07:00",
-            cielo: ["#0f172a", "#0f172a"],
-            mal:  { titulo: "Si te duermes a las 02:00", icono: "fa-mobile-screen",
-                    lista: ["Dormirás 5 h, bajo lo recomendado", "Mañana partes cansado y con sueño"] },
-            bien: { titulo: "Si te dormiste a tu hora", icono: "fa-moon",
-                    lista: ["Dormirás 7,5 h, dentro de lo recomendado", "Mañana partes con energía"] }
-        }
+    // Los textos de cada momento están en textos.js ("momentos"), en el mismo orden.
+    const MOMENTOS = [
+        { archivo: "dia-0800.jpg", hora: "08:00", ejemplo: true, cielo: ["#fbcfe8", "#fed7aa"], iconoMal: "fa-mobile-screen", iconoBien: "fa-headphones" },
+        { archivo: "dia-1030.jpg", hora: "10:30", cielo: ["#bae6fd", "#e0f2fe"], iconoMal: "fa-bell", iconoBien: "fa-list-check" },
+        { archivo: "dia-1330.jpg", hora: "13:30", ejemplo: true, cielo: ["#7dd3fc", "#bae6fd"], iconoMal: "fa-laptop", iconoBien: "fa-utensils" },
+        { archivo: "dia-1600.jpg", hora: "16:00", cielo: ["#bae6fd", "#fde68a"], iconoMal: "fa-hourglass-end", iconoBien: "fa-list-check" },
+        { archivo: "dia-1930.jpg", hora: "19:30", cielo: ["#fb7185", "#1e3a8a"], iconoMal: "fa-couch", iconoBien: "fa-person-running" },
+        { archivo: "dia-2100.jpg", hora: "21:00", cielo: ["#1e3a8a", "#0b1a45"], iconoMal: "fa-mobile-screen", iconoBien: "fa-guitar" },
+        { archivo: "dia-2300.jpg", hora: "23:00", cielo: ["#0b1a45", "#1e3a8a"], iconoMal: "fa-mobile-screen", iconoBien: "fa-book-open" },
+        { archivo: "dia-0030.jpg", hora: "00:30", cielo: ["#0f172a", "#0b1a45"], iconoMal: "fa-mobile-screen", iconoBien: "fa-bed" },
+        { archivo: "dia-0030.jpg", hora: "02:00", estilo: "madrugada", cielo: ["#0f172a", "#0f172a"], iconoMal: "fa-mobile-screen", iconoBien: "fa-moon",
+          barras: [ { horas: 7.5, tipo: "bien" }, { horas: 5, tipo: "mal" } ] }
     ];
 
     // Etapa de las 18:00 (Trabajo): se activa al tener la ilustración img/dia-1800.jpg.
-    // Para usarla, pega este bloque dentro de "momentos", entre la de las 16:00 y la de las 19:30.
-    /*
-        {
-            archivo: "dia-1800.jpg", hora: "18:00", titulo: "Trabajo",
-            dato: "3 de 10", texto: "estudiantes estudian y trabajan", ejemplo: true,
-            fuente: "CASEN 2022",
-            cielo: ["#fdba74", "#fb7185"],
-            mal:  { titulo: "Si trabajas sin ordenar la semana", icono: "fa-battery-quarter",
-                    lista: ["Terminas restando horas de sueño", "Todo se junta al final"] },
-            bien: { titulo: "Si fijas bloques en la semana", icono: "fa-calendar-days",
-                    lista: ["Sabes cuándo estudias y cuándo trabajas", "Baja el estrés"] }
-        }
-    */
+    // Para usarla:
+    //  1. Pega esta línea en MOMENTOS, entre la de las 16:00 y la de las 19:30:
+    //     { archivo: "dia-1800.jpg", hora: "18:00", ejemplo: true, cielo: ["#fdba74", "#fb7185"], iconoMal: "fa-battery-quarter", iconoBien: "fa-calendar-days" },
+    //  2. En textos.js, copia "momentoTrabajo" dentro de "momentos" en la misma posición (en es y en).
 
     const CARPETA = "img/";
     const $seccion = $("#dia-scroll");
     if (!$seccion.length) return;
 
+    // Momento con sus textos en el idioma actual
+    function momento(i) {
+        return Object.assign({}, MOMENTOS[i], lista("momentos")[i]);
+    }
+
     // Fondos (ilustración o fondo provisorio) y puntos de la línea del día
-    momentos.forEach((m, i) => {
+    MOMENTOS.forEach((m, i) => {
         let fondo = $(`
             <div class="dia-fondo ${m.estilo || ""}" data-i="${i}" style="background-image:url('${CARPETA + m.archivo}')">
-                <img src="${CARPETA + m.archivo}" alt="Ilustración: ${m.titulo}, mal hábito a la izquierda y buen hábito a la derecha">
+                <img src="${CARPETA + m.archivo}" alt="">
+                <div class="dia-velo"></div>
             </div>`);
         fondo.find("img").on("error", function() {
             fondo.addClass("provisorio").css("background", `linear-gradient(to bottom, ${m.cielo[0]}, ${m.cielo[1]})`);
             fondo.append(`
-                <div class="mitad-provisoria mal"><i class="fa-solid ${m.mal.icono}"></i><small>Falta ${CARPETA + m.archivo}</small></div>
-                <div class="mitad-provisoria bien"><i class="fa-solid ${m.bien.icono}"></i></div>`);
+                <div class="mitad-provisoria mal"><i class="fa-solid ${m.iconoMal}"></i><small></small></div>
+                <div class="mitad-provisoria bien"><i class="fa-solid ${m.iconoBien}"></i></div>`);
+            textosFondos();
         });
         $("#dia-fondos").append(fondo);
 
-        $("#dia-puntos").append(
-            `<li><button type="button" class="dia-punto" data-i="${i}"><span>${m.hora} · ${m.titulo}</span></button></li>`);
+        $("#dia-puntos").append(`<li><button type="button" class="dia-punto" data-i="${i}"><span></span></button></li>`);
     });
+
+    // Textos de los fondos y de la línea del día (cambian con el idioma)
+    function textosFondos() {
+        $(".dia-fondo").each(function() {
+            let i = $(this).data("i");
+            let m = momento(i);
+            $(this).find("img").attr("alt", t("vive.alt", { titulo: m.titulo }));
+            $(this).find(".mitad-provisoria small").text(t("vive.falta", { archivo: CARPETA + m.archivo }));
+            $(`.dia-punto[data-i="${i}"] span`).text(`${m.hora} · ${m.titulo}`);
+        });
+    }
+    textosFondos();
 
     // Mostrar un momento en el escenario
     let actual = -1;
     function mostrarMomento(i) {
         if (i === actual) return;
         actual = i;
-        let m = momentos[i];
+        let m = momento(i);
 
         $(".dia-punto").removeClass("activo");
         $(`.dia-punto[data-i="${i}"]`).addClass("activo");
@@ -573,28 +938,28 @@ $(document).ready(function() {
             $("#dia-ejemplo").toggle(!!m.ejemplo);
             $("#dia-mal-titulo").text(m.mal.titulo);
             $("#dia-bien-titulo").text(m.bien.titulo);
-            $("#dia-mal-lista").html(m.mal.lista.map(t => `<li>${t}</li>`).join(""));
-            $("#dia-bien-lista").html(m.bien.lista.map(t => `<li>${t}</li>`).join(""));
-            $("#dia-fuente").text("Fuente: " + m.fuente);
+            $("#dia-mal-lista").html(m.mal.lista.map(x => `<li>${x}</li>`).join(""));
+            $("#dia-bien-lista").html(m.bien.lista.map(x => `<li>${x}</li>`).join(""));
+            $("#dia-fuente").text(t("vive.fuente", { fuente: m.fuente }));
             if (m.barras) {
                 const MAX = 9; // escala de 0 a 9 horas
-                let filas = m.barras.map(br => `
+                let filas = m.barras.map((br, j) => `
                     <div class="barra-sueno ${br.tipo}">
-                        <span class="barra-etiqueta">${br.etiqueta}</span>
+                        <span class="barra-etiqueta">${m.etiquetasBarras[j]}</span>
                         <div class="barra-pista">
                             <div class="barra-zona" style="left:${7 / MAX * 100}%; width:${2 / MAX * 100}%"></div>
                             <div class="barra-relleno" style="width:${br.horas / MAX * 100}%"></div>
                         </div>
-                        <span class="barra-valor">${String(br.horas).replace(".", ",")} h</span>
+                        <span class="barra-valor">${formatoNumero(br.horas)} h</span>
                     </div>`).join("");
-                $("#dia-barras").html(filas + '<p class="barra-nota"><span></span> Lo recomendado: 7 a 9 h</p>').show();
+                $("#dia-barras").html(filas + `<p class="barra-nota"><span></span> ${t("vive.recomendado")}</p>`).show();
             } else {
                 $("#dia-barras").empty().hide();
             }
             $t.removeClass("cambiando");
         }, 250);
 
-        $("#dia-sigue").css("visibility", i === momentos.length - 1 ? "hidden" : "visible");
+        $("#dia-sigue").css("visibility", i === MOMENTOS.length - 1 ? "hidden" : "visible");
     }
 
     // Qué momento corresponde según cuánto se ha bajado
@@ -603,7 +968,7 @@ $(document).ready(function() {
         let alto = $(window).height();
         let avance = $(window).scrollTop() - $seccion.offset().top;
         let i = Math.round(avance / alto);
-        i = Math.max(0, Math.min(momentos.length - 1, i));
+        i = Math.max(0, Math.min(MOMENTOS.length - 1, i));
         mostrarMomento(i);
     }
     $(window).on("scroll resize", alHacerScroll);
@@ -627,6 +992,25 @@ $(document).ready(function() {
         $("#dia-plegar").attr("aria-expanded", false);
     }
 
-    // Al entrar a la pantalla de resultados, dejar listo el primer momento
+    // Interruptor "Con buenos hábitos" / "Con malos hábitos" (hay dos: en la portada y fijo arriba)
+    $(".dia-modo-btn").click(function() {
+        let modo = $(this).data("modo");
+        $("#pantalla-vive").removeClass("modo-bien modo-mal").addClass("modo-" + modo);
+        $(".dia-modo-btn").removeClass("activo").attr("aria-checked", "false");
+        $(`.dia-modo-btn[data-modo="${modo}"]`).addClass("activo").attr("aria-checked", "true");
+    });
+
+    // Al cambiar de idioma: volver a escribir el momento actual
+    $(document).on("cambioIdioma", function() {
+        textosFondos();
+        let i = Math.max(actual, 0);
+        actual = -1;
+        mostrarMomento(i);
+    });
+
+    // Dejar listo el primer momento
     mostrarMomento(0);
 });
+
+// Al final, cuando todo está listo: poner los textos del idioma elegido
+$(document).ready(aplicarIdioma);
