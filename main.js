@@ -851,7 +851,7 @@ $(document).ready(function() {
             }, 500);
         }
     }
-}
+
 
     function htmlEnlaces(titulo, enlaces) {
         if (!enlaces || !enlaces.length) return `<p>${titulo} ${pendiente()}</p>`;
