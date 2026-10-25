@@ -1183,18 +1183,11 @@ h4, strong, b { font-weight: 700; }
 .vd-personaje {
     position: absolute; z-index: 3; pointer-events: none;
     left: var(--vd-pj-x); bottom: calc(var(--vd-suelo-alto) - 3%);
-    height: 52%; transform: translateX(-50%);
+    height: 52%; aspect-ratio: 600 / 900; transform: translateX(-50%);
 }
-.vd-pj-slot {
-    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    height: 100%; width: max-content; opacity: 0; transition: opacity 0.45s ease;
-}
+.vd-pj-slot { position: absolute; inset: 0; opacity: 0; transition: opacity 0.45s ease; }
 .vd-pj-slot.activo { opacity: 1; }
-.vd-pj-slot .vd-img { height: 100%; width: auto; aspect-ratio: auto !important; }
-.vd-pj-slot .vd-img img {
-    display: block; height: 100%; width: auto; max-width: none;
-    object-fit: contain; object-position: bottom center;
-}
+.vd-pj-slot .vd-img { width: 100%; height: 100%; }
 .vd-personaje.caminando .vd-pj-slot.activo { animation: vd-caminar 0.5s ease-in-out infinite; }
 @keyframes vd-caminar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
