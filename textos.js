@@ -211,7 +211,7 @@ es: {
             bien: "Terminas el día con energía y buen ánimo."
         }
     },
-
+    
     // --- Mensaje de bienestar ---
     "bien.tituloDerivar": "Hablar con alguien puede ayudarte",
     "bien.tituloConsejo": "Una idea para estos días",
@@ -447,7 +447,16 @@ es: {
         titulo: "Trabajo", dato: "3 de 10", texto: "estudiantes estudian y trabajan", fuente: "CASEN 2022",
         mal:  { titulo: "Si trabajas sin ordenar la semana", lista: ["Terminas restando horas de sueño", "Todo se junta al final"] },
         bien: { titulo: "Si fijas bloques en la semana", lista: ["Sabes cuándo estudias y cuándo trabajas", "Baja el estrés"] }
-    }
+    },
+    "nav.sugerencias": "Ayudanos",
+    "sugerencias.titulo": "Déjanos tus sugerencias",
+    "sugerencias.sub": "Tu opinión nos ayuda a mejorar la experiencia.",
+    "sugerencias.califica": "Califica la página:",
+    "sugerencias.placeholder": "Escribe tus ideas, sugerencias o críticas aquí...",
+    "sugerencias.enviar": "Enviar sugerencia",
+    "sugerencias.exito": "Gracias por ayudarnos a mejorar",
+    "sugerencias.otra": "Dejar otra sugerencia",
+
 },
 
 // =====================================================================
@@ -883,7 +892,15 @@ en: {
         titulo: "Work", dato: "3 in 10", texto: "students study and work", fuente: "CASEN 2022",
         mal:  { titulo: "If you work without organizing your week", lista: ["You end up cutting into your sleep", "Everything piles up at the end"] },
         bien: { titulo: "If you set blocks in your week", lista: ["You know when you study and when you work", "Your stress goes down"] }
-    }
+    },
+    "nav.sugerencias": "Help Us",
+    "sugerencias.titulo": "Leave us your feedback",
+    "sugerencias.sub": "Your opinion helps us improve the experience.",
+    "sugerencias.califica": "Rate our site:",
+    "sugerencias.placeholder": "Write your ideas, suggestions, or criticisms here...",
+    "sugerencias.enviar": "Submit feedback",
+    "sugerencias.exito": "Thanks for helping us improve",
+    "sugerencias.otra": "Leave another suggestion",
 }
 
 };

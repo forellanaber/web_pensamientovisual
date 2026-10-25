@@ -1351,3 +1351,91 @@ h4, strong, b { font-weight: 700; }
     .vd-pj-slot, .vd-tarjeta, .vd-hipnograma, .vd-bateria { transition: none; }
     .vd-personaje.caminando .vd-pj-slot.activo, .vd-pista i { animation: none; }
 }
+.contenedor-sugerencias {
+    max-width: 800px;
+    margin: 4rem auto;
+    background-color: var(--fondo-off-white, #f8f9fa);
+    padding: 3rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.encabezado-sugerencias { margin-bottom: 2rem; }
+
+.layout-sugerencias {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.caja-formulario { width: 100%; }
+
+.rating-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--azul-profundo, #2c3e50);
+}
+
+.stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+}
+
+.stars input { display: none; }
+.stars label {
+    font-size: 3rem;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.stars label:hover,
+.stars label:hover ~ label,
+.stars input:checked ~ label {
+    color: var(--color-naranja, #f39c12);
+}
+
+#mensaje-sugerencia {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+#mensaje-sugerencia:focus {
+    border-color: var(--azul-profundo, #2c3e50);
+    outline: none;
+}
+
+.btn-naranja, .btn-secundario {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: opacity 0.2s;
+}
+
+.btn-naranja { background-color: var(--color-naranja, #f39c12); color: #fff; }
+.btn-secundario { background-color: var(--azul-profundo, #2c3e50); color: #fff; margin-top: 1.5rem; }
+.btn-naranja:hover, .btn-secundario:hover { opacity: 0.9; }
+
+.caja-exito {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 3rem 0;
+    width: 100%;
+}

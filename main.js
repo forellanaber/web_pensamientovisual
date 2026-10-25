@@ -1470,6 +1470,62 @@ $(document).ready(function() {
     prueba.onerror = () => { paradas = PARADAS_DIA.concat(PARADAS_NOCHE); alMostrar(); };
     prueba.src = "img/dia-1800.jpg";
 });
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Lógica de Navegación SPA
+    const linkSugerencias = document.getElementById('link-sugerencias');
+    const pantallaSugerencias = document.getElementById('pantalla-sugerencias');
+    const pantallas = document.querySelectorAll('section[id^="pantalla-"]');
+
+    if (linkSugerencias && pantallaSugerencias) {
+        linkSugerencias.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Ocultar todas las pantallas (Vive un día, Explorar, etc.)
+            pantallas.forEach(pantalla => {
+                pantalla.classList.add('seccion-oculta');
+            });
+            // Mostrar la pantalla de sugerencias
+            pantallaSugerencias.classList.remove('seccion-oculta');
+        });
+    }
+
+    // 2. Lógica del Formulario y Envío
+    const form = document.getElementById('suggestion-form');
+    const formContainer = document.getElementById('form-container');
+    const successMessage = document.getElementById('success-message');
+    const btnOtra = document.getElementById('btn-otra-sugerencia');
+
+    if (form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const data = new FormData(form);
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: data,
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (response.ok) {
+                    formContainer.style.display = 'none';
+                    successMessage.style.display = 'flex';
+                    form.reset(); 
+                } else {
+                    alert('Hubo un problema al enviar la sugerencia.');
+                }
+            } catch (error) {
+                alert('Error de conexión. Verifica tu red.');
+            }
+        });
+    }
+
+    if (btnOtra) {
+        btnOtra.addEventListener('click', () => {
+            successMessage.style.display = 'none';
+            formContainer.style.display = 'block';
+        });
+    }
+});
 
 /* =====================================================================
    VERSIÓN ANTERIOR de Vive un día (scroll vertical con tarjeta central).
