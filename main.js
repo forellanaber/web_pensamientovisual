@@ -46,7 +46,12 @@ $(document).on("click", "#btn-idioma", function() {
 // Formato: { 13: [ { nombre: "Universidad X, apoyo psicológico", url: "https://..." } ], ... }
 // Mientras esté vacío, el sitio muestra un texto general.
 // =====================================================================
-const APOYO_ESTUDIANTIL = {};
+const APOYO_ESTUDIANTIL = {
+    1: [
+        { nombre: "Bienestar Estudiantil UNAP", url: "https://www.unap.cl" },
+        { nombre: "Servicio de Salud Estudiantil Santo Tomás Iquique", url: "https://www.santotomas.cl" }
+    ]
+};
 
 $(document).ready(function() {
 
@@ -728,7 +733,7 @@ $(document).ready(function() {
 // Los servicios de apoyo estudiantil van en APOYO_ESTUDIANTIL (al inicio de este archivo).
 const DATOS_REGIONES = {
     15: { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Arica y Parinacota
-    1:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Tarapacá
+    1:  { estudiantes: 18500, estudiaYTrabaja: 28.5, duermePoco: 42.0, universidades: 2, ip: 3, cft: 2, instituciones: [ { nombre: "Universidad Arturo Prat", url: "https://www.unap.cl" },{ nombre: "Universidad de Tarapacá (Sede Iquique)", url: "https://www.uta.cl" },{ nombre: "INACAP Iquique", url: "https://www.inacap.cl" },{ nombre: "Santo Tomás Iquique", url: "https://www.santotomas.cl" }] },
     2:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Antofagasta
     3:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Atacama
     4:  { estudiantes: null, estudiaYTrabaja: null, duermePoco: null, universidades: null, ip: null, cft: null, instituciones: [] }, // Coquimbo
