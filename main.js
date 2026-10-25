@@ -84,6 +84,10 @@ $(document).ready(function() {
         e.preventDefault();
         mostrarSeccion("#pantalla-vive", $(this));
     });
+    $("#link-sugerencias").click(function(e) {
+        e.preventDefault();
+        mostrarSeccion("#pantalla-sugerencias", $(this));
+    });
     $(".btn-ir-vive").click(function() {
         mostrarSeccion("#pantalla-vive", $("#link-vive"));
     });
@@ -1471,23 +1475,6 @@ $(document).ready(function() {
     prueba.src = "img/dia-1800.jpg";
 });
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Lógica de Navegación SPA
-    const linkSugerencias = document.getElementById('link-sugerencias');
-    const pantallaSugerencias = document.getElementById('pantalla-sugerencias');
-    const pantallas = document.querySelectorAll('section[id^="pantalla-"]');
-
-    if (linkSugerencias && pantallaSugerencias) {
-        linkSugerencias.addEventListener('click', (e) => {
-            e.preventDefault();
-            // Ocultar todas las pantallas (Vive un día, Explorar, etc.)
-            pantallas.forEach(pantalla => {
-                pantalla.classList.add('seccion-oculta');
-            });
-            // Mostrar la pantalla de sugerencias
-            pantallaSugerencias.classList.remove('seccion-oculta');
-        });
-    }
-
     // 2. Lógica del Formulario y Envío
     const form = document.getElementById('suggestion-form');
     const formContainer = document.getElementById('form-container');
