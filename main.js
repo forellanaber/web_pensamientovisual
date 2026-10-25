@@ -787,38 +787,46 @@ $(document).ready(function() {
     }
 
     function mostrarRegion(codigo, desplazar) {
-        regionActual = codigo;
-        let r = DATOS_REGIONES[codigo];
+    regionActual = codigo;
+    let r = DATOS_REGIONES[codigo];
 
-        // Resaltar en el mapa (se mueve al final para quedar por encima de las vecinas) y en la lista
-        $(".region-mapa").removeClass("activa");
-        $(`.region-mapa[data-region="${codigo}"]`).addClass("activa").appendTo("#mapa-chile");
-        $(".item-region").removeClass("activo");
-        $(`.item-region[data-region="${codigo}"]`).addClass("activo");
+    // Resaltar en el mapa y en la lista
+    $(".region-mapa").removeClass("activa");
+    $(`.region-mapa[data-region="${codigo}"]`).addClass("activa").appendTo("#mapa-chile");
+    $(".item-region").removeClass("activo");
+    $(`.item-region[data-region="${codigo}"]`).addClass("activo");
 
-        $("#ficha-vacia").prop("hidden", true);
-        $("#ficha-contenido").prop("hidden", false);
-        $("#nombre-region").text(nombreRegion(codigo));
+    $("#ficha-vacia").prop("hidden", true);
+    $("#ficha-contenido").prop("hidden", false);
 
-        // 1. Cómo son los estudiantes
-        $("#dato-estudiantes").html(hayDato(r.estudiantes) ? miles(r.estudiantes) : pendiente());
-        $("#dato-trabaja").html(hayDato(r.estudiaYTrabaja) ? formatoNumero(r.estudiaYTrabaja) + "%" : pendiente());
-        $("#dato-duerme").html(hayDato(r.duermePoco) ? formatoNumero(r.duermePoco) + "%" : pendiente());
+    // Generar el contenido de apoyo estudiantil
+    let htmlApoyo = (r.apoyoEstudiantil && r.apoyoEstudiantil.length > 0)
+        ? r.apoyoEstudiantil.map(item => `<a href="${item.url}" target="_blank" rel="noopener" style="display:inline-block; margin:4px 0; color:#0056b3; font-weight:bold;">${item.nombre}</a>`).join("<br>")
+        : pendiente();
 
-        // 2. Dónde estudian
-        $("#dato-universidades").html(hayDato(r.universidades) ? r.universidades : pendiente());
-        $("#dato-ip").html(hayDato(r.ip) ? r.ip : pendiente());
-        $("#dato-cft").html(hayDato(r.cft) ? r.cft : pendiente());
-        $("#lista-instituciones").html(htmlEnlaces(t("explorar.sitios"), r.instituciones));
+    let contenidoNuevo = `
+        <h2 id="nombre-region">${nombreRegion(codigo)}</h2>
+        <div style="margin-top: 15px; font-size: 0.95rem; line-height: 1.5;">
+            <p style="margin-bottom: 8px;"><strong>🎓 Estudiantes de ed. superior:</strong> ${hayDato(r.estudiantes) ? miles(r.estudiantes) : pendiente()}</p>
+            <p style="margin-bottom: 8px;"><strong>📌 Hábitos de estudio:</strong> ${r.habitoClave || pendiente()}</p>
+            <p style="margin-bottom: 8px;"><strong>⚠️ Factor de riesgo/estrés:</strong> ${r.factorRiesgo || pendiente()}</p>
+            <p style="margin-bottom: 8px;"><strong>💡 Tip de Bienestar:</strong> ${r.tipBienestar || pendiente()}</p>
+            <div style="margin-top: 15px; background: #f0f7ff; padding: 12px; border-radius: 8px; border-left: 4px solid #0056b3;">
+                <strong>💙 Dónde pedir apoyo estudiantil:</strong>
+                <div style="margin-top: 8px;">${htmlApoyo}</div>
+            </div>
+        </div>
+    `;
 
-        // 3. Dónde pedir apoyo (Salud Responde y *4141 están fijos en el HTML)
-        $("#apoyo-region").html(htmlEnlaces(t("explorar.apoyoEstudiantil"), APOYO_ESTUDIANTIL[codigo]));
+    $("#ficha-contenido").html(contenidoNuevo);
 
-        // En celular la ficha queda bajo el mapa: bajar hasta ella
-        if (desplazar && window.matchMedia("(max-width: 900px)").matches) {
-            $("html, body").animate({ scrollTop: $("#ficha-region").offset().top - parseInt(getComputedStyle(document.documentElement).getPropertyValue("--alto-header")) - 12 }, 500);
-        }
+    // En celular la ficha queda bajo el mapa: bajar hasta ella
+    if (desplazar && window.matchMedia("(max-width: 900px)").matches) {
+        $("html, body").animate({
+            scrollTop: $("#ficha-region").offset().top - parseInt(getComputedStyle(document.documentElement).getPropertyValue("--alto-header") || 0) - 12
+        }, 500);
     }
+}
 
     function htmlEnlaces(titulo, enlaces) {
         if (!enlaces || !enlaces.length) return `<p>${titulo} ${pendiente()}</p>`;
