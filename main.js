@@ -732,22 +732,118 @@ $(document).ready(function() {
 //  instituciones:   [ { nombre: "Universidad X", url: "https://..." }, ... ]
 // Los servicios de apoyo estudiantil van en APOYO_ESTUDIANTIL (al inicio de este archivo).
 const DATOS_REGIONES = {
-    15: { estudiantes: 15200, habitoClave: "Aprovechamiento de pausas al aire libre tras bloques de estudio intensos.", factorRiesgo: "Baja frecuencia de pausas activas durante jornadas prolongadas.", tipBienestar: "Aprovechar el clima templado para estudiar en espacios abiertos ayuda a reducir la fatiga mental.", apoyoEstudiantil: [{ nombre: "DAE Universidad de Tarapacá", url: "https://www.uta.cl" }, { nombre: "Apoyo Estudiantil INACAP Arica", url: "https://www.inacap.cl" }] }, // Arica y Parinacota
-    1:  { estudiantes: 18500, habitoClave: "Caminatas breves por la costa entre clases para desconectar del entorno digital.", factorRiesgo: "Trasnoches frecuentes antes de entregas o evaluaciones principales.", tipBienestar: "Integrar descansos visuales lejos de pantallas ayuda a regular el descanso nocturno.", apoyoEstudiantil: [{ nombre: "Bienestar Estudiantil UNAP", url: "https://www.unap.cl" }, { nombre: "DAE Santo Tomás Iquique", url: "https://www.santotomas.cl" }, { nombre: "Asuntos Estudiantiles INACAP", url: "https://www.inacap.cl" }] }, // Tarapacá
-    2:  { estudiantes: 34000, habitoClave: "Estudio grupal en bibliotecas para mantener la disciplina horaria.", factorRiesgo: "Sobrecarga de tareas combinada con ritmos de trabajo/turnos en la zona.", tipBienestar: "Planificar la semana en bloques rígidos evita la acumulación de cansancio hacia el fin de semana.", apoyoEstudiantil: [{ nombre: "DIDE UCN Antofagasta", url: "https://www.ucn.cl" }, { nombre: "DAE Universidad de Antofagasta", url: "https://www.uantof.cl" }] }, // Antofagasta
-    3:  { estudiantes: 9500, habitoClave: "Rutinas estables de descanso en campus alejados del centro urbano.", factorRiesgo: "Aislamiento en periodos de alta exigencia académica.", tipBienestar: "Coordinar repasos en equipo fortalece las redes de apoyo y mitiga la ansiedad.", apoyoEstudiantil: [{ nombre: "Bienestar Estudiantil UDA", url: "https://www.uda.cl" }] }, // Atacama
-    4:  { estudiantes: 32000, habitoClave: "Técnica Pomodoro (45 min de estudio por 10 min de descanso) en zonas de patio.", factorRiesgo: "Procrastinación del trabajo autónomo por falta de priorización.", tipBienestar: "Dividir grandes entregas en metas diarias pequeñas mantiene alta la motivación.", apoyoEstudiantil: [{ nombre: "DAE Universidad de La Serena", url: "https://www.userena.cl" }, { nombre: "DAE UCN Coquimbo", url: "https://www.ucn.cl" }] }, // Coquimbo
-    5:  { estudiantes: 98000, habitoClave: "Uso activo de espacios universitarios para separar la vida académica del hogar.", factorRiesgo: "Desbalance entre la alta oferta social y los tiempos de estudio.", tipBienestar: "Establecer un límite explícito de hora de fin de jornada previene el colapso semanal.", apoyoEstudiantil: [{ nombre: "DAE PUCV", url: "https://www.pucv.cl" }, { nombre: "Dirección de Asuntos Estudiantiles UV", url: "https://www.uv.cl" }, { nombre: "Servicios de Salud UPLA", url: "https://www.upla.cl" }] }, // Valparaíso
-    13: { estudiantes: 380000, habitoClave: "Repaso de audio o lectura breve durante trayectos largos para liberar la tarde.", factorRiesgo: "Estrés severo acumulado por tiempos de traslado y multitarea.", tipBienestar: "Aprovechar los traslados para escuchar música relajante o podcasts disminuye la fatiga urbana.", apoyoEstudiantil: [{ nombre: "Salud Estudiantil UC", url: "https://www.uc.cl" }, { nombre: "Bienestar Estudiantil U. de Chile", url: "https://uchile.cl" }, { nombre: "DAE USACH", url: "https://www.usach.cl" }, { nombre: "DAE UDP", url: "https://www.udp.cl" }] }, // Metropolitana
-    6:  { estudiantes: 14000, habitoClave: "Desconexión de dispositivos móviles al finalizar la jornada de lecturas.", factorRiesgo: "Falta de pausas estructuradas en jornadas de tarde.", tipBienestar: "Separar un espacio físico exclusivo para estudiar ayuda al cerebro a conciliar mejor el sueño.", apoyoEstudiantil: [{ nombre: "DAE Universidad de O'Higgins", url: "https://www.uoh.cl" }] }, // O'Higgins
-    7:  { estudiantes: 41000, habitoClave: "Almuerzo y descansos al aire libre en áreas verdes del campus.", factorRiesgo: "Sedentarismo en épocas de certámenes.", tipBienestar: "Caminar 15 minutos tras el almuerzo mejora el rendimiento y la concentración vespertina.", apoyoEstudiantil: [{ nombre: "DVET Universidad de Talca", url: "https://www.utalca.cl" }, { nombre: "DAE UCM", url: "https://portal.ucm.cl" }] }, // Maule
-    16: { estudiantes: 18000, habitoClave: "Grupos de estudio colaborativo para resolver dudas de forma eficiente.", factorRiesgo: "Sobrecarga por mala distribución de tareas en trabajos grupales.", tipBienestar: "Definir roles claros desde el día uno ahorra horas de reuniones innecesarias.", apoyoEstudiantil: [{ nombre: "Dir. Desarrollo Estudiantil UBB Chillán", url: "https://www.ubiobio.cl" }] }, // Ñuble
-    8:  { estudiantes: 125000, habitoClave: "Rutinas deportivas e integración de actividad física en el campus.", factorRiesgo: "Elevada autoexigencia académica y falta de horas de sueño acumuladas.", tipBienestar: "Mantener horarios de comida regulares protege la energía física durante semanas intensas.", apoyoEstudiantil: [{ nombre: "Dise Universidad de Concepción", url: "https://www.udec.cl" }, { nombre: "DAE UCSC", url: "https://www.ucsc.cl" }, { nombre: "DDE UBB Concepción", url: "https://www.ubiobio.cl" }] }, // Biobío
-    9:  { estudiantes: 52000, habitoClave: "Estudio en recintos cerrados bien iluminados durante el invierno.", factorRiesgo: "Baja motivación ligada a la falta de luz natural y clima frío.", tipBienestar: "Mantener el lugar de estudio bien ventilado previene la somnolencia y la pesadez mental.", apoyoEstudiantil: [{ nombre: "DGE Universidad de La Frontera", url: "https://www.ufro.cl" }, { nombre: "DAE UCT Temuco", url: "https://www.uct.cl" }] }, // La Araucanía
-    14: { estudiantes: 22000, habitoClave: "Pausas de contacto con la naturaleza para regular el estrés académico.", factorRiesgo: "Postergación de repasos por acumulación de entregas simultáneas.", tipBienestar: "Usar un calendario visual semanal ayuda a anticipar los picos de trabajo.", apoyoEstudiantil: [{ nombre: "DAE Universidad Austral de Chile", url: "https://www.uach.cl" }] }, // Los Ríos
-    10: { estudiantes: 28000, habitoClave: "Planificación anticipada de entregas para evitar jornadas nocturnas.", factorRiesgo: "Desorganización en el uso del tiempo libre.", tipBienestar: "Cumplir metas diarias cortas reduce la angustia antes de un examen decisivo.", apoyoEstudiantil: [{ nombre: "DAE Universidad de Los Lagos", url: "https://www.ulagos.cl" }, { nombre: "DAE UACh Sede Puerto Montt", url: "https://www.uach.cl" }] }, // Los Lagos
-    11: { estudiantes: 2100, habitoClave: "Trabajo estrecho en pares y redes de apoyo comunitarias.", factorRiesgo: "Sensación de aislamiento durante el año académico.", tipBienestar: "Fomentar espacios de conversación no académica ayuda a despejar la mente.", apoyoEstudiantil: [{ nombre: "DAE Universidad de Aysén", url: "https://uaysen.cl" }] }, // Aysén
-    12: { estudiantes: 6800, habitoClave: "Adaptación del reloj biológico a la baja luminosidad invernal.", factorRiesgo: "Alteración de ciclos de sueño por desorden de horarios.", tipBienestar: "Sostener la misma hora de levantar y acostarse protege tus niveles diarios de energía.", apoyoEstudiantil: [{ nombre: "DAE Universidad de Magallanes", url: "https://www.umag.cl" }] }  // Magallanes
+    15: { 
+        estudiantes: 15200, 
+        habitoClave: "Aprovechamiento del entorno costero y clima desértico-costero para pausas de estudio al aire libre.", 
+        factorRiesgo: "Desplazamientos entre zonas extremas y adaptación al ritmo de la macrozona norte.", 
+        tipBienestar: "Aprovechar la luz solar regular para establecer rutinas estables de estudio y descanso.", 
+        apoyoEstudiantil: [{ nombre: "DAE Universidad de Tarapacá", url: "https://www.uta.cl" }, { nombre: "Apoyo Estudiantil INACAP Arica", url: "https://www.inacap.cl" }] 
+    }, // Arica y Parinacota
+    1:  { 
+        estudiantes: 18500, 
+        habitoClave: "Uso de los espacios costeros y playas como zonas de desconexión entre jornadas académicas.", 
+        factorRiesgo: "Cargas de estudio concentradas en el entorno de zona franca e industrial.", 
+        tipBienestar: "Integrar descansos visuales mirando al horizonte marino para mitigar el cansancio acumulado.", 
+        apoyoEstudiantil: [{ nombre: "Bienestar Estudiantil UNAP", url: "https://www.unap.cl" }, { nombre: "DAE Santo Tomás Iquique", url: "https://www.santotomas.cl" }, { nombre: "Asuntos Estudiantiles INACAP", url: "https://www.inacap.cl" }] 
+    }, // Tarapacá
+    2:  { 
+        estudiantes: 34000, 
+        habitoClave: "Organización de tiempos de estudio adaptados a la dinámica minero-industrial de la región.", 
+        factorRiesgo: "Extensión de jornadas de estudio y trabajo en un entorno predominantemente árido y de alta exigencia.", 
+        tipBienestar: "Mantener una alta hidratación y proteger los ambientes nocturnos de descanso.", 
+        apoyoEstudiantil: [{ nombre: "DIDE UCN Antofagasta", url: "https://www.ucn.cl" }, { nombre: "DAE Universidad de Antofagasta", url: "https://www.uantof.cl" }] 
+    }, // Antofagasta
+    3:  { 
+        estudiantes: 9500, 
+        habitoClave: "Estudio presencial y colaborador en campus integrados a valles desérticos.", 
+        factorRiesgo: "Distancias entre comunas y aislamiento geográfico durante periodos de evaluaciones.", 
+        tipBienestar: "Coordinar grupos de apoyo académico presenciales para fortalecer la red comunitaria.", 
+        apoyoEstudiantil: [{ nombre: "Bienestar Estudiantil UDA", url: "https://www.uda.cl" }] 
+    }, // Atacama
+    4:  { 
+        estudiantes: 32000, 
+        habitoClave: "Uso de patios universitarios y campus abiertos gracias al clima semiarido propicio.", 
+        factorRiesgo: "Extensión de trayectos interurbanos entre La Serena, Coquimbo y el interior.", 
+        tipBienestar: "Aprovechar las áreas verdes del entorno costero o de valles para hacer pausas de estudio.", 
+        apoyoEstudiantil: [{ nombre: "DAE Universidad de La Serena", url: "https://www.userena.cl" }, { nombre: "DAE UCN Coquimbo", url: "https://www.ucn.cl" }] 
+    }, // Coquimbo
+    5:  { 
+        estudiantes: 98000, 
+        habitoClave: "Integración académica entre múltiples universidades y la activa vida de ciudad puerto y universitaria.", 
+        factorRiesgo: "Complejidad en los trayectos por la geografía de cerros y la alta conectividad costera.", 
+        tipBienestar: "Marcar un límite claro entre las actividades académicas y los momentos de recreación regional.", 
+        apoyoEstudiantil: [{ nombre: "DAE PUCV", url: "https://www.pucv.cl" }, { nombre: "Dirección de Asuntos Estudiantiles UV", url: "https://www.uv.cl" }, { nombre: "Servicios de Salud UPLA", url: "https://www.upla.cl" }] 
+    }, // Valparaíso
+    13: { 
+        estudiantes: 380000, 
+        habitoClave: "Uso eficiente del transporte metropolitano para la lectura o repaso de contenidos.", 
+        factorRiesgo: "Estrés urbano acumulado debido a los largos tiempos de traslado en la gran capital.", 
+        tipBienestar: "Aprovechar los traslados diarios para desconectar activamente con música o contenidos auditivos.", 
+        apoyoEstudiantil: [{ nombre: "Salud Estudiantil UC", url: "https://www.uc.cl" }, { nombre: "Bienestar Estudiantil U. de Chile", url: "https://uchile.cl" }, { nombre: "DAE USACH", url: "https://www.usach.cl" }, { nombre: "DAE UDP", url: "https://www.udp.cl" }] 
+    }, // Metropolitana
+    6:  { 
+        estudiantes: 14000, 
+        habitoClave: "Aprovechamiento de la calma del entorno agrourbano para jornadas de concentración focalizada.", 
+        factorRiesgo: "Desplazamientos diarios entre comunas rurales y la capital regional.", 
+        tipBienestar: "Separar espacios definidos en el hogar para evitar la mezcla entre estudio y descanso.", 
+        apoyoEstudiantil: [{ nombre: "DAE Universidad de O'Higgins", url: "https://www.uoh.cl" }] 
+    }, // O'Higgins
+    7:  { 
+        estudiantes: 41000, 
+        habitoClave: "Pausas de descanso y estudio en las amplias áreas verdes que caracterizan los campus del centro-sur.", 
+        factorRiesgo: "Fluctuaciones de temperatura estaciónales que alteran el rendimiento o dinamismo diario.", 
+        tipBienestar: "Caminar periódicamente por zonas arboladas para despejar la mente entre clases.", 
+        apoyoEstudiantil: [{ nombre: "DVET Universidad de Talca", url: "https://www.utalca.cl" }, { nombre: "DAE UCM", url: "https://portal.ucm.cl" }] 
+    }, // Maule
+    16: { 
+        estudiantes: 18000, 
+        habitoClave: "Organización de grupos de estudio en una zona de alta cercanía y vida estudiantil de pequeña escala.", 
+        factorRiesgo: "Impacto del clima lluvioso e invernal en la movilidad cotidiana.", 
+        tipBienestar: "Organizar espacios iluminados y templados para el trabajo académico en época de frío.", 
+        apoyoEstudiantil: [{ nombre: "Dir. Desarrollo Estudiantil UBB Chillán", url: "https://www.ubiobio.cl" }] 
+    }, // Ñuble
+    8:  { 
+        estudiantes: 125000, 
+        habitoClave: "Intensa vida universitaria integrada a campus con abundante vegetación y tradición académica.", 
+        factorRiesgo: "Saturación por alta exigencia académica combinada con el clima húmedo y lluvioso.", 
+        tipBienestar: "Mantener horarios de alimentación regulares durante las semanas de alta carga climática.", 
+        apoyoEstudiantil: [{ nombre: "Dise Universidad de Concepción", url: "https://www.udec.cl" }, { nombre: "DAE UCSC", url: "https://www.ucsc.cl" }, { nombre: "DDE UBB Concepción", url: "https://www.ubiobio.cl" }] 
+    }, // Biobío
+    9:  { 
+        estudiantes: 52000, 
+        habitoClave: "Estudio y encuentro estudiantil en recintos cerrados adaptados a la zona sur y multicultural.", 
+        factorRiesgo: "Menor exposición a luz natural durante los periodos de otoño-invierno.", 
+        tipBienestar: "Asegurar una ventilación adecuada en áreas de estudio con calefacción constante.", 
+        apoyoEstudiantil: [{ nombre: "DGE Universidad de La Frontera", url: "https://www.ufro.cl" }, { nombre: "DAE UCT Temuco", url: "https://www.uct.cl" }] 
+    }, // La Araucanía
+    14: { 
+        estudiantes: 22000, 
+        habitoClave: "Aprovechamiento del entorno natural y fluvial para equilibrar el estrés académico.", 
+        factorRiesgo: "Continuidad de lluvias prolongadas que dificultan el movimiento al aire libre.", 
+        tipBienestar: "Llevar un calendario visual para planificar las entregas durante días con clima adverso.", 
+        apoyoEstudiantil: [{ nombre: "DAE Universidad Austral de Chile", url: "https://www.uach.cl" }] 
+    }, // Los Ríos
+    10: { 
+        estudiantes: 28000, 
+        habitoClave: "Rutinas adaptadas al dinamismo insular, norpatagónico y costero de la región.", 
+        factorRiesgo: "Aislamiento geográfico temporal por factores meteorológicos y de transporte marítimo/terrestre.", 
+        tipBienestar: "Cumplir objetivos diarios graduados para evitar acumulación de tareas de última hora.", 
+        apoyoEstudiantil: [{ nombre: "DAE Universidad de Los Lagos", url: "https://www.ulagos.cl" }, { nombre: "DAE UACh Sede Puerto Montt", url: "https://www.uach.cl" }] 
+    }, // Los Lagos
+    11: { 
+        estudiantes: 2100, 
+        habitoClave: "Fuerte trabajo colaborativo en comunidades estudiantiles reducidas y unidas de la Patagonia.", 
+        factorRiesgo: "Condiciones climáticas extremas e insularidad que limitan la movilidad regular.", 
+        tipBienestar: "Fomentar actividades compartidas para mantener el bienestar emocional en los meses más fríos.", 
+        apoyoEstudiantil: [{ nombre: "DAE Universidad de Aysén", url: "https://uaysen.cl" }] 
+    }, // Aysén
+    12: { 
+        estudiantes: 6800, 
+        habitoClave: "Adaptación de los hábitos de estudio a las variaciones dramáticas de luz diurna durante el año.", 
+        factorRiesgo: "Alteración de ciclos circadianos por las pocas horas de luz solar en invierno austral.", 
+        tipBienestar: "Sostener horarios estrictos de sueño para regular los niveles de energía corporal.", 
+        apoyoEstudiantil: [{ nombre: "DAE Universidad de Magallanes", url: "https://www.umag.cl" }] 
+    }  // Magallanes
 };
 
 $(document).ready(function() {
