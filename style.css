@@ -1122,8 +1122,8 @@ h4, strong, b { font-weight: 700; }
 /* Capas de parallax */
 .vd-capa { position: absolute; left: 0; right: 0; pointer-events: none; }
 .vd-tira { display: flex; align-items: flex-end; height: 100%; width: max-content; will-change: transform; }
-#capa-cordillera { bottom: calc(var(--vd-suelo-alto) + 6%); height: 34%; filter: brightness(calc(1 - var(--vd-oscuridad))); }
-#capa-ciudad { bottom: var(--vd-suelo-alto); height: 30%; filter: brightness(calc(1 - var(--vd-oscuridad) * 0.9)); }
+#capa-cordillera { bottom: calc(var(--vd-suelo-alto) + 2%); height: 55%; filter: brightness(calc(1 - var(--vd-oscuridad))); }
+#capa-ciudad { bottom: var(--vd-suelo-alto); height: 40%; filter: brightness(calc(1 - var(--vd-oscuridad) * 0.9)); }
 #capa-calle { inset: 0; pointer-events: auto; }
 #capa-calle .vd-tira { align-items: stretch; }
 .vd-copia { height: 100%; flex: 0 0 auto; }
