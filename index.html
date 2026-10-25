@@ -48,17 +48,26 @@
         </div>
     </header>
 
-    <!-- Pantalla 1: Bienvenida -->
-    <!-- Fondo: foto tenue en img/fondo-inicio.jpg con capa blanca encima (ver .inicio-fondo en style.css).
-         Mientras no exista la foto, el fondo queda blanco. -->
+    <!-- Pantalla 1: Bienvenida (dos columnas: texto a la izquierda, personaje a la derecha) -->
+    <!-- Fondo: --fondo (off-white). Si existe img/patron.png, se ve encima al 8% (ver .inicio-fondo en style.css). -->
     <section id="pantalla-bienvenida" class="seccion-activa inicio-fondo">
-        <div class="contenedor centrado">
-            <p class="lema"><svg class="lema-reloj" aria-hidden="true"><use href="#reloj-arena"/></svg> <span data-t="pie.lema">Tu día, en equilibrio</span></p>
-            <h1 class="titulo-inicio">
-                <span class="titulo-inicio-1" data-t="inicio.titulo1">¿Eres estudiante y te gustaría</span>
-                <span class="titulo-inicio-2" data-t="inicio.titulo2">mejorar tu uso del tiempo?</span>
-            </h1>
-            <button id="btn-comenzar" class="boton-primario boton-si" data-t="inicio.si">Sí</button>
+        <div class="inicio-contenido">
+            <div class="inicio-texto">
+                <h1 class="titulo-inicio">
+                    <span class="titulo-inicio-1" data-t="inicio.titulo1">¿Eres estudiante y te gustaría</span>
+                    <span class="titulo-inicio-2" data-t="inicio.titulo2">mejorar tu uso del tiempo?</span>
+                </h1>
+                <button id="btn-comenzar" class="boton-primario boton-si" data-t="inicio.si">Sí</button>
+            </div>
+            <div class="inicio-personaje" aria-hidden="true">
+                <!-- El marco mueve juntos la imagen y las rayitas cuando el personaje reacciona al botón -->
+                <div class="personaje-marco">
+                    <img src="img/personaje-inicio.png" alt="" width="600" height="909">
+                    <span class="personaje-chispa c1"></span>
+                    <span class="personaje-chispa c2"></span>
+                    <span class="personaje-chispa c3"></span>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -401,14 +410,9 @@
                 </div>
             </div>
 
-            <!-- Invitación a Vive un día -->
-            <div class="invita-vive">
-                <i class="fa-solid fa-sun"></i>
-                <div>
-                    <h3 data-t="invita.titulo">¿Cómo cambia un día con otros hábitos?</h3>
-                    <p data-t="invita.texto">Recorre un día completo de un estudiante, de la mañana a la madrugada.</p>
-                </div>
-                <button type="button" class="boton-secundario btn-ir-vive"><span data-t="invita.boton">Vive un día</span> <i class="fa-solid fa-arrow-right"></i></button>
+            <!-- Botón a Vive un día (la sección vive en su propia pantalla) -->
+            <div class="invita-vive-solo">
+                <button type="button" class="boton-secundario btn-ir-vive"><i class="fa-solid fa-sun"></i> <span data-t="invita.boton">Vive un día</span> <i class="fa-solid fa-arrow-right"></i></button>
             </div>
 
             <div class="cta-guia centrado">
@@ -553,7 +557,110 @@
         </div>
     </section>
 
-    <!-- Pantalla Vive un día: recorrido ilustrado con scroll -->
+    <!-- Pantalla Vive un día: recorrido horizontal de 08:00 a 07:00.
+         Se arma en la sección 9 de main.js y sus estilos están en el bloque "Vive un día (recorrido horizontal)" de style.css.
+         Reemplaza al recorrido con scroll vertical, que quedó comentado más abajo. -->
+    <section id="pantalla-vive" class="seccion-oculta modo-bien">
+
+        <!-- Esta caja queda fija (pin) mientras el scroll vertical mueve el día hacia el lado -->
+        <div id="vd-recorrido" class="vd-recorrido">
+            <!-- Capas, de atrás hacia adelante -->
+            <div id="vd-cielo" class="vd-cielo"></div>
+            <div class="vd-cielo-sombra"></div>
+            <div id="capa-cordillera" class="vd-capa"><div class="vd-tira"></div></div>
+            <div id="capa-ciudad" class="vd-capa"><div class="vd-tira"></div></div>
+            <div id="capa-calle" class="vd-capa"><div id="vd-calle" class="vd-tira"></div></div>
+
+            <!-- Personaje fijo en el tercio izquierdo; el mundo se mueve detrás -->
+            <div id="vd-personaje" class="vd-personaje" aria-hidden="true">
+                <div id="vd-bateria" class="vd-bateria">
+                    <div class="contenedor-bateria">
+                        <div class="bateria-cuerpo"><div id="vd-bateria-nivel" class="bateria-nivel"></div></div>
+                        <div class="bateria-punta"></div>
+                    </div>
+                    <small data-t="vd.ilustrativo">Ilustrativo</small>
+                </div>
+                <div class="vd-pj-slot activo"></div>
+                <div class="vd-pj-slot"></div>
+            </div>
+
+            <!-- Interruptor de hábitos -->
+            <div class="vd-modo" role="radiogroup" data-t-aria="vd.modoAria" aria-label="Cómo vivir el día">
+                <button type="button" class="vd-modo-btn activo" data-modo="bien" role="radio" aria-checked="true"><i class="fa-solid fa-check"></i> <span data-t="vd.modoBien">Buenos hábitos</span></button>
+                <button type="button" class="vd-modo-btn" data-modo="mal" role="radio" aria-checked="false"><i class="fa-solid fa-xmark"></i> <span data-t="vd.modoMal">Malos hábitos</span></button>
+            </div>
+            <p id="vd-pista" class="vd-pista"><i class="fa-solid fa-arrow-down"></i> <span data-t="vd.pista">Baja para recorrer el día</span></p>
+
+            <!-- Hipnograma: solo de noche. Se dibuja a medida que avanza el scroll. -->
+            <div id="vd-hipnograma" class="vd-hipnograma" role="img" data-t-aria="vd.hipnogramaAria" aria-label="Fases del sueño durante la noche">
+                <ul class="vd-niveles">
+                    <li data-t="vd.despierto">Despierto</li>
+                    <li data-t="vd.liviano">Liviano</li>
+                    <li data-t="vd.rem">REM</li>
+                    <li data-t="vd.profundo">Profundo</li>
+                </ul>
+                <div class="vd-hipno-grafico">
+                    <svg viewBox="0 0 480 100">
+                        <line class="vd-hipno-guia" x1="0" y1="12" x2="480" y2="12"/>
+                        <line class="vd-hipno-guia" x1="0" y1="37" x2="480" y2="37"/>
+                        <line class="vd-hipno-guia" x1="0" y1="62" x2="480" y2="62"/>
+                        <line class="vd-hipno-guia" x1="0" y1="87" x2="480" y2="87"/>
+                        <path id="vd-hipno-linea" class="vd-hipno-linea" d="M0 12"/>
+                    </svg>
+                    <div class="vd-hipno-horas"><span>23:00</span><span>01:00</span><span>03:00</span><span>05:00</span><span>07:00</span></div>
+                </div>
+                <small class="vd-hipno-nota" data-t="vd.ilustrativo">Ilustrativo</small>
+            </div>
+
+            <!-- Barra del día: un punto por parada; permite saltar a cada una -->
+            <nav id="vd-barra" class="vd-barra" data-t-aria="vd.barraAria" aria-label="Línea del día, de 08:00 a 07:00">
+                <div class="vd-barra-pista">
+                    <div class="vd-barra-noche"></div>
+                    <ol id="vd-barra-puntos"></ol>
+                    <div id="vd-barra-marca" class="vd-barra-marca"></div>
+                </div>
+                <div class="vd-barra-extremos"><span>08:00</span><span>07:00</span></div>
+            </nav>
+
+            <!-- Tarjeta de detalle (una sola abierta a la vez). En celular sube como hoja desde abajo. -->
+            <article id="vd-tarjeta" class="vd-tarjeta" hidden>
+                <button type="button" id="vd-tarjeta-cerrar" class="vd-tarjeta-cerrar" data-t-aria="vd.cerrar" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                <div id="vd-tarjeta-contenido"></div>
+            </article>
+        </div>
+
+        <!-- Versión sin animaciones (prefers-reduced-motion): paradas una debajo de otra -->
+        <div id="vd-lista" class="vd-lista" hidden></div>
+
+        <!-- Final: las dos noches lado a lado -->
+        <div class="vd-final">
+            <div class="vd-final-baterias">
+                <div class="vd-final-item">
+                    <div class="contenedor-bateria">
+                        <div class="bateria-cuerpo"><div class="bateria-nivel" style="width: 95%; background: var(--estado-bien)"></div></div>
+                        <div class="bateria-punta"></div>
+                    </div>
+                    <span class="vd-final-horas" data-t="vive.finalBuenas">7,5 h</span>
+                    <span class="vd-final-etiqueta"><i class="fa-solid fa-check"></i> <span data-t="vd.modoBien">Buenos hábitos</span></span>
+                </div>
+                <div class="vd-final-item">
+                    <div class="contenedor-bateria">
+                        <div class="bateria-cuerpo"><div class="bateria-nivel" style="width: 55%; background: var(--estado-mejorar)"></div></div>
+                        <div class="bateria-punta"></div>
+                    </div>
+                    <span class="vd-final-horas" data-t="vive.finalMalas">5 h</span>
+                    <span class="vd-final-etiqueta"><i class="fa-solid fa-xmark"></i> <span data-t="vd.modoMal">Malos hábitos</span></span>
+                </div>
+            </div>
+            <small class="vd-final-nota" data-t="vd.ilustrativo">Ilustrativo</small>
+            <p class="vd-final-frase" data-t="vd.finalFrase">La diferencia empieza mucho antes de dormir</p>
+            <button type="button" id="btn-vive-test" class="boton-primario boton-empezar"><span data-t="vive.finalBoton">Hacer el test</span> <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </section>
+
+    <!-- ===== VERSIÓN ANTERIOR (scroll vertical), REEMPLAZADA por el recorrido horizontal de arriba.
+         Se deja comentada como referencia. Los comentarios internos se marcaron con <!~~ ~~> para no cortar este bloque.
+    <!~~ Pantalla Vive un día: recorrido ilustrado con scroll ~~>
     <section id="pantalla-vive" class="seccion-oculta modo-bien">
         <div class="dia-intro">
             <h2 data-t="vive.titulo">Vive un día</h2>
@@ -569,7 +676,7 @@
             <div class="dia-escenario">
                 <div class="dia-divisor" aria-hidden="true"></div>
 
-                <!-- Interruptor fijo mientras se recorre el día -->
+                <!~~ Interruptor fijo mientras se recorre el día ~~>
                 <div class="dia-modo dia-modo-fijo" role="radiogroup" data-t-aria="vive.modoAria" aria-label="Cómo vivir el día">
                     <button type="button" class="dia-modo-btn activo" data-modo="bien" role="radio" aria-checked="true"><i class="fa-solid fa-check"></i> <span data-t="vive.modoBien">Con buenos hábitos</span></button>
                     <button type="button" class="dia-modo-btn" data-modo="mal" role="radio" aria-checked="false"><i class="fa-solid fa-xmark"></i> <span data-t="vive.modoMal">Con malos hábitos</span></button>
@@ -613,11 +720,11 @@
                 <div id="dia-sigue" class="dia-sigue"><i class="fa-solid fa-chevron-down"></i><span data-t="vive.sigue">Sigue bajando</span></div>
             </div>
 
-            <!-- Ilustraciones de fondo: una pantalla por momento, se recorren con el scroll -->
+            <!~~ Ilustraciones de fondo: una pantalla por momento, se recorren con el scroll ~~>
             <div id="dia-fondos" class="dia-fondos"></div>
         </div>
 
-        <!-- Cierre: horas de sueño lado a lado -->
+        <!~~ Cierre: horas de sueño lado a lado ~~>
         <div class="dia-final">
             <h2 data-t="vive.finalTitulo">Así termina el día</h2>
             <p class="dia-final-sub" data-t="vive.finalSub">Con la alarma a las 07:00, esto es lo que alcanzas a dormir.</p>
@@ -640,6 +747,8 @@
             <button type="button" id="btn-vive-test" class="boton-primario boton-empezar"><span data-t="vive.finalBoton">Hacer el test</span> <i class="fa-solid fa-arrow-right"></i></button>
         </div>
     </section>
+
+    ===== FIN VERSIÓN ANTERIOR -->
 
     <!-- Pantalla Explorar Chile -->
     <section id="pantalla-explorar" class="seccion-oculta">
@@ -763,6 +872,9 @@
     </footer>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- GSAP y ScrollTrigger (versión fija) para el recorrido horizontal de Vive un día -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="textos.js"></script>
     <script src="main.js"></script>
 </body>

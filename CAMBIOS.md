@@ -51,6 +51,7 @@ Salen del testeo con compañeros y del plan de mejoras. Marcar con [x] lo que qu
 - [x] Sacar "Un día que te alcanza" de la página de resultados y llevarlo al menú, junto a Explorar Chile, con el nombre "Vive un día".
 - [x] Agregar un interruptor arriba: "Con buenos hábitos" / "Con malos hábitos". Usa los datos `bien` y `mal` que ya tiene cada momento.
 - [x] Al final, las horas de sueño lado a lado (7,5 h contra 5 h) y un botón para hacer el test.
+- [x] Rehacer "Vive un día" como recorrido horizontal con parallax, hipnograma, batería y barra del día (ver VIVE-UN-DIA.md). Faltan las imágenes de img/dia/.
 
 ### 8. Plan de acción
 - [x] Cada cambio activado en el simulador muestra "Agregarlo a mi calendario" con dos opciones:

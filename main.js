@@ -100,6 +100,11 @@ $(document).ready(function() {
     $(document).on("cambioIdioma", medirHeader);
 
     $("#btn-comenzar").click(function() { revelarYScrollear("#pantalla-bienvenida", "#pantalla-contexto"); });
+
+    // El personaje del inicio reacciona cuando el cursor (o el teclado) llega al botón "Sí"
+    $("#btn-comenzar")
+        .on("mouseenter focus", function() { $(".inicio-contenido").addClass("reacciona"); })
+        .on("mouseleave blur", function() { $(".inicio-contenido").removeClass("reacciona"); });
     $("#btn-ir-al-test").click(function() {
         revelarYScrollear("#pantalla-contexto", "#pantalla-test");
         empezarTest();
@@ -852,6 +857,492 @@ $(document).ready(function() {
 });
 
 // =====================================================================
+// --- 9. Vive un día: recorrido horizontal de 08:00 a 07:00 ---
+// La sección queda fija (pin de ScrollTrigger) y el scroll vertical mueve el día hacia el lado.
+// Capas: cielo (degradé por código), cordillera (lenta), ciudad (media) y calle (rápida).
+// Reemplaza al recorrido con scroll vertical, que quedó comentado más abajo.
+// =====================================================================
+$(document).ready(function() {
+    const $seccion = $("#pantalla-vive");
+    if (!$seccion.length || !$("#vd-recorrido").length) return;
+
+    const CARPETA = "img/dia/";
+    // Proporción de cada imagen (ancho, alto). Los rectángulos provisorios usan la misma.
+    const TAM = { cordillera: [2400, 800], ciudad: [2400, 800], escenario: [1500, 1000], personaje: [600, 900] };
+    const MIN_TOTAL = 1380;   // de 08:00 a 07:00 del día siguiente, en minutos
+    const MIN_NOCHE = 900;    // 23:00
+    const VELOCIDAD = { cordillera: 0.12, ciudad: 0.35, calle: 1 };
+
+    // Paradas del día: textos del arreglo "momentos" de textos.js (mismo orden)
+    const PARADAS_DIA = [
+        { hora: "08:00", min: 0,   momento: 0, ejemplo: true, iconoBien: "fa-headphones",     iconoMal: "fa-mobile-screen" },
+        { hora: "10:30", min: 150, momento: 1,                iconoBien: "fa-list-check",     iconoMal: "fa-bell" },
+        { hora: "13:30", min: 330, momento: 2, ejemplo: true, iconoBien: "fa-utensils",       iconoMal: "fa-laptop" },
+        { hora: "16:00", min: 480, momento: 3,                iconoBien: "fa-list-check",     iconoMal: "fa-hourglass-end" },
+        { hora: "19:30", min: 690, momento: 4,                iconoBien: "fa-person-running", iconoMal: "fa-couch" },
+        { hora: "21:00", min: 780, momento: 5,                iconoBien: "fa-guitar",         iconoMal: "fa-mobile-screen" }
+    ];
+    // Se agrega solo si existe img/dia-1800.jpg (textos en "momentoTrabajo")
+    const PARADA_TRABAJO = { hora: "18:00", min: 600, trabajo: true, ejemplo: true, iconoBien: "fa-calendar-days", iconoMal: "fa-battery-quarter" };
+    // Paradas de la noche: textos en "noche" de textos.js. "sueno" = horas dormidas hasta esa hora.
+    const PARADAS_NOCHE = [
+        { hora: "23:00", min: 900,  noche: 0, sueno: { bien: 0,   mal: 0 },   fuente: { bien: "",               mal: "vd.fuentePantalla" }, iconoBien: "fa-book-open",  iconoMal: "fa-mobile-screen" },
+        { hora: "23:30", min: 930,  noche: 1, sueno: { bien: 0,   mal: 0 },   fuente: { bien: "vd.fuenteNoche", mal: "vd.fuentePantalla" }, iconoBien: "fa-bed",        iconoMal: "fa-mobile-screen" },
+        { hora: "00:30", min: 990,  noche: 2, sueno: { bien: 1,   mal: 0 },   fuente: { bien: "vd.fuenteNoche", mal: "vd.fuentePantalla" }, iconoBien: "fa-moon",       iconoMal: "fa-mobile-screen" },
+        { hora: "02:00", min: 1080, noche: 3, sueno: { bien: 2.5, mal: 0 },   fuente: { bien: "vd.fuenteNoche", mal: "" },                  iconoBien: "fa-moon",       iconoMal: "fa-bed" },
+        { hora: "04:30", min: 1230, noche: 4, sueno: { bien: 5,   mal: 2.5 }, fuente: { bien: "vd.fuenteNoche", mal: "vd.fuenteNoche" },    iconoBien: "fa-cloud-moon", iconoMal: "fa-bed" },
+        { hora: "07:00", min: 1380, noche: 5, sueno: { bien: 7.5, mal: 5 },   fuente: { bien: "vd.fuenteNoche", mal: "vd.fuenteNoche" },    iconoBien: "fa-sun",        iconoMal: "fa-clock" }
+    ];
+
+    // Cielo: colores (variables de :root) en distintas horas; entre ellas se mezclan
+    const CIELO = [[0, "0800"], [330, "1330"], [480, "1600"], [690, "1930"], [780, "2100"],
+                   [900, "2300"], [1080, "0200"], [1290, "0530"], [1380, "0700"]];
+    // Cuánto se oscurecen la cordillera y la ciudad según la hora (0 = nada)
+    const OSCURIDAD = [[0, 0], [690, 0.05], [780, 0.3], [900, 0.5], [1080, 0.62], [1290, 0.45], [1380, 0.05]];
+
+    // Hipnograma (ilustrativo): minutos desde las 23:00. Fases: d despierto, l liviano, r REM, p profundo.
+    const CICLOS = {
+        bien: { despierta: 30, ciclos: [
+            [["l", 15], ["p", 45], ["l", 15], ["r", 15]],
+            [["l", 15], ["p", 35], ["l", 20], ["r", 20]],
+            [["l", 20], ["p", 20], ["l", 25], ["r", 25]],
+            [["l", 25], ["p", 10], ["l", 25], ["r", 30]],
+            [["l", 25], ["p", 5],  ["l", 25], ["r", 35]] ] },
+        mal: { despierta: 180, ciclos: [
+            [["l", 15], ["p", 45], ["l", 15], ["r", 15]],
+            [["l", 15], ["p", 35], ["l", 20], ["r", 20]],
+            [["l", 20], ["p", 25], ["l", 20], ["r", 55]] ] }   // el último REM lo corta la alarma de las 07:00
+    };
+    const NIVEL = { d: 0, l: 1, r: 2, p: 3 };
+    // Batería (ilustrativa): parte en 20% y se carga mientras duerme
+    const BATERIA = { bien: { duerme: 930, llega: 95 }, mal: { duerme: 1080, llega: 55 } };
+
+    const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let paradas = [];
+    let modo = "bien";
+    let actual = -1;           // parada activa
+    let pos = 0;               // posición en el recorrido (índice con decimales)
+    let anchoParada = 0;
+    let disparador = null;     // ScrollTrigger
+    let construido = false;
+    let tarjetaAbierta = -1;
+    let coloresCielo = null;
+    let hipno = { puntos: [], largos: [], total: 0, animando: false };
+
+    const esNoche = p => p.noche !== undefined;
+    const hhmm = p => p.hora.replace(":", "");
+    const limitar01 = n => Math.max(0, Math.min(1, n));
+
+    // ---------- Imágenes (o rectángulo provisorio si falta el archivo) ----------
+    function imagen(nombre, tam, clase) {
+        let $caja = $(`<div class="vd-img ${clase || ""}" style="aspect-ratio: ${tam[0]} / ${tam[1]}" data-archivo="${CARPETA + nombre}"></div>`);
+        let img = new Image();
+        img.alt = "";
+        img.onload = function() { $caja.addClass("cargada"); };
+        img.onerror = function() {
+            $caja.addClass("vd-falta").empty().append(`<span>${t("vive.falta", { archivo: CARPETA + nombre })}</span>`);
+        };
+        img.src = CARPETA + nombre;
+        $caja.append(img);
+        return $caja;
+    }
+
+    // ---------- Textos de una parada en el idioma y la versión actuales ----------
+    function textosParada(p) {
+        if (esNoche(p)) {
+            let n = lista("noche")[p.noche], v = n[modo];
+            return {
+                titulo: n.titulo, dato: formatoNumero(p.sueno[modo]) + " h", nota: t("vd.deSueno"),
+                frase: v.frase, linea: "", detalle: v.detalle,
+                fuente: p.fuente[modo] ? t(p.fuente[modo]) : "", ejemplo: false
+            };
+        }
+        let m = p.trabajo ? lista("momentoTrabajo") : lista("momentos")[p.momento];
+        return {
+            titulo: m.titulo, dato: m.dato, nota: "", frase: m.texto, linea: m[modo].titulo,
+            detalle: m[modo].lista, fuente: m.fuente, ejemplo: !!p.ejemplo
+        };
+    }
+
+    // ---------- Construcción ----------
+    function construir() {
+        if (!paradas.length) return;
+        construido = true;
+        $seccion.toggleClass("vd-reducido", reducido || typeof gsap === "undefined");
+        if (reducido || typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
+            construirLista();
+            return;
+        }
+
+        let $calle = $("#vd-calle").empty();
+        paradas.forEach((p, i) => {
+            let escenario = esNoche(p) ? "escenario-dormitorio.png" : `escenario-${hhmm(p)}.png`;
+            let $p = $(`<div class="vd-parada ${esNoche(p) ? "es-noche" : ""}" data-i="${i}"></div>`);
+            $p.append('<div class="vd-suelo"></div>');
+            $p.append(imagen(escenario, TAM.escenario, "vd-escenario"));
+            $p.append(`<span class="vd-objeto" data-version="bien"><i class="fa-solid ${p.iconoBien}"></i></span>`);
+            $p.append(`<span class="vd-objeto" data-version="mal"><i class="fa-solid ${p.iconoMal}"></i></span>`);
+            $p.append(`
+                <button type="button" class="vd-info" data-i="${i}">
+                    <span class="vd-hora">${p.hora}</span>
+                    <span class="vd-dato"></span>
+                    <span class="vd-nota"></span>
+                    <span class="vd-frase"></span>
+                    <span class="vd-linea"></span>
+                    <span class="vd-ver-mas"></span>
+                </button>`);
+            $calle.append($p);
+        });
+
+        // Barra del día
+        let $puntos = $("#vd-barra-puntos").empty();
+        paradas.forEach((p, i) => {
+            $puntos.append(`<li style="left: ${p.min / MIN_TOTAL * 100}%"><button type="button" class="vd-barra-punto" data-i="${i}"><span>${p.hora}</span></button></li>`);
+        });
+        $(".vd-barra-noche").css("left", MIN_NOCHE / MIN_TOTAL * 100 + "%");
+
+        leerColoresCielo();
+        pintarTextos();
+        medir();
+        crearDesplazamiento();
+        aplicar(0);
+        activarDeslizamientoTactil();
+    }
+
+    // Tiras de cordillera y ciudad: suficientes copias para cubrir todo el recorrido
+    function llenarTira(selector, nombre, velocidad) {
+        let $tira = $(`${selector} .vd-tira`).empty();
+        let alto = $(selector).height();
+        let anchoCopia = alto * TAM[nombre][0] / TAM[nombre][1];
+        let necesario = $(window).width() * 1.2 + velocidad * (paradas.length - 1) * anchoParada;
+        let copias = Math.max(1, Math.ceil(necesario / anchoCopia) + 1);
+        for (let i = 0; i < copias; i++) $tira.append(imagen(nombre + ".png", TAM[nombre], "vd-copia"));
+    }
+
+    function medir() {
+        anchoParada = $(".vd-parada").first().outerWidth() || $(window).width();
+        llenarTira("#capa-cordillera", "cordillera", VELOCIDAD.cordillera);
+        llenarTira("#capa-ciudad", "ciudad", VELOCIDAD.ciudad);
+        construirHipnograma();
+    }
+
+    function crearDesplazamiento() {
+        gsap.registerPlugin(ScrollTrigger);
+        let proxy = { pos: 0 };
+        let tween = gsap.to(proxy, {
+            pos: paradas.length - 1,
+            ease: "none",
+            onUpdate: () => aplicar(proxy.pos),
+            scrollTrigger: {
+                trigger: "#vd-recorrido",
+                pin: true,
+                start: "top top",
+                end: () => "+=" + Math.round((paradas.length - 1) * anchoParada * 0.9),
+                scrub: 0.6,
+                invalidateOnRefresh: true,
+                onRefreshInit: medir
+            }
+        });
+        disparador = tween.scrollTrigger;
+    }
+
+    // ---------- Lo que cambia con el scroll ----------
+    function minutosEn(p) {
+        let i = Math.floor(p), f = p - i;
+        if (i >= paradas.length - 1) return paradas[paradas.length - 1].min;
+        return paradas[i].min + f * (paradas[i + 1].min - paradas[i].min);
+    }
+
+    let pararCaminar = null;
+    function aplicar(nuevaPos) {
+        let cambio = Math.abs(nuevaPos - pos) > 0.0005;
+        pos = nuevaPos;
+        let x = -pos * anchoParada;
+        $("#vd-calle")[0].style.transform = `translate3d(${x * VELOCIDAD.calle}px, 0, 0)`;
+        $("#capa-ciudad .vd-tira")[0].style.transform = `translate3d(${x * VELOCIDAD.ciudad}px, 0, 0)`;
+        $("#capa-cordillera .vd-tira")[0].style.transform = `translate3d(${x * VELOCIDAD.cordillera}px, 0, 0)`;
+
+        let min = minutosEn(pos);
+        pintarCielo(min);
+
+        let activa = Math.round(pos);
+        if (activa !== actual) cambiarParada(activa);
+
+        let deNoche = min >= MIN_NOCHE - 20;
+        $("#vd-hipnograma, #vd-bateria").toggleClass("visible", deNoche);
+        if (!hipno.animando) dibujarHipnograma(min);
+        pintarBateria(min);
+
+        $("#vd-barra-marca").css("left", min / MIN_TOTAL * 100 + "%");
+        $("#vd-pista").toggleClass("oculta-pista", pos > 0.05);
+
+        if (cambio) {
+            $("#vd-personaje").addClass("caminando");
+            clearTimeout(pararCaminar);
+            pararCaminar = setTimeout(() => $("#vd-personaje").removeClass("caminando"), 180);
+        }
+    }
+
+    function cambiarParada(i) {
+        actual = i;
+        $(".vd-barra-punto").removeClass("activo").filter(`[data-i="${i}"]`).addClass("activo");
+        $(".vd-parada").removeClass("activa").filter(`[data-i="${i}"]`).addClass("activa");
+        mostrarPersonaje(false);
+        if (tarjetaAbierta !== -1 && tarjetaAbierta !== i) cerrarTarjeta();
+    }
+
+    // Personaje: dos capas que se cruzan con un fundido
+    let personajeActual = "";
+    function mostrarPersonaje(forzar) {
+        let p = paradas[actual];
+        if (!p) return;
+        let nombre = `personaje-${hhmm(p)}-${modo}.png`;
+        if (nombre === personajeActual && !forzar) return;
+        personajeActual = nombre;
+        let $slots = $("#vd-personaje .vd-pj-slot");
+        let $siguiente = $slots.not(".activo").first();
+        $siguiente.empty().append(imagen(nombre, TAM.personaje, "vd-pj-img"));
+        $slots.removeClass("activo");
+        $siguiente.addClass("activo");
+    }
+
+    // ---------- Cielo ----------
+    function hexARgb(hex) {
+        hex = hex.trim().replace("#", "");
+        if (hex.length === 3) hex = hex.split("").map(c => c + c).join("");
+        return [0, 2, 4].map(i => parseInt(hex.substr(i, 2), 16));
+    }
+    function leerColoresCielo() {
+        let estilo = getComputedStyle(document.documentElement);
+        coloresCielo = CIELO.map(([min, clave]) => ({
+            min: min,
+            arriba: hexARgb(estilo.getPropertyValue(`--vd-cielo-${clave}-arriba`)),
+            abajo: hexARgb(estilo.getPropertyValue(`--vd-cielo-${clave}-abajo`))
+        }));
+    }
+    function interpolar(tabla, min, valor) {
+        for (let i = 0; i < tabla.length - 1; i++) {
+            let a = tabla[i], b = tabla[i + 1];
+            let ma = a.min !== undefined ? a.min : a[0], mb = b.min !== undefined ? b.min : b[0];
+            if (min <= mb) return valor(a, b, limitar01((min - ma) / (mb - ma)));
+        }
+        let u = tabla[tabla.length - 1];
+        return valor(u, u, 0);
+    }
+    const mezcla = (c1, c2, f) => c1.map((c, i) => Math.round(c + (c2[i] - c) * f));
+    function pintarCielo(min) {
+        let [arriba, abajo] = interpolar(coloresCielo, min, (a, b, f) => [mezcla(a.arriba, b.arriba, f), mezcla(a.abajo, b.abajo, f)]);
+        $("#vd-cielo")[0].style.background = `linear-gradient(to bottom, rgb(${arriba}), rgb(${abajo}))`;
+        let osc = interpolar(OSCURIDAD, min, (a, b, f) => a[1] + (b[1] - a[1]) * f);
+        $("#vd-recorrido")[0].style.setProperty("--vd-oscuridad", osc.toFixed(3));
+    }
+
+    // ---------- Hipnograma ----------
+    function fasesDe(version) {
+        let c = CICLOS[version], fases = [["d", 0]], tiempo = c.despierta;
+        c.ciclos.forEach(ciclo => ciclo.forEach(([fase, dur]) => { fases.push([fase, tiempo]); tiempo += dur; }));
+        fases.push(["d", 480]);
+        return fases;
+    }
+    function construirHipnograma() {
+        let $svg = $("#vd-hipnograma svg");
+        let ancho = Math.max(100, $svg.width()), alto = Math.max(40, $svg.height());
+        $svg.attr("viewBox", `0 0 ${ancho} ${alto}`);
+        let y = n => 6 + n * (alto - 12) / 3;
+        $svg.find(".vd-hipno-guia").each(function(n) { $(this).attr({ x1: 0, x2: ancho, y1: y(n), y2: y(n) }); });
+
+        // Escalera: horizontal hasta el inicio de la fase siguiente, luego vertical
+        let fases = fasesDe(modo), puntos = [];
+        fases.forEach(([fase, min], k) => {
+            let px = min / 480 * ancho;
+            if (k === 0) puntos.push([px, y(NIVEL[fase])]);
+            else { puntos.push([px, puntos[puntos.length - 1][1]]); puntos.push([px, y(NIVEL[fase])]); }
+        });
+        let largos = [0];
+        for (let i = 1; i < puntos.length; i++) {
+            largos.push(largos[i - 1] + Math.hypot(puntos[i][0] - puntos[i - 1][0], puntos[i][1] - puntos[i - 1][1]));
+        }
+        hipno.puntos = puntos; hipno.largos = largos; hipno.total = largos[largos.length - 1]; hipno.ancho = ancho;
+        let linea = document.getElementById("vd-hipno-linea");
+        linea.setAttribute("d", "M" + puntos.map(p => p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" L"));
+        linea.style.strokeDasharray = hipno.total;
+    }
+    // Largo de la línea hasta cierta hora (para dibujarla a medida que avanza la noche)
+    function largoHasta(min) {
+        let px = limitar01((min - MIN_NOCHE) / 480) * hipno.ancho;
+        let p = hipno.puntos, l = hipno.largos;
+        for (let i = 1; i < p.length; i++) {
+            if (p[i][0] > px) return l[i - 1] + Math.max(0, px - p[i - 1][0]);
+        }
+        return hipno.total;
+    }
+    function dibujarHipnograma(min, largo) {
+        let hecho = largo !== undefined ? largo : largoHasta(min);
+        document.getElementById("vd-hipno-linea").style.strokeDashoffset = hipno.total - hecho;
+    }
+    // Al cambiar el interruptor, la línea nueva se dibuja desde el inicio hasta la hora actual.
+    // Dura ~0,9 s; pase lo que pase, al segundo vuelve al dibujo normal.
+    function redibujarHipnograma() {
+        construirHipnograma();
+        clearTimeout(hipno.fin);
+        let terminar = () => { hipno.animando = false; dibujarHipnograma(minutosEn(pos)); };
+        if (typeof gsap === "undefined") { terminar(); return; }
+        hipno.animando = true;
+        let proxy = { f: 0 };
+        gsap.to(proxy, { f: 1, duration: 0.9, ease: "power2.out",
+            onUpdate: () => { if (hipno.animando) dibujarHipnograma(0, proxy.f * largoHasta(minutosEn(pos))); },
+            onComplete: terminar });
+        hipno.fin = setTimeout(terminar, 1000);
+    }
+
+    // ---------- Batería ----------
+    function nivelBateria(min, version) {
+        let b = BATERIA[version];
+        return Math.round(20 + (b.llega - 20) * limitar01((min - b.duerme) / (MIN_TOTAL - b.duerme)));
+    }
+    function pintarBateria(min) {
+        let nivel = nivelBateria(min, modo);
+        let color = nivel < 30 ? "var(--estado-atencion)" : (nivel < 60 ? "var(--estado-mejorar)" : "var(--estado-bien)");
+        $("#vd-bateria-nivel").css({ width: nivel + "%", background: color });
+    }
+
+    // ---------- Textos ----------
+    function pintarTextos() {
+        $(".vd-parada").each(function() {
+            let i = $(this).data("i"), txt = textosParada(paradas[i]);
+            let $info = $(this).find(".vd-info");
+            $info.find(".vd-dato").text(txt.dato);
+            $info.find(".vd-nota").text(txt.nota).toggle(!!txt.nota);
+            $info.find(".vd-frase").text(txt.frase);
+            $info.find(".vd-linea").html(txt.linea ? `<i class="fa-solid ${modo === "bien" ? "fa-check" : "fa-xmark"}"></i> ${txt.linea}` : "").toggle(!!txt.linea);
+            $info.find(".vd-ver-mas").html(`${t("vd.verMas")} <i class="fa-solid fa-plus"></i>`);
+        });
+        $(".vd-barra-punto").each(function() {
+            this.setAttribute("aria-label", t("vd.irA", { hora: paradas[$(this).data("i")].hora }));
+        });
+        $(".vd-falta").each(function() {
+            $(this).find("span").text(t("vive.falta", { archivo: $(this).data("archivo") }));
+        });
+        if (tarjetaAbierta !== -1) llenarTarjeta(tarjetaAbierta);
+        if ($seccion.hasClass("vd-reducido")) construirLista();
+    }
+
+    // ---------- Tarjeta de detalle ----------
+    function htmlDetalle(i) {
+        let p = paradas[i], txt = textosParada(p);
+        return `
+            <p class="vd-t-hora">${p.hora} · ${txt.titulo}</p>
+            <p class="vd-t-dato">${txt.dato} ${txt.nota ? `<small>${txt.nota}</small>` : ""}</p>
+            <p class="vd-t-frase">${txt.frase}</p>
+            ${txt.linea ? `<h4><i class="fa-solid ${modo === "bien" ? "fa-check" : "fa-xmark"}"></i> ${txt.linea}</h4>` : ""}
+            <ul>${txt.detalle.map(d => `<li>${d}</li>`).join("")}</ul>
+            ${txt.ejemplo ? `<span class="vd-t-ejemplo">${t("vive.ejemplo")}</span>` : ""}
+            ${txt.fuente ? `<p class="vd-t-fuente">${t("vive.fuente", { fuente: txt.fuente })}</p>` : ""}`;
+    }
+    function llenarTarjeta(i) { $("#vd-tarjeta-contenido").html(htmlDetalle(i)); }
+    function abrirTarjeta(i) {
+        tarjetaAbierta = i;
+        llenarTarjeta(i);
+        let $t = $("#vd-tarjeta").prop("hidden", false);
+        requestAnimationFrame(() => $t.addClass("abierta"));
+    }
+    function cerrarTarjeta() {
+        tarjetaAbierta = -1;
+        let $t = $("#vd-tarjeta").removeClass("abierta");
+        setTimeout(() => { if (tarjetaAbierta === -1) $t.prop("hidden", true); }, 300);
+    }
+    $seccion.on("click", ".vd-info", function() {
+        let i = $(this).data("i");
+        if (tarjetaAbierta === i) cerrarTarjeta(); else abrirTarjeta(i);
+    });
+    $("#vd-tarjeta-cerrar").on("click", cerrarTarjeta);
+    $(document).on("keydown", e => { if (e.key === "Escape" && tarjetaAbierta !== -1) cerrarTarjeta(); });
+
+    // ---------- Barra del día: saltar a una parada ----------
+    function irAParada(i) {
+        if (!disparador) return;
+        let destino = disparador.start + (i / (paradas.length - 1)) * (disparador.end - disparador.start);
+        window.scrollTo({ top: destino, behavior: "smooth" });
+    }
+    $seccion.on("click", ".vd-barra-punto", function() { irAParada($(this).data("i")); });
+
+    // ---------- Interruptor de hábitos (no reinicia ni mueve el scroll) ----------
+    $seccion.on("click", ".vd-modo-btn", function() {
+        let nuevo = $(this).data("modo");
+        if (nuevo === modo) return;
+        modo = nuevo;
+        $seccion.removeClass("modo-bien modo-mal").addClass("modo-" + modo);
+        $seccion.find(".vd-modo-btn").removeClass("activo").attr("aria-checked", "false")
+            .filter(`[data-modo="${modo}"]`).addClass("activo").attr("aria-checked", "true");
+        if ($seccion.hasClass("vd-reducido")) { construirLista(); return; }
+        pintarTextos();
+        mostrarPersonaje(true);
+        redibujarHipnograma();
+        pintarBateria(minutosEn(pos));
+    });
+
+    // ---------- Celular: deslizar el dedo hacia el lado también avanza ----------
+    function activarDeslizamientoTactil() {
+        let el = document.getElementById("vd-recorrido"), x0 = null, y0 = null;
+        el.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+        el.addEventListener("touchmove", e => {
+            if (x0 === null) return;
+            let dx = e.touches[0].clientX - x0, dy = e.touches[0].clientY - y0;
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 6) {
+                e.preventDefault();
+                window.scrollBy(0, -dx * 1.4);
+                x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+            }
+        }, { passive: false });
+        el.addEventListener("touchend", () => { x0 = null; }, { passive: true });
+    }
+
+    // ---------- Sin animaciones (prefers-reduced-motion o sin GSAP): una parada debajo de otra ----------
+    function construirLista() {
+        let $lista = $("#vd-lista").prop("hidden", false).empty();
+        $("#vd-recorrido").prop("hidden", true);
+        $lista.append(`
+            <div class="vd-modo vd-modo-lista" role="radiogroup" aria-label="${t("vd.modoAria")}">
+                <button type="button" class="vd-modo-btn ${modo === "bien" ? "activo" : ""}" data-modo="bien" role="radio" aria-checked="${modo === "bien"}"><i class="fa-solid fa-check"></i> ${t("vd.modoBien")}</button>
+                <button type="button" class="vd-modo-btn ${modo === "mal" ? "activo" : ""}" data-modo="mal" role="radio" aria-checked="${modo === "mal"}"><i class="fa-solid fa-xmark"></i> ${t("vd.modoMal")}</button>
+            </div>`);
+        paradas.forEach((p, i) => {
+            let $item = $(`<article class="vd-lista-item ${esNoche(p) ? "es-noche" : ""}"></article>`);
+            $item.append(imagen(`personaje-${hhmm(p)}-${modo}.png`, TAM.personaje, "vd-lista-pj"));
+            $item.append(`<div class="vd-lista-texto">${htmlDetalle(i)}</div>`);
+            $lista.append($item);
+        });
+    }
+
+    // ---------- Arranque: se construye la primera vez que se abre la sección ----------
+    function alMostrar() {
+        if (!$seccion.hasClass("seccion-activa")) {
+            if (disparador) disparador.disable();
+            return;
+        }
+        if (!construido) { construir(); return; }
+        if (disparador) { disparador.enable(); ScrollTrigger.refresh(); }
+    }
+    new MutationObserver(alMostrar).observe($seccion[0], { attributes: true, attributeFilter: ["class"] });
+
+    $(document).on("cambioIdioma", function() {
+        if (!construido) return;
+        pintarTextos();
+    });
+
+    // Paradas: día (+ 18:00 si existe su imagen) y noche
+    let prueba = new Image();
+    prueba.onload = () => { paradas = PARADAS_DIA.slice(0, 4).concat([PARADA_TRABAJO], PARADAS_DIA.slice(4), PARADAS_NOCHE); alMostrar(); };
+    prueba.onerror = () => { paradas = PARADAS_DIA.concat(PARADAS_NOCHE); alMostrar(); };
+    prueba.src = "img/dia-1800.jpg";
+});
+
+/* =====================================================================
+   VERSIÓN ANTERIOR de Vive un día (scroll vertical con tarjeta central).
+   La REEMPLAZA la sección 9 de arriba (recorrido horizontal). Se deja comentada como referencia.
+   ===================================================================== */
+/*
+// =====================================================================
 // --- 9. Vive un día: recorrido ilustrado con scroll ---
 // =====================================================================
 $(document).ready(function() {
@@ -1011,6 +1502,8 @@ $(document).ready(function() {
     // Dejar listo el primer momento
     mostrarMomento(0);
 });
+
+*/
 
 // Al final, cuando todo está listo: poner los textos del idioma elegido
 $(document).ready(aplicarIdioma);

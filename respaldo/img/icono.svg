@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Ícono provisorio (pestaña del navegador): reloj de arena sobre azul de marca.
+       Reemplazar por el SVG oficial cuando el equipo lo entregue. -->
+  <rect width="64" height="64" rx="14" fill="#104edb"/>
+  <g transform="translate(17 9) scale(1.25)">
+    <rect x="1" y="0" width="22" height="3.6" rx="1.8" fill="#ffffff"/>
+    <rect x="1" y="32.4" width="22" height="3.6" rx="1.8" fill="#ffffff"/>
+    <path d="M4.5 3.6 C4.5 11.5 10 14.5 10.6 18 C10 21.5 4.5 24.5 4.5 32.4 M19.5 3.6 C19.5 11.5 14 14.5 13.4 18 C14 21.5 19.5 24.5 19.5 32.4" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M7.6 9.5 H16.4 C15.2 12.4 13 14 12 15.6 C11 14 8.8 12.4 7.6 9.5 Z" fill="#ff7a1a"/>
+    <path d="M6.6 31.4 C7.6 26.6 10.4 25.2 12 25.2 C13.6 25.2 16.4 26.6 17.4 31.4 Z" fill="#ff7a1a"/>
+  </g>
+</svg>

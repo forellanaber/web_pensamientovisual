@@ -14,10 +14,11 @@
     --azul-suave: #eaf2ff;    /* Azul cielo */
     --texto: #0f172a;         /* Tinta */
     --blanco: #ffffff;
-    --acento: #ff7a1a;        /* Naranjo: solo detalles e ilustraciones */
+    --naranjo: #ff7a1a;       /* Naranjo de marca */
+    --acento: var(--naranjo); /* detalles e ilustraciones */
 
     /* Base */
-    --fondo: #ffffff;
+    --fondo: #faf8f4;         /* off-white */
     --fondo-suave: #f4f8ff;
     --texto-suave: #55657e;
     --borde: #e2e8f0;
@@ -64,12 +65,12 @@
     --marca-instagram: #e1306c;
 
     /* Transparencias, capas y sombras */
-    --capa-inicio: rgba(255, 255, 255, 0.72);
-    --capa-inicio-centro: rgba(255, 255, 255, 0.9);
     --sombra: rgba(15, 23, 42, 0.06);
     --sombra-media: rgba(15, 23, 42, 0.1);
     --sombra-fuerte: rgba(15, 23, 42, 0.3);
     --sombra-azul: rgba(16, 78, 219, 0.32);
+    --sombra-boton: rgba(31, 63, 209, 0.3);
+    --sombra-boton-hover: rgba(31, 63, 209, 0.4);
     --sombra-acento: rgba(255, 122, 26, 0.35);
     --velo-oscuro: rgba(15, 23, 42, 0.35);
     --velo-oscuro-fuerte: rgba(15, 23, 42, 0.45);
@@ -80,11 +81,32 @@
     --zona-recomendada: rgba(34, 197, 94, 0.22);
     --velo-modo: rgba(11, 27, 77, 0.62);
     --modo-fondo: rgba(255, 255, 255, 0.14);
+
+    /* Vive un día (recorrido horizontal): cielo por hora, suelo y rectángulos provisorios */
+    --vd-cielo-0800-arriba: #8ec5ff;  --vd-cielo-0800-abajo: #e3f1ff;
+    --vd-cielo-1330-arriba: #64aef7;  --vd-cielo-1330-abajo: #cfe6ff;
+    --vd-cielo-1600-arriba: #f6b26b;  --vd-cielo-1600-abajo: #ffe3bd;
+    --vd-cielo-1930-arriba: #ee8a5e;  --vd-cielo-1930-abajo: #f9c98b;
+    --vd-cielo-2100-arriba: #24356f;  --vd-cielo-2100-abajo: #4a5a96;
+    --vd-cielo-2300-arriba: #0b1b4d;  --vd-cielo-2300-abajo: #1a2d6b;
+    --vd-cielo-0200-arriba: #05070f;  --vd-cielo-0200-abajo: #0c1226;
+    --vd-cielo-0530-arriba: #0c1430;  --vd-cielo-0530-abajo: #2a3a6e;
+    --vd-cielo-0700-arriba: #9fcaff;  --vd-cielo-0700-abajo: #fde3c9;
+    --vd-cielo-sombra-mal: rgba(5, 8, 20, 0.28);
+    --vd-suelo-dia: #e9e4d8;
+    --vd-suelo-noche: #272c47;
+    --vd-falta-cordillera: rgba(16, 78, 219, 0.14);
+    --vd-falta-ciudad: rgba(16, 78, 219, 0.24);
+    --vd-falta-escenario: rgba(255, 122, 26, 0.16);
+    --vd-falta-personaje: rgba(255, 255, 255, 0.75);
+    --vd-falta-borde: rgba(15, 23, 42, 0.35);
+    --vd-panel-noche: rgba(11, 27, 77, 0.78);
 }
 
 /* Alto del header fijo (se usa para dejar espacio debajo) */
 :root {
     --alto-header: 84px;
+    --margen-header: 3rem;   /* margen lateral del header; el inicio se alinea con él */
 }
 
 body {
@@ -100,7 +122,7 @@ body {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: 1.5rem 3rem; background-color: var(--blanco);
+    padding: 1.5rem var(--margen-header); background-color: var(--blanco);
     box-shadow: 0 4px 6px -1px var(--sombra);
     position: fixed; top: 0; width: 100%; box-sizing: border-box; z-index: 100;
 }
@@ -134,19 +156,127 @@ h2 { font-size: 2.2rem; color: var(--azul-oscuro); margin-bottom: 1.5rem;}
 .tarjeta-info { background: var(--blanco); padding: 2rem; border-radius: 16px; box-shadow: 0 10px 15px -3px var(--sombra-media); margin: 2rem 0; }
 
 /* --- Inicio --- */
-/* Foto tenue con capa blanca encima. Si img/fondo-inicio.jpg no existe, se ve el blanco. */
-.inicio-fondo {
-    background-color: var(--fondo);
-    /* Capa blanca más fuerte al centro para que el título se lea bien */
-    background-image: radial-gradient(ellipse at center, var(--capa-inicio-centro) 0%, var(--capa-inicio-centro) 35%, var(--capa-inicio) 100%), url("img/fondo-inicio.jpg");
-    background-size: cover;
-    background-position: center;
+/* Fondo off-white. Si existe img/patron.png, se ve encima al 8% de opacidad. */
+.inicio-fondo { position: relative; isolation: isolate; overflow: hidden; background-color: var(--fondo); }
+.inicio-fondo::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: url("img/patron.png") center top / 520px repeat;
+    opacity: 0.08;
 }
-.titulo-inicio { margin: 0 0 2.5rem; line-height: 1.15; }
-.titulo-inicio span { display: block; }
-.titulo-inicio-1 { font-size: clamp(1.4rem, 3.4vw, 2.3rem); font-weight: 600; color: var(--texto); }
-.titulo-inicio-2 { font-size: clamp(2.2rem, 6.4vw, 4.4rem); font-weight: 800; color: var(--azul); margin-top: 0.3rem; }
-.boton-si { font-size: 1.8rem; font-weight: 800; padding: 1rem 4.2rem; }
+
+/* Ocupa todo el alto visible. El header es fijo, así que se deja su alto arriba.
+   Sin animación de entrada en la pantalla. */
+#pantalla-bienvenida.seccion-activa { animation: none; opacity: 1; }
+#pantalla-bienvenida {
+    min-height: 100vh; min-height: 100svh;
+    box-sizing: border-box; padding-top: var(--alto-header);
+}
+
+/* Título, botón y personaje forman UN solo grupo centrado en la pantalla */
+.inicio-contenido {
+    /* Alto del personaje: 92% del alto disponible bajo el header (máximo 900px),
+       y nunca tan ancho que no quepa al lado del título */
+    --pj-alto: min(calc((100vh - var(--alto-header)) * 0.92), 900px, 49vw);
+    --t2: clamp(2.4rem, 4.2vw, 4.2rem);          /* línea naranja */
+    --t1: clamp(1.9rem, 3vw, 3rem);              /* línea azul */
+
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    align-items: end;
+    column-gap: clamp(1.5rem, 3vw, 3rem);        /* nunca más de 3rem entre "tiempo?" y el personaje */
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    box-sizing: border-box;
+    min-height: calc(100vh - var(--alto-header));
+    min-height: calc(100svh - var(--alto-header));
+}
+
+/* Texto: ocupa todo el alto de la pantalla de inicio y se centra en vertical.
+   El padding-bottom lo sube un poco, para que quede a la altura de la cara y los hombros del personaje. */
+.inicio-texto {
+    text-align: left;
+    align-self: stretch;
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: flex-start;
+    padding-bottom: 14vh;   /* línea azul frente a la cara, naranja frente a los hombros */
+}
+.titulo-inicio { margin: 0; line-height: 1.15; font-style: normal; }
+.titulo-inicio span { display: block; white-space: nowrap; }
+.titulo-inicio-1 { font-size: var(--t1); font-weight: 600; color: var(--azul); }
+.titulo-inicio-2 { font-size: var(--t2); font-weight: 800; color: var(--naranjo); margin-top: 0.3em; }
+
+/* Botón "Sí": el elemento que más invita a hacer clic */
+.boton-si {
+    margin: 2.5rem 0 0; min-width: 220px;
+    padding: 1.2rem 4.5rem; border-radius: 999px;
+    font-size: 2rem; font-weight: 800;
+    color: var(--blanco); background-color: var(--azul);
+    box-shadow: 0 10px 24px var(--sombra-boton);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.boton-si:hover, .boton-si:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px var(--sombra-boton-hover);
+    background-color: var(--azul);
+}
+
+/* Personaje: apoyado en el borde inferior, sin margen abajo */
+.inicio-personaje { align-self: end; display: flex; align-items: flex-end; }
+.personaje-marco {
+    position: relative;
+    height: var(--pj-alto);
+    aspect-ratio: 600 / 909;   /* ancho automático según el alto */
+    transform-origin: 50% 100%;   /* gira desde abajo, así no se despega del borde */
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.personaje-marco img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: bottom center; }
+
+/* Reacción al pasar el cursor por el botón "Sí": se inclina hacia él, se estira un poco
+   y le salen rayitas junto a la cabeza. La clase .reacciona la pone main.js. */
+.inicio-contenido.reacciona .personaje-marco { transform: translateY(8px) rotate(-2.5deg) scale(1.04); }
+.personaje-chispa {
+    position: absolute; width: 3%; height: 2.5px; border-radius: 2px;
+    background: var(--naranjo); opacity: 0; transform: scaleX(0.3);
+    transition: opacity 0.2s ease, transform 0.3s ease;
+}
+.personaje-chispa.c1 { left: 17%; top: 9%; rotate: 35deg; }
+.personaje-chispa.c2 { left: 15%; top: 14%; }
+.personaje-chispa.c3 { left: 17%; top: 19%; rotate: -35deg; }
+.inicio-contenido.reacciona .personaje-chispa { opacity: 1; transform: scaleX(1); transition-delay: 0.1s; }
+
+@media (prefers-reduced-motion: reduce) {
+    .personaje-marco, .personaje-chispa, .boton-si { transition: none; }
+    .inicio-contenido.reacciona .personaje-marco { transform: none; }
+}
+
+/* Pantallas medianas: primero se achica el personaje (hasta 60vh) y después el título.
+   El título toma el ancho que deja el personaje, así nunca se separan hacia los bordes. */
+@media (min-width: 701px) and (max-width: 1100px) and (orientation: landscape) {
+    .inicio-contenido {
+        --pj-alto: max(60vh, min(calc((100vh - var(--alto-header)) * 0.92), 900px, 49vw));
+        --t2: max(1.6rem, min(clamp(2.4rem, 4.2vw, 4.2rem), calc((100vw - var(--pj-alto) * 0.66 - 6rem) / 14.5)));
+        --t1: calc(var(--t2) * 0.714);
+    }
+    .boton-si { font-size: 1.7rem; padding: 1rem 3.6rem; }
+}
+
+/* Celular y tablets verticales: una sola columna. Título y botón arriba, centrados;
+   personaje abajo, más chico, sin tapar el botón */
+@media (max-width: 700px), (max-width: 1100px) and (orientation: portrait) {
+    .inicio-contenido {
+        --pj-alto: min(46vh, 460px);
+        grid-template-columns: auto; grid-template-rows: auto 1fr;
+        justify-items: center; row-gap: 1.4rem;
+    }
+    .inicio-texto { display: block; align-self: start; margin: 0; padding: 2rem 0 0; text-align: center; }
+    .titulo-inicio span { white-space: normal; }
+    .titulo-inicio-1 { font-size: 1.7rem; }
+    .titulo-inicio-2 { font-size: 2.2rem; }
+    .boton-si { width: 100%; min-width: 0; margin-top: 2rem; padding: 1rem 1.5rem; font-size: 1.8rem; }
+    .personaje-marco { height: min(46vh, 460px); height: min(46svh, 460px); }
+}
 
 /* --- Dato de contexto --- */
 .contexto-intro { font-size: 1.3rem; font-weight: 600; color: var(--texto-suave); margin: 0; }
@@ -496,7 +626,8 @@ input:checked + .slider.round:before { transform: translateX(22px); }
 
 /* Responsive */
 @media (max-width: 900px) {
-    .header-principal { grid-template-columns: auto 1fr; gap: 0.35rem 1rem; padding: 0.7rem 1rem 0.6rem; }
+    :root { --margen-header: 1rem; }
+    .header-principal { grid-template-columns: auto 1fr; gap: 0.35rem 1rem; padding: 0.7rem var(--margen-header) 0.6rem; }
     .logo { font-size: 1.2rem; }
     .redes { justify-self: end; }
     .redes a { font-size: 1rem; margin-left: 0.8rem; }
@@ -920,14 +1051,6 @@ input:checked + .slider.round:before { transform: translateX(22px); }
 h1, h2, h3 { font-weight: 800; letter-spacing: -0.3px; }
 h4, strong, b { font-weight: 700; }
 
-/* Lema sobre el título del inicio */
-.lema {
-    display: inline-flex; align-items: center; gap: 0.5rem; margin: 0 0 1.6rem;
-    padding: 0.4rem 1.1rem; border-radius: 50px;
-    font-size: 0.95rem; font-weight: 600; color: var(--azul-oscuro);
-    background: var(--blanco-fuerte); box-shadow: 0 4px 14px var(--sombra);
-}
-.lema-reloj { width: 14px; height: 21px; color: var(--azul); }
 
 /* Pantalla de carga: reloj de arena que se da vuelta, con líneas de movimiento */
 .carga-reloj { position: relative; width: 150px; height: 104px; margin: 0 auto 2rem; }
@@ -981,4 +1104,250 @@ h4, strong, b { font-weight: 700; }
     .reparto-pista { grid-column: 1 / -1; grid-row: 2; }
     .pie { flex-direction: column; text-align: center; }
     .pie-ayuda { text-align: center; }
+}
+
+/* =====================================================================
+   Vive un día (recorrido horizontal)
+   La sección queda fija y el scroll mueve las capas hacia el lado (ver sección 9 de main.js).
+   Reemplaza al recorrido vertical (.dia-*), cuyos estilos de más arriba ya no se usan en el HTML.
+   ===================================================================== */
+#pantalla-vive.seccion-activa { animation: none; opacity: 1; }   /* sin transform: si no, el pin no queda fijo */
+#pantalla-vive { --vd-suelo-alto: 24%; --vd-pj-x: 30vw; --vd-oscuridad: 0; }
+
+.vd-recorrido { position: relative; height: 100vh; height: 100svh; overflow: hidden; background: var(--vd-cielo-0800-abajo); }
+.vd-cielo, .vd-cielo-sombra { position: absolute; inset: 0; }
+.vd-cielo-sombra { background: var(--vd-cielo-sombra-mal); opacity: 0; transition: opacity 0.6s ease; pointer-events: none; }
+#pantalla-vive.modo-mal .vd-cielo-sombra { opacity: 1; }
+
+/* Capas de parallax */
+.vd-capa { position: absolute; left: 0; right: 0; pointer-events: none; }
+.vd-tira { display: flex; align-items: flex-end; height: 100%; width: max-content; will-change: transform; }
+#capa-cordillera { bottom: calc(var(--vd-suelo-alto) + 6%); height: 34%; filter: brightness(calc(1 - var(--vd-oscuridad))); }
+#capa-ciudad { bottom: var(--vd-suelo-alto); height: 30%; filter: brightness(calc(1 - var(--vd-oscuridad) * 0.9)); }
+#capa-calle { inset: 0; pointer-events: auto; }
+#capa-calle .vd-tira { align-items: stretch; }
+.vd-copia { height: 100%; flex: 0 0 auto; }
+
+/* Imágenes y rectángulos provisorios (mientras no exista el archivo) */
+.vd-img { position: relative; }
+.vd-img img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: bottom center; }
+.vd-img:not(.cargada) img { visibility: hidden; }   /* evita el ícono de imagen rota mientras carga */
+.vd-falta {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    border: 2px dashed var(--vd-falta-borde); border-radius: 10px; box-sizing: border-box;
+    font-size: 0.75rem; font-weight: 600; color: var(--texto); padding: 0.4rem;
+}
+.vd-falta span { background: var(--blanco-fuerte); padding: 0.2rem 0.5rem; border-radius: 6px; }
+#capa-cordillera .vd-falta { background: var(--vd-falta-cordillera); }
+#capa-ciudad .vd-falta { background: var(--vd-falta-ciudad); }
+.vd-escenario.vd-falta { background: var(--vd-falta-escenario); }
+.vd-pj-img.vd-falta, .vd-lista-pj.vd-falta { background: var(--vd-falta-personaje); }
+
+/* Cada parada: un ancho de pantalla, con su escenario sobre la misma línea de suelo */
+.vd-parada { position: relative; flex: 0 0 100vw; height: 100%; }
+.vd-suelo { position: absolute; left: 0; right: 0; bottom: 0; height: var(--vd-suelo-alto); background: var(--vd-suelo-dia); }
+.vd-parada.es-noche .vd-suelo { background: var(--vd-suelo-noche); }
+.vd-escenario {
+    position: absolute; bottom: var(--vd-suelo-alto);
+    left: calc(var(--vd-pj-x) - 26vw); width: 52vw; max-height: 56%;
+}
+/* Objetos que cambian con el interruptor (data-version="bien" o "mal") */
+.vd-objeto {
+    position: absolute; left: calc(var(--vd-pj-x) + 9vw); bottom: calc(var(--vd-suelo-alto) + 4%);
+    width: clamp(3rem, 5vw, 4.5rem); height: clamp(3rem, 5vw, 4.5rem); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(1.3rem, 2.2vw, 2rem); color: var(--azul); background: var(--blanco); box-shadow: 0 6px 16px var(--sombra-media);
+}
+#pantalla-vive.modo-bien [data-version="mal"], #pantalla-vive.modo-mal [data-version="bien"] { display: none; }
+
+/* Texto de la parada: siempre visible (hora, dato grande y frase). Al tocarlo se abre la tarjeta. */
+.vd-info {
+    position: absolute; left: 58vw; top: calc(var(--alto-header) + 92px);
+    width: min(34vw, 420px); margin: 0; padding: 1.3rem 1.5rem; box-sizing: border-box;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; text-align: left;
+    font-family: 'Poppins', sans-serif; font-weight: 400; color: var(--texto);
+    background: var(--tarjeta-vidrio); border-radius: 20px; box-shadow: 0 16px 36px var(--sombra-fuerte);
+    transition: transform 0.2s ease;
+}
+.vd-info:hover { transform: translateY(-2px); }
+.vd-hora { font-size: 1.1rem; font-weight: 800; color: var(--azul); letter-spacing: 0.5px; }
+.vd-dato { font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 800; line-height: 1.05; color: var(--azul-oscuro); }
+.vd-nota { font-size: 0.9rem; color: var(--texto-suave); margin-top: -0.2rem; }
+.vd-frase { font-size: 1rem; font-weight: 600; line-height: 1.4; }
+.vd-linea { font-size: 0.9rem; color: var(--texto-suave); margin-top: 0.3rem; }
+.vd-linea i { color: var(--bien-texto); }
+#pantalla-vive.modo-mal .vd-linea i { color: var(--malo-texto); }
+.vd-ver-mas { margin-top: 0.6rem; font-size: 0.85rem; font-weight: 700; color: var(--azul); }
+
+/* Personaje fijo en el tercio izquierdo */
+.vd-personaje {
+    position: absolute; z-index: 3; pointer-events: none;
+    left: var(--vd-pj-x); bottom: calc(var(--vd-suelo-alto) - 3%);
+    height: 52%; aspect-ratio: 600 / 900; transform: translateX(-50%);
+}
+.vd-pj-slot { position: absolute; inset: 0; opacity: 0; transition: opacity 0.45s ease; }
+.vd-pj-slot.activo { opacity: 1; }
+.vd-pj-slot .vd-img { width: 100%; height: 100%; }
+.vd-personaje.caminando .vd-pj-slot.activo { animation: vd-caminar 0.5s ease-in-out infinite; }
+@keyframes vd-caminar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* Batería sobre el personaje (solo de noche) */
+.vd-bateria {
+    position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; opacity: 0; transition: opacity 0.4s ease;
+}
+.vd-bateria.visible { opacity: 1; }
+.vd-bateria .contenedor-bateria { margin: 0; transform: scale(0.5); transform-origin: bottom center; }
+.vd-bateria small, .vd-hipno-nota, .vd-final-nota { font-size: 0.68rem; color: var(--blanco-fuerte); }
+
+/* Interruptor y pista */
+.vd-modo {
+    position: absolute; z-index: 6; top: calc(var(--alto-header) + 14px); left: 50%; transform: translateX(-50%);
+    display: inline-flex; gap: 4px; padding: 4px; border-radius: 50px;
+    background: var(--velo-oscuro-fuerte); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 8px 20px var(--sombra-fuerte); white-space: nowrap;
+}
+.vd-modo-btn {
+    margin: 0; padding: 0.55rem 1.2rem; border-radius: 50px;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    font-size: 0.95rem; color: var(--blanco); background: transparent; box-shadow: none;
+}
+.vd-modo-btn:hover { background: var(--modo-fondo); }
+.vd-modo-btn.activo[data-modo="bien"] { background: var(--bien-texto); }
+.vd-modo-btn.activo[data-modo="mal"] { background: var(--malo-texto); }
+.vd-pista {
+    position: absolute; z-index: 5; top: calc(var(--alto-header) + 70px); left: 50%; transform: translateX(-50%);
+    margin: 0; font-size: 0.85rem; font-weight: 600; color: var(--azul-oscuro); transition: opacity 0.3s ease;
+}
+.vd-pista i { animation: rebote 1.8s infinite; }
+.vd-pista.oculta-pista { opacity: 0; }
+
+/* Hipnograma (solo de noche) */
+.vd-hipnograma {
+    position: absolute; z-index: 4; left: 4vw; right: 4vw; bottom: 64px; height: 96px;
+    display: grid; grid-template-columns: auto 1fr auto; align-items: stretch; gap: 0.6rem;
+    padding: 0.5rem 0.8rem; border-radius: 14px; background: var(--vd-panel-noche); box-sizing: border-box;
+    opacity: 0; transform: translateY(12px); transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none;
+}
+.vd-hipnograma.visible { opacity: 1; transform: none; }
+.vd-niveles { list-style: none; margin: 0; padding: 0 0 0.8rem; display: flex; flex-direction: column; justify-content: space-between; font-size: 0.66rem; color: var(--blanco-fuerte); text-align: right; }
+.vd-hipno-grafico { position: relative; display: flex; flex-direction: column; min-width: 0; height: 100%; overflow: hidden; }
+.vd-hipno-grafico svg { display: block; flex: 1 1 0; width: 100%; height: 0; min-height: 0; overflow: visible; }
+.vd-hipno-guia { stroke: var(--blanco-tenue); stroke-width: 1; }
+.vd-hipno-linea { fill: none; stroke: var(--azul-claro); stroke-width: 2.5; stroke-linejoin: round; }
+#pantalla-vive.modo-mal .vd-hipno-linea { stroke: var(--estado-atencion-suave); }
+.vd-hipno-horas { display: flex; justify-content: space-between; font-size: 0.6rem; color: var(--blanco-medio); }
+.vd-hipno-nota { align-self: end; }
+
+/* Barra del día */
+.vd-barra { position: absolute; z-index: 5; left: 4vw; right: 4vw; bottom: 14px; }
+.vd-barra-pista { position: relative; height: 6px; border-radius: 3px; background: var(--blanco-fuerte); box-shadow: 0 1px 4px var(--sombra-media); }
+.vd-barra-noche { position: absolute; top: 0; bottom: 0; right: 0; border-radius: 0 3px 3px 0; background: var(--noche-2); }
+.vd-barra-pista ol { list-style: none; margin: 0; padding: 0; }
+.vd-barra-pista li { position: absolute; top: 50%; transform: translate(-50%, -50%); }
+.vd-barra-punto {
+    margin: 0; padding: 0; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--blanco); border: 2px solid var(--azul); box-shadow: none; position: relative;
+}
+.vd-barra-punto span {
+    position: absolute; bottom: 150%; left: 50%; transform: translateX(-50%);
+    font-size: 0.62rem; font-weight: 700; color: var(--texto); background: var(--blanco-fuerte);
+    padding: 0.05rem 0.3rem; border-radius: 4px; opacity: 0; transition: opacity 0.2s ease; white-space: nowrap; pointer-events: none;
+}
+.vd-barra-punto:hover span, .vd-barra-punto.activo span { opacity: 1; }
+.vd-barra-punto.activo { background: var(--azul); }
+.vd-barra-marca {
+    position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; transform: translate(-50%, -50%);
+    background: var(--naranjo); border: 3px solid var(--blanco); box-shadow: 0 2px 6px var(--sombra-fuerte); pointer-events: none;
+}
+.vd-barra-extremos { display: flex; justify-content: space-between; margin-top: 4px; font-size: 0.62rem; font-weight: 600; color: var(--texto-suave); }
+
+/* Tarjeta de detalle */
+.vd-tarjeta {
+    position: absolute; z-index: 8; right: 4vw; top: calc(var(--alto-header) + 72px);
+    width: min(380px, 36vw); max-height: 62%; overflow: auto; box-sizing: border-box;
+    padding: 1.4rem 1.5rem; border-radius: 20px; background: var(--tarjeta-vidrio); color: var(--texto);
+    box-shadow: 0 24px 50px var(--sombra-fuerte);
+    opacity: 0; transform: translateY(10px); transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.vd-tarjeta.abierta { opacity: 1; transform: none; }
+.vd-tarjeta-cerrar {
+    position: absolute; top: 10px; right: 10px; margin: 0; padding: 0; width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+    background: var(--fondo-suave); color: var(--texto-suave); box-shadow: none;
+}
+.vd-t-hora { margin: 0 2rem 0.2rem 0; font-size: 0.95rem; font-weight: 800; color: var(--azul); }
+.vd-t-dato { margin: 0; font-size: 2.2rem; font-weight: 800; color: var(--azul-oscuro); line-height: 1.1; }
+.vd-t-dato small { font-size: 0.9rem; font-weight: 600; color: var(--texto-suave); }
+.vd-t-frase { margin: 0.3rem 0 0.8rem; font-weight: 600; }
+.vd-tarjeta h4, .vd-lista-texto h4 { margin: 0 0 0.4rem; font-size: 0.95rem; }
+.vd-tarjeta h4 i, .vd-lista-texto h4 i { color: var(--bien-texto); }
+#pantalla-vive.modo-mal .vd-tarjeta h4 i, #pantalla-vive.modo-mal .vd-lista-texto h4 i { color: var(--malo-texto); }
+.vd-tarjeta ul, .vd-lista-texto ul { margin: 0; padding-left: 1.1rem; }
+.vd-tarjeta li, .vd-lista-texto li { margin-bottom: 0.35rem; line-height: 1.45; font-size: 0.92rem; }
+.vd-t-ejemplo {
+    display: inline-block; margin-top: 0.5rem; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 0.15rem 0.6rem; border-radius: 20px; border: 1px solid var(--gris-medio); color: var(--texto-suave);
+}
+.vd-t-fuente { margin: 0.7rem 0 0; font-size: 0.72rem; color: var(--texto-suave); }
+
+/* Final: las dos noches lado a lado */
+.vd-final {
+    padding: 5rem 1.5rem 6rem; text-align: center; color: var(--blanco);
+    background: linear-gradient(to bottom, var(--vd-cielo-0700-arriba), var(--azul-oscuro));
+}
+.vd-final-baterias { display: flex; justify-content: center; gap: clamp(2rem, 8vw, 6rem); flex-wrap: wrap; }
+.vd-final-item { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.vd-final-item .contenedor-bateria { margin: 0 0 0.4rem; }
+.vd-final-item .bateria-cuerpo { border-color: var(--blanco); }
+.vd-final-item .bateria-punta { background: var(--blanco); }
+.vd-final-horas { font-size: clamp(2.4rem, 5vw, 3.4rem); font-weight: 800; line-height: 1; }
+.vd-final-etiqueta { font-weight: 600; display: inline-flex; gap: 0.4rem; align-items: center; }
+.vd-final-nota { display: block; margin-top: 1rem; }
+.vd-final-frase { margin: 2.4rem auto 1.8rem; max-width: 640px; font-size: clamp(1.5rem, 3.4vw, 2.3rem); font-weight: 800; line-height: 1.2; }
+
+/* Sin animaciones: lista vertical */
+.vd-lista { max-width: 900px; margin: 0 auto; padding: calc(var(--alto-header) + 2rem) 1.5rem 3rem; display: flex; flex-direction: column; gap: 1.5rem; }
+.vd-modo-lista { position: static; transform: none; align-self: center; }
+.vd-lista-item { display: grid; grid-template-columns: 140px 1fr; gap: 1.5rem; align-items: center; padding: 1.4rem; border-radius: 18px; background: var(--blanco); box-shadow: 0 6px 18px var(--sombra); }
+.vd-lista-item.es-noche { background: var(--azul-suave); }
+.vd-lista-pj { width: 140px; }
+
+/* Resultados: solo un botón hacia Vive un día */
+.invita-vive-solo { display: flex; justify-content: center; margin-top: 3rem; }
+.invita-vive-solo .boton-secundario { margin: 0; display: inline-flex; align-items: center; gap: 0.6rem; }
+
+/* Celular */
+@media (max-width: 700px) {
+    #pantalla-vive { --vd-suelo-alto: 22%; --vd-pj-x: 30vw; }
+    .vd-modo { top: calc(var(--alto-header) + 8px); }
+    .vd-modo-btn { font-size: 0.75rem; padding: 0.4rem 0.75rem; gap: 0.3rem; }
+    .vd-pista { top: calc(var(--alto-header) + 52px); font-size: 0.75rem; white-space: nowrap; }
+    .vd-info { left: 5vw; width: 90vw; top: calc(var(--alto-header) + 56px); padding: 0.9rem 1.1rem; }
+    .vd-dato { font-size: 2rem; }
+    .vd-frase { font-size: 0.9rem; }
+    .vd-escenario { left: 0; width: 75vw; max-height: 34%; }
+    .vd-objeto { left: 62vw; width: 2.8rem; height: 2.8rem; font-size: 1.2rem; }
+    .vd-personaje { height: 36%; }
+    .vd-bateria .contenedor-bateria { transform: scale(0.38); }
+    .vd-hipnograma { left: 3vw; right: 3vw; bottom: 50px; height: 70px; padding: 0.35rem 0.5rem; gap: 0.35rem; }
+    .vd-niveles { font-size: 0.52rem; padding-bottom: 0.6rem; }
+    .vd-hipno-horas { font-size: 0.5rem; }
+    .vd-hipno-nota { display: none; }
+    .vd-barra { left: 4vw; right: 4vw; bottom: 10px; }
+    .vd-barra-punto { width: 10px; height: 10px; }
+    .vd-barra-marca { width: 16px; height: 16px; }
+    /* La tarjeta sube como una hoja desde abajo */
+    .vd-tarjeta {
+        left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 62%;
+        border-radius: 22px 22px 0 0; padding: 1.4rem 1.3rem 2rem;
+        transform: translateY(100%); transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .vd-tarjeta.abierta { transform: translateY(0); }
+    .vd-lista-item { grid-template-columns: 90px 1fr; gap: 1rem; padding: 1rem; }
+    .vd-lista-pj { width: 90px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .vd-pj-slot, .vd-tarjeta, .vd-hipnograma, .vd-bateria { transition: none; }
+    .vd-personaje.caminando .vd-pj-slot.activo, .vd-pista i { animation: none; }
 }
