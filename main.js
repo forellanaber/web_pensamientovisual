@@ -786,45 +786,70 @@ $(document).ready(function() {
         }
     }
 
-    function mostrarRegion(codigo, desplazar) {
-    regionActual = codigo;
-    let r = DATOS_REGIONES[codigo];
+   function mostrarRegion(codigo, desplazar) {
+        regionActual = codigo;
+        let r = DATOS_REGIONES[codigo];
 
-    // Resaltar en el mapa y en la lista
-    $(".region-mapa").removeClass("activa");
-    $(`.region-mapa[data-region="${codigo}"]`).addClass("activa").appendTo("#mapa-chile");
-    $(".item-region").removeClass("activo");
-    $(`.item-region[data-region="${codigo}"]`).addClass("activo");
+        if (!r) return;
 
-    $("#ficha-vacia").prop("hidden", true);
-    $("#ficha-contenido").prop("hidden", false);
+        // Resaltar en el mapa y en la lista
+        $(".region-mapa").removeClass("activa");
+        $(`.region-mapa[data-region="${codigo}"]`).addClass("activa").appendTo("#mapa-chile");
+        $(".item-region").removeClass("activo");
+        $(`.item-region[data-region="${codigo}"]`).addClass("activo");
 
-    // Generar el contenido de apoyo estudiantil
-    let htmlApoyo = (r.apoyoEstudiantil && r.apoyoEstudiantil.length > 0)
-        ? r.apoyoEstudiantil.map(item => `<a href="${item.url}" target="_blank" rel="noopener" style="display:inline-block; margin:4px 0; color:#0056b3; font-weight:bold;">${item.nombre}</a>`).join("<br>")
-        : pendiente();
+        $("#ficha-vacia").prop("hidden", true);
+        $("#ficha-contenido").prop("hidden", false);
 
-    let contenidoNuevo = `
-        <h2 id="nombre-region">${nombreRegion(codigo)}</h2>
-        <div style="margin-top: 15px; font-size: 0.95rem; line-height: 1.5;">
-            <p style="margin-bottom: 8px;"><strong>🎓 Estudiantes de ed. superior:</strong> ${hayDato(r.estudiantes) ? miles(r.estudiantes) : pendiente()}</p>
-            <p style="margin-bottom: 8px;"><strong>📌 Hábitos de estudio:</strong> ${r.habitoClave || pendiente()}</p>
-            <p style="margin-bottom: 8px;"><strong>⚠️ Factor de riesgo/estrés:</strong> ${r.factorRiesgo || pendiente()}</p>
-            <p style="margin-bottom: 8px;"><strong>💡 Tip de Bienestar:</strong> ${r.tipBienestar || pendiente()}</p>
-            <div style="margin-top: 15px; background: #f0f7ff; padding: 12px; border-radius: 8px; border-left: 4px solid #0056b3;">
-                <strong>💙 Dónde pedir apoyo estudiantil:</strong>
-                <div style="margin-top: 8px;">${htmlApoyo}</div>
+        // Generar lista de enlaces de apoyo estudiantil
+        let htmlApoyo = (r.apoyoEstudiantil && r.apoyoEstudiantil.length > 0)
+            ? r.apoyoEstudiantil.map(item => `<li><a href="${item.url}" target="_blank" rel="noopener"><strong>${item.nombre}</strong> <i class="fa-solid fa-arrow-up-right-from-square"></i></a></li>`).join("")
+            : `<li>${pendiente()}</li>`;
+
+        let contenidoNuevo = `
+            <h3 id="nombre-region" style="font-size: 1.5rem; margin-bottom: 15px; color: var(--primario);">${nombreRegion(codigo)}</h3>
+
+            <div class="ficha-bloque">
+                <h4><i class="fa-solid fa-user-graduate"></i> Cómo son los estudiantes</h4>
+                <ul class="ficha-datos">
+                    <li><span class="ficha-valor">${hayDato(r.estudiantes) ? miles(r.estudiantes) : pendiente()}</span> estudiantes de educación superior</li>
+                </ul>
             </div>
-        </div>
-    `;
 
-    $("#ficha-contenido").html(contenidoNuevo);
+            <div class="ficha-bloque">
+                <h4><i class="fa-solid fa-brain"></i> Hábitos y Bienestar</h4>
+                <p style="margin-bottom: 8px;"><strong>📌 Hábitos de estudio:</strong> ${r.habitoClave || pendiente()}</p>
+                <p style="margin-bottom: 8px;"><strong>⚠️ Factor de riesgo/estrés:</strong> ${r.factorRiesgo || pendiente()}</p>
+                <p style="margin-bottom: 8px;"><strong>💡 Tip de Bienestar:</strong> ${r.tipBienestar || pendiente()}</p>
+            </div>
 
-    // En celular la ficha queda bajo el mapa: bajar hasta ella
-    if (desplazar && window.matchMedia("(max-width: 900px)").matches) {
-        $("html, body").animate({
-            scrollTop: $("#ficha-region").offset().top - parseInt(getComputedStyle(document.documentElement).getPropertyValue("--alto-header") || 0) - 12
-        }, 500);
+            <div class="ficha-bloque">
+                <h4><i class="fa-solid fa-hand-holding-heart"></i> Dónde pedir apoyo</h4>
+                <ul class="apoyo-instituciones" style="margin-bottom: 12px;">
+                    ${htmlApoyo}
+                </ul>
+                <ul class="contactos-ayuda">
+                    <li><i class="fa-solid fa-phone"></i> <span><strong>Salud Responde</strong> <a href="tel:6003607777">600 360 7777</a></span></li>
+                    <li><i class="fa-solid fa-phone"></i> <span><strong>Línea <a href="tel:*4141">*4141</a></strong> del Minsal, gratuita, 24/7</span></li>
+                </ul>
+            </div>
+
+            <button type="button" id="btn-explorar-test-nuevo" class="boton-primario" style="margin-top: 15px; width: 100%;">Compárate con tu región · Hacer el test</button>
+        `;
+
+        $("#ficha-contenido").html(contenidoNuevo);
+
+        // Evento para activar el botón del test dentro de la ficha inyectada
+        $("#btn-explorar-test-nuevo").click(function() {
+            mostrarSeccion("#pantalla-contexto");
+        });
+
+        // En celular desplaza la vista hacia la ficha
+        if (desplazar && window.matchMedia("(max-width: 900px)").matches) {
+            $("html, body").animate({
+                scrollTop: $("#ficha-region").offset().top - parseInt(getComputedStyle(document.documentElement).getPropertyValue("--alto-header") || 0) - 12
+            }, 500);
+        }
     }
 }
 
