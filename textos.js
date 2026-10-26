@@ -513,8 +513,8 @@ es: {
     // Paradas de la noche (23:00 a 07:00). "frase" se ve siempre; "detalle" va en la tarjeta.
     "noche": [
         { titulo: "Antes de dormir",
-          bien: { frase: "Deja el celular y lee un rato.", detalle: ["Sin pantalla en la cama, se duerme más rápido.", "Descansa mejor y rinde más al otro día."] },
-          mal:  { frase: "En la cama con el celular.", detalle: ["Cada hora de pantalla en la cama sube un 59% el riesgo de insomnio.", "Y quita unos 24 minutos de sueño."] } },
+          bien: {"frase":"Si dejas el celular antes de dormir:","detalle":["Te das un momento para bajar el ritmo y relajarte.","Puedes conciliar el sueño con más facilidad y descansar mejor."]},
+          mal:  {"frase":"Si sigues usando el celular en la cama:","detalle":["Puedes retrasar tu hora de dormir y reducir tu tiempo de descanso.","Puede costarte más conciliar el sueño."]} },
         { titulo: "Se apaga la luz",
           bien: { frase: "Se duerme.", detalle: ["Empieza el primer ciclo de sueño, de unos 90 minutos."] },
           mal:  { frase: "Sigue en el celular.", detalle: ["Con la cara iluminada por la pantalla."] } },
@@ -522,13 +522,13 @@ es: {
           bien: { frase: "Sueño profundo.", detalle: ["Es la fase más reparadora.", "Se concentra en el primer tercio de la noche."] },
           mal:  { frase: "Sigue despierto.", detalle: ["Cada hora de pantalla en la cama quita unos 24 minutos de sueño."] } },
         { titulo: "Madrugada",
-          bien: { frase: "Va en su segundo ciclo.", detalle: ["Cada ciclo dura unos 90 minutos y pasa por sueño liviano, profundo y REM."] },
+          bien: { frase: "Va en su tercer ciclo.", detalle: ["Cada ciclo dura unos 90 minutos y pasa por sueño liviano, profundo y REM."] },
           mal:  { frase: "Recién se duerme.", detalle: ["Con la alarma a las 07:00, le quedan 5 horas de sueño."] } },
         { titulo: "Antes del amanecer",
           bien: { frase: "Aumenta el sueño REM.", detalle: ["Es la fase de los sueños.", "Se asocia a ordenar lo aprendido."] },
           mal:  { frase: "Va en su primer ciclo de sueño profundo.", detalle: ["Todavía le falta casi todo el REM de la noche."] } },
         { titulo: "Suena la alarma",
-          bien: { frase: "Despierta con 7,5 horas.", detalle: ["Cerca de 5 ciclos completos."] },
+          bien: { frase: "Despierta con 9 horas.", detalle: ["Cerca de 6 ciclos completos."] },
           mal:  { frase: "El despertador lo saca a mitad de ciclo.", detalle: ["Duerme 5 horas, unos 3 ciclos.", "Se pierde gran parte del REM, que se concentra al final de la noche."] } }
     ],
 
@@ -575,9 +575,9 @@ es: {
     "vive.recomendado": "Lo recomendado: 7 a 9 h",
     "vive.finalTitulo": "Así termina el día",
     "vive.finalSub": "Con la alarma a las 07:00, esto es lo que alcanzas a dormir.",
-    "vive.finalBuenas": "7,5 h",
+    "vive.finalBuenas": "9 h",
     "vive.finalMalas": "5 h",
-    "vive.durmio2330": "Te dormiste a las 23:30",
+    "vive.durmio2330": "Te dormiste a las 22:00",
     "vive.durmio0200": "Te dormiste a las 02:00",
     "vive.finalNota": "Lo recomendado: 7 a 9 h. Fuente: National Sleep Foundation (Hirshkowitz et al., 2015)",
     "vive.finalPregunta": "¿Y cómo es tu día?",
@@ -586,20 +586,20 @@ es: {
     // Momentos del día, en el mismo orden que "momentos" en main.js
     "momentos": [
         {
-            titulo: "Traslado", dato: "5 de 10", texto: "estudiantes tardan más de 1 hora en trasladarse", fuente: "ENUT 2023",
-            mal:  { titulo: "Si viajas pegado al celular", lista: ["Llegas con la cabeza saturada", "Sientes que el viaje fue tiempo perdido"] },
-            bien: { titulo: "Si escuchas un podcast", lista: ["El viaje se vuelve un rato útil", "Repasas sin darte cuenta"] }
+            titulo: "Traslado", dato: "5 de 10", texto: "estudiantes tardan más de 1 hora en trasladarse", fuente: "Espinoza Díaz et al. (2025); Errázuriz y Valdés (2017)",
+            mal:  {"titulo":"Si pasas todo el viaje pendiente de redes y notificaciones:","lista":["El uso excesivo del celular puede aumentar tu sensación de ansiedad.","Puedes terminar el trayecto con la sensación de no haber tenido una pausa."]},
+            bien: {"titulo":"Si escuchas un podcast y/o lees:","lista":["El tiempo del viaje se vuelve productivo","Puedes desconectarte por un rato de tus pendientes y convertir el trayecto en un momento para ti"]}
         },
         {
             titulo: "Clases y estudio", dato: "59%", texto: "de los universitarios de un estudio se pone objetivos de estudio",
-            fuente: "Reyes-González, Meneses-Báez y Díaz-Mujica (2022)",
-            mal:  { titulo: "Si estudias con todo abierto", lista: ["Saltas entre pestañas y notificaciones", "Estudiar te toma más tiempo"] },
-            bien: { titulo: "Si planificas la semana", lista: ["Sabes qué hacer y cuándo", "Los que rinden mejor priorizan y descansan"] }
+            fuente: "Zambrano et al. (2021)",
+            mal:  {"titulo":"Si estudias con redes y notificaciones abiertas:","lista":["Las interrupciones dificultan que mantengas la concentración.","Puedes tardar más en terminar tus tareas."]},
+            bien: {"titulo":"Si planificas la semana:","lista":["Divides los objetivos grandes en pasos pequeños y alcanzables.","Distribuyes tus tareas según sus plazos y el tiempo disponible.","Puedes reconocer tus avances y sentir que el objetivo está más cerca."]}
         },
         {
             titulo: "Almuerzo y pausa", dato: "1 h", texto: "al día dedican los estudiantes a comer", fuente: "ENUT 2023",
-            mal:  { titulo: "Si comes frente al computador", lista: ["No hay una pausa real", "La tarde se hace más pesada"] },
-            bien: { titulo: "Si almuerzas con otros", lista: ["Recargas energía para la tarde", "Compartes y bajas el estrés"] }
+            mal:  {"titulo":"Si sigues estudiando mientras almuerzas:","lista":["Comes con la atención dividida entre la comida y tus tareas.","Pierdes una pausa para descansar y despejar la mente."]},
+            bien: {"titulo":"si comes sin pantallas:","lista":["Te das una pausa para descansar y despejar la mente.","Bajas el ritmo del día, lo que puede ayudarte a reducir el estrés."]}
         },
         {
             titulo: "Tareas pendientes", dato: "4 de 6", texto: "áreas del bienestar son más bajas en quienes más postergan",
@@ -610,20 +610,20 @@ es: {
         {
             titulo: "Deporte", dato: "150 min", texto: "de actividad física a la semana recomienda la OMS",
             fuente: "Organización Mundial de la Salud (2020)",
-            mal:  { titulo: "Si pasas todo el día sentado", lista: ["Aumenta el cansancio", "Cuesta más soltar el estrés"] },
-            bien: { titulo: "Si sales a moverte", lista: ["Bastan 20 a 30 minutos al día", "Mejora tu ánimo y tu descanso"] }
+            mal:  {"titulo":"Si pasas muchas horas sentado sin hacer pausas:","lista":["Puedes sentir molestias físicas por mantener la misma postura.","Puedes acumular cansancio y sentir más sueño durante la jornada."]},
+            bien: {"titulo":"Si haces deporte o actividad física:","lista":["Mejora tu ánimo y ayuda a dormir mejor.","Puede favorecer tu concentración y tu memoria."]}
         },
         {
             titulo: "Celular y redes", dato: "66,8%", texto: "de los jóvenes de 16 a 29 años está más de 4 h al día en internet",
             fuente: "SUBTEL y Cadem (2024)",
-            mal:  { titulo: "Si scrolleas sin parar", lista: ["El tiempo se escapa sin darte cuenta", "Se te pasa la hora de dormir"] },
-            bien: { titulo: "Si te pones un límite", lista: ["Recuperas tiempo para lo que te gusta", "Llegas más tranquilo a la hora de dormir"] }
+            mal:  {"titulo":"Si revisas redes sin ponerte un límite:","lista":["Puedes perder la noción del tiempo y quedarte más de lo que querías.","Dejas menos tiempo para tus pendientes y las actividades que disfrutas."]},
+            bien: {"titulo":"Si limitas tu tiempo en redes:","lista":["Evitas pasar más tiempo del que querías en el celular.","Recuperas tiempo para descansar o hacer actividades que disfrutas."]}
         },
         {
             titulo: "Antes de dormir", dato: "+59%", texto: "más riesgo de insomnio por cada hora de pantalla en la cama",
             fuente: "Hjetland et al. (2025), Frontiers in Psychiatry",
-            mal:  { titulo: "Si usas el celular", lista: ["Duermes 24 minutos menos", "Te cuesta más concentrarte al otro día"] },
-            bien: { titulo: "Si lo dejas 30 min antes", lista: ["Te duermes más rápido", "Descansas mejor y rindes más"] }
+            mal:  {"titulo":"Si sigues usando el celular en la cama:","lista":["Puedes retrasar tu hora de dormir y reducir tu tiempo de descanso.","Puede costarte más conciliar el sueño."]},
+            bien: {"titulo":"Si dejas el celular antes de dormir:","lista":["Te das un momento para bajar el ritmo y relajarte.","Puedes conciliar el sueño con más facilidad y descansar mejor."]}
         },
         {
             titulo: "Pasada la medianoche", dato: "−36 min", texto: "de sueño ya perdió quien lleva 1 h y media con el celular en la cama",
@@ -1174,13 +1174,13 @@ en: {
           bien: { frase: "Deep sleep.", detalle: ["The most restorative stage.", "It is concentrated in the first third of the night."] },
           mal:  { frase: "Still awake.", detalle: ["Every hour of screen time in bed takes away about 24 minutes of sleep."] } },
         { titulo: "Small hours",
-          bien: { frase: "In the second cycle.", detalle: ["Each cycle lasts about 90 minutes and goes through light, deep and REM sleep."] },
+          bien: { frase: "In the third cycle.", detalle: ["Each cycle lasts about 90 minutes and goes through light, deep and REM sleep."] },
           mal:  { frase: "Only now falls asleep.", detalle: ["With the alarm at 07:00, there are 5 hours of sleep left."] } },
         { titulo: "Before dawn",
           bien: { frase: "More REM sleep.", detalle: ["The dreaming stage.", "It is linked to sorting out what was learned."] },
           mal:  { frase: "In the first cycle of deep sleep.", detalle: ["Almost all of the night's REM is still to come."] } },
         { titulo: "The alarm goes off",
-          bien: { frase: "Wakes up after 7.5 hours.", detalle: ["Close to 5 full cycles."] },
+          bien: { frase: "Wakes up after 9 hours.", detalle: ["Close to 6 full cycles."] },
           mal:  { frase: "The alarm cuts a cycle in half.", detalle: ["Sleeps 5 hours, about 3 cycles.", "Misses much of the REM, which is concentrated at the end of the night."] } }
     ],
 
@@ -1227,9 +1227,9 @@ en: {
     "vive.recomendado": "Recommended: 7 to 9 h",
     "vive.finalTitulo": "How the day ends",
     "vive.finalSub": "With the alarm set for 07:00, this is how much sleep you get.",
-    "vive.finalBuenas": "7.5 h",
+    "vive.finalBuenas": "9 h",
     "vive.finalMalas": "5 h",
-    "vive.durmio2330": "You fell asleep at 23:30",
+    "vive.durmio2330": "You fell asleep at 22:00",
     "vive.durmio0200": "You fell asleep at 02:00",
     "vive.finalNota": "Recommended: 7 to 9 h. Source: National Sleep Foundation (Hirshkowitz et al., 2015)",
     "vive.finalPregunta": "And what's your day like?",

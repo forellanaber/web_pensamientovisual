@@ -1257,28 +1257,27 @@ $(document).ready(function() {
     // Proporción de cada imagen (ancho, alto). Los rectángulos provisorios usan la misma.
     const TAM = { cordillera: [2400, 800], ciudad: [2400, 800], escenario: [1500, 1000], personaje: [600, 900] };
     const MIN_TOTAL = 1380;   // de 08:00 a 07:00 del día siguiente, en minutos
-    const MIN_NOCHE = 900;    // 23:00
+    const MIN_NOCHE = 810;    // 21:30, preparación para dormir
     const VELOCIDAD = { cordillera: 0.12, ciudad: 0.35, calle: 1 };
 
     // Paradas del día: textos del arreglo "momentos" de textos.js (mismo orden)
     const PARADAS_DIA = [
-        { hora: "08:00", min: 0,   momento: 0, ejemplo: true, iconoBien: "fa-headphones",     iconoMal: "fa-mobile-screen" },
-        { hora: "10:30", min: 150, momento: 1,                iconoBien: "fa-list-check",     iconoMal: "fa-bell" },
-        { hora: "13:30", min: 330, momento: 2, ejemplo: true, iconoBien: "fa-utensils",       iconoMal: "fa-laptop" },
-        { hora: "16:00", min: 480, momento: 3,                iconoBien: "fa-list-check",     iconoMal: "fa-hourglass-end" },
-        { hora: "19:30", min: 690, momento: 4,                iconoBien: "fa-person-running", iconoMal: "fa-couch" },
-        { hora: "21:00", min: 780, momento: 5,                iconoBien: "fa-guitar",         iconoMal: "fa-mobile-screen" }
+        { hora: "08:00", min: 0, momento: 0, ejemplo: true, iconoBien: "fa-headphones", iconoMal: "fa-mobile-screen" },
+        { hora: "10:30", min: 150, momento: 1, iconoBien: "fa-list-check", iconoMal: "fa-bell" },
+        { hora: "13:30", min: 330, momento: 2, ejemplo: true, iconoBien: "fa-utensils", iconoMal: "fa-laptop" },
+        { hora: "16:00", min: 480, momento: 4, iconoBien: "fa-person-running", iconoMal: "fa-couch", horaImagen: "1930" },
+        { hora: "21:00", min: 780, momento: 5, iconoBien: "fa-guitar", iconoMal: "fa-mobile-screen" }
     ];
     // Se agrega solo si existe img/dia-1800.jpg (textos en "momentoTrabajo")
     const PARADA_TRABAJO = { hora: "18:00", min: 600, trabajo: true, ejemplo: true, iconoBien: "fa-calendar-days", iconoMal: "fa-battery-quarter" };
     // Paradas de la noche: textos en "noche" de textos.js. "sueno" = horas dormidas hasta esa hora.
     const PARADAS_NOCHE = [
-        { hora: "23:00", min: 900,  noche: 0, sueno: { bien: 0,   mal: 0 },   fuente: { bien: "",               mal: "vd.fuentePantalla" }, iconoBien: "fa-book-open",  iconoMal: "fa-mobile-screen" },
-        { hora: "23:30", min: 930,  noche: 1, sueno: { bien: 0,   mal: 0 },   fuente: { bien: "vd.fuenteNoche", mal: "vd.fuentePantalla" }, iconoBien: "fa-bed",        iconoMal: "fa-mobile-screen" },
-        { hora: "00:30", min: 990,  noche: 2, sueno: { bien: 1,   mal: 0 },   fuente: { bien: "vd.fuenteNoche", mal: "vd.fuentePantalla" }, iconoBien: "fa-moon",       iconoMal: "fa-mobile-screen" },
-        { hora: "02:00", min: 1080, noche: 3, sueno: { bien: 2.5, mal: 0 },   fuente: { bien: "vd.fuenteNoche", mal: "" },                  iconoBien: "fa-moon",       iconoMal: "fa-bed" },
-        { hora: "04:30", min: 1230, noche: 4, sueno: { bien: 5,   mal: 2.5 }, fuente: { bien: "vd.fuenteNoche", mal: "vd.fuenteNoche" },    iconoBien: "fa-cloud-moon", iconoMal: "fa-bed" },
-        { hora: "07:00", min: 1380, noche: 5, sueno: { bien: 7.5, mal: 5 },   fuente: { bien: "vd.fuenteNoche", mal: "vd.fuenteNoche" },    iconoBien: "fa-sun",        iconoMal: "fa-clock" }
+        { hora: "21:30", min: 810, noche: 0, sueno: {"bien":0,"mal":0}, fuente: {"bien":"","mal":"vd.fuentePantalla"}, iconoBien: "fa-book-open", iconoMal: "fa-mobile-screen", horaImagen: "2300" },
+        { hora: "22:00", min: 840, noche: 1, sueno: {"bien":0,"mal":0}, fuente: {"bien":"vd.fuenteNoche","mal":"vd.fuentePantalla"}, iconoBien: "fa-bed", iconoMal: "fa-mobile-screen", horaImagen: "2330" },
+        { hora: "00:30", min: 990, noche: 2, sueno: {"bien":2.5,"mal":0}, fuente: {"bien":"vd.fuenteNoche","mal":"vd.fuentePantalla"}, iconoBien: "fa-moon", iconoMal: "fa-mobile-screen" },
+        { hora: "02:00", min: 1080, noche: 3, sueno: {"bien":4,"mal":0}, fuente: {"bien":"vd.fuenteNoche","mal":""}, iconoBien: "fa-moon", iconoMal: "fa-bed" },
+        { hora: "04:30", min: 1230, noche: 4, sueno: {"bien":6.5,"mal":2.5}, fuente: {"bien":"vd.fuenteNoche","mal":"vd.fuenteNoche"}, iconoBien: "fa-cloud-moon", iconoMal: "fa-bed" },
+        { hora: "07:00", min: 1380, noche: 5, sueno: {"bien":9,"mal":5}, fuente: {"bien":"vd.fuenteNoche","mal":"vd.fuenteNoche"}, iconoBien: "fa-sun", iconoMal: "fa-clock" }
     ];
 
     // Cielo: colores (variables de :root) en distintas horas; entre ellas se mezclan
@@ -1287,22 +1286,25 @@ $(document).ready(function() {
     // Cuánto se oscurecen la cordillera y la ciudad según la hora (0 = nada)
     const OSCURIDAD = [[0, 0], [690, 0.05], [780, 0.3], [900, 0.5], [1080, 0.62], [1290, 0.45], [1380, 0.05]];
 
-    // Hipnograma (ilustrativo): minutos desde las 23:00. Fases: d despierto, l liviano, r REM, p profundo.
+    // Hipnograma (ilustrativo): minutos desde las 21:30. Fases: d despierto, l liviano, r REM, p profundo.
     const CICLOS = {
         bien: { despierta: 30, ciclos: [
-            [["l", 15], ["p", 45], ["l", 15], ["r", 15]],
-            [["l", 15], ["p", 35], ["l", 20], ["r", 20]],
-            [["l", 20], ["p", 20], ["l", 25], ["r", 25]],
-            [["l", 25], ["p", 10], ["l", 25], ["r", 30]],
-            [["l", 25], ["p", 5],  ["l", 25], ["r", 35]] ] },
-        mal: { despierta: 180, ciclos: [
-            [["l", 15], ["p", 45], ["l", 15], ["r", 15]],
-            [["l", 15], ["p", 35], ["l", 20], ["r", 20]],
-            [["l", 20], ["p", 25], ["l", 20], ["r", 55]] ] }   // el último REM lo corta la alarma de las 07:00
+            [["l",15],["p",45],["l",15],["r",15]],
+            [["l",15],["p",35],["l",20],["r",20]],
+            [["l",20],["p",20],["l",25],["r",25]],
+            [["l",25],["p",10],["l",25],["r",30]],
+            [["l",25],["p",5],["l",25],["r",35]],
+            [["l",25],["p",5],["l",25],["r",35]]
+        ] },
+        mal: { despierta: 270, ciclos: [
+            [["l",15],["p",45],["l",15],["r",15]],
+            [["l",15],["p",35],["l",20],["r",20]],
+            [["l",20],["p",25],["l",20],["r",55]]
+        ] }
     };
     const NIVEL = { d: 0, l: 1, r: 2, p: 3 };
     // Batería (ilustrativa): parte en 20% y se carga mientras duerme
-    const BATERIA = { bien: { duerme: 930, llega: 95 }, mal: { duerme: 1080, llega: 55 } };
+    const BATERIA = { bien: {"duerme":840,"llega":95}, mal: {"duerme":1080,"llega":55} };
 
     const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let paradas = PARADAS_DIA.concat(PARADAS_NOCHE);
@@ -1317,7 +1319,7 @@ $(document).ready(function() {
     let hipno = { puntos: [], largos: [], total: 0, animando: false };
 
     const esNoche = p => p.noche !== undefined;
-    const hhmm = p => p.hora.replace(":", "");
+    const hhmm = p => p.horaImagen || p.hora.replace(":", "");
     const limitar01 = n => Math.max(0, Math.min(1, n));
 
     // ---------- Imágenes (o rectángulo provisorio si falta el archivo) ----------
@@ -1528,7 +1530,7 @@ $(document).ready(function() {
     function fasesDe(version) {
         let c = CICLOS[version], fases = [["d", 0]], tiempo = c.despierta;
         c.ciclos.forEach(ciclo => ciclo.forEach(([fase, dur]) => { fases.push([fase, tiempo]); tiempo += dur; }));
-        fases.push(["d", 480]);
+        fases.push(["d", MIN_TOTAL - MIN_NOCHE]);
         return fases;
     }
     function construirHipnograma() {
@@ -1541,7 +1543,7 @@ $(document).ready(function() {
         // Escalera: horizontal hasta el inicio de la fase siguiente, luego vertical
         let fases = fasesDe(modo), puntos = [];
         fases.forEach(([fase, min], k) => {
-            let px = min / 480 * ancho;
+            let px = min / (MIN_TOTAL - MIN_NOCHE) * ancho;
             if (k === 0) puntos.push([px, y(NIVEL[fase])]);
             else { puntos.push([px, puntos[puntos.length - 1][1]]); puntos.push([px, y(NIVEL[fase])]); }
         });
@@ -1556,7 +1558,7 @@ $(document).ready(function() {
     }
     // Largo de la línea hasta cierta hora (para dibujarla a medida que avanza la noche)
     function largoHasta(min) {
-        let px = limitar01((min - MIN_NOCHE) / 480) * hipno.ancho;
+        let px = limitar01((min - MIN_NOCHE) / (MIN_TOTAL - MIN_NOCHE)) * hipno.ancho;
         let p = hipno.puntos, l = hipno.largos;
         for (let i = 1; i < p.length; i++) {
             if (p[i][0] > px) return l[i - 1] + Math.max(0, px - p[i - 1][0]);
