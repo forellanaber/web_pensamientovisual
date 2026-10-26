@@ -88,6 +88,10 @@ $(document).ready(function() {
         e.preventDefault();
         mostrarSeccion("#pantalla-sugerencias", $(this));
     });
+    $("#link-quienes").click(function(e) {
+        e.preventDefault();
+        mostrarSeccion("#pantalla-quienes", $(this));
+    });
     $(".btn-ir-vive").click(function() {
         mostrarSeccion("#pantalla-vive", $("#link-vive"));
     });

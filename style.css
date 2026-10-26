@@ -1439,3 +1439,58 @@ h4, strong, b { font-weight: 700; }
     padding: 3rem 0;
     width: 100%;
 }
+/* --- Sección Quiénes somos --- */
+.bloque-quienes {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+}
+
+.bloque-quienes.inverso {
+    flex-direction: row-reverse;
+}
+
+.quienes-img {
+    flex: 1;
+    max-width: 50%;
+    text-align: center;
+}
+
+.quienes-img img {
+    width: 100%;
+    max-width: 450px; /* Evita que las imágenes sean gigantes en pantallas anchas */
+    height: auto;
+}
+
+.quienes-texto {
+    flex: 1;
+}
+
+.quienes-texto h3 {
+    font-size: 2.2rem;
+    color: var(--primario); /* Asegúrate de que coincida con tu paleta */
+    margin-bottom: 1rem;
+}
+
+.quienes-texto p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--texto);
+}
+
+/* Adaptación para pantallas pequeñas (móviles) */
+@media (max-width: 768px) {
+    .bloque-quienes, 
+    .bloque-quienes.inverso {
+        flex-direction: column;
+        gap: 2rem;
+        text-align: center;
+        margin-top: 3rem;
+        margin-bottom: 3rem;
+    }
+    .quienes-img {
+        max-width: 80%;
+    }
+}

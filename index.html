@@ -36,7 +36,7 @@
             <ul>
                 <a href="#" id="link-explorar" data-t="nav.explorar">Explorar Chile</a>
                 <a href="#" id="link-vive" data-t="nav.vive">Vive un día</a>
-                <a href="#" data-t="nav.quienes">Quiénes somos</a>
+                <a href="#" id="link-quienes" data-t="Nosotros">Nosotros</a>
                 <a href="#" id="link-sugerencias" data-t="nav.sugerencias">Ayudanos</a>
             <ul>
         </nav>
@@ -866,6 +866,36 @@
                 <div id="success-message" class="caja-exito" style="display: none;">
                     <h3 data-t="sugerencias.exito">Gracias por ayudarnos a mejorar</h3>
                     <button id="btn-otra-sugerencia" class="btn-secundario" data-t="sugerencias.otra">Dejar otra sugerencia</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Pantalla Quiénes somos -->
+    <section id="pantalla-quienes" class="seccion-oculta">
+        <div class="contenedor">
+            <h2 class="titulo-principal centrado" data-t="nav.quienes">Quiénes somos</h2>
+            
+            <!-- Misión: Imagen izquierda, texto derecha -->
+            <div class="bloque-quienes">
+                <div class="quienes-img">
+                    <!-- Reemplaza el src con tu ilustración real -->
+                    <img src="img/mision.svg" alt="Ilustración de la misión" aria-hidden="true">
+                </div>
+                <div class="quienes-texto">
+                    <h3 data-t="quienes.misionTitulo">Nuestra misión</h3>
+                    <p data-t="quienes.misionTexto">Ayudar a los estudiantes a administrar su tiempo. A través de datos reales y herramientas simples, mostramos como pequeños ajustes en el día a día protegen la salud mental, mejoran su rendimiento y les devuelven horas para lo que realmente les importa.</p>
+                </div>
+            </div>
+
+            <!-- Visión: Texto izquierda, imagen derecha -->
+            <div class="bloque-quienes inverso">
+                <div class="quienes-img">
+                    <!-- Reemplaza el src con tu ilustración real -->
+                    <img src="img/vision.svg" alt="Ilustración de la visión" aria-hidden="true">
+                </div>
+                <div class="quienes-texto">
+                    <h3 data-t="quienes.visionTitulo">Nuestra visión</h3>
+                    <p data-t="quienes.visionTexto">Ser la plataforma interactiva de referencia en Chile para el bienestar estudiantil, impulsando una cultura universitaria donde el descanso, la salud mental y el tiempo personal sean reconocidos como pilares fundamentales del éxito académico.</p>
                 </div>
             </div>
         </div>

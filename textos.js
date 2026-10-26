@@ -456,6 +456,10 @@ es: {
     "sugerencias.enviar": "Enviar sugerencia",
     "sugerencias.exito": "Gracias por ayudarnos a mejorar",
     "sugerencias.otra": "Dejar otra sugerencia",
+    "quienes.misionTitulo": "Nuestra misión",
+    "quienes.misionTexto": "Ayudar a los estudiantes a administrar su tiempo. A través de datos reales y herramientas simples, mostramos como pequeños ajustes en el día a día protegen la salud mental, mejoran su rendimiento y les devuelven horas para lo que realmente les importa.",
+    "quienes.visionTitulo": "Nuestra visión",
+    "quienes.visionTexto": "Ser la plataforma interactiva de referencia en Chile para el bienestar estudiantil, impulsando una cultura universitaria donde el descanso, la salud mental y el tiempo personal sean reconocidos como pilares fundamentales del éxito académico.",
 
 },
 
@@ -901,6 +905,10 @@ en: {
     "sugerencias.enviar": "Submit feedback",
     "sugerencias.exito": "Thanks for helping us improve",
     "sugerencias.otra": "Leave another suggestion",
-}
+    "quienes.misionTitulo": "Our mission",
+    "quienes.misionTexto": "To help students manage their time. Through real data and simple tools, we show how small daily adjustments protect mental health, improve performance, and give them back hours for what truly matters.",
+    "quienes.visionTitulo": "Our vision",
+    "quienes.visionTexto": "To be the benchmark interactive platform in Chile for student well-being, driving a university culture where rest, mental health, and personal time are recognized as fundamental pillars of academic success.",
+    }
 
 };
