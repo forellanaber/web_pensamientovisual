@@ -1494,3 +1494,73 @@ h4, strong, b { font-weight: 700; }
         max-width: 80%;
     }
 }
+/* --- Nuevos Bloques: Bases de Datos y Equipo --- */
+.lista-datos {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.5rem;
+    text-align: left;
+    display: inline-block;
+}
+
+.lista-datos li {
+    font-size: 1.1rem;
+    color: var(--texto-secundario, #555);
+    margin-bottom: 0.8rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.lista-datos li::before {
+    content: "•";
+    color: var(--primario);
+    font-weight: bold;
+    font-size: 1.5rem;
+    position: absolute;
+    left: 0;
+    top: -4px;
+}
+
+.tarjeta-equipo {
+    background: transparent;
+    padding: 2.5rem;
+    border: 2px dashed var(--primario);
+    border-radius: 16px;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.logo-universidad {
+    font-size: 2.5rem;
+    color: var(--primario);
+    margin-bottom: 1rem;
+}
+
+.texto-universidad {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--texto);
+    margin-bottom: 1.5rem;
+}
+
+.nombres-equipo {
+    font-size: 1rem;
+    color: var(--texto-secundario, #555);
+    line-height: 1.8;
+}
+
+.nombres-equipo span {
+    display: inline-block;
+    margin: 0 0.5rem;
+}
+
+/* Adaptación para móviles del equipo */
+@media (max-width: 768px) {
+    .nombres-equipo span {
+        display: block;
+        margin: 0.5rem 0;
+    }
+    .nombres-equipo {
+        line-height: 1.4;
+    }
+}

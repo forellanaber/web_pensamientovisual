@@ -461,6 +461,9 @@ es: {
     "quienes.misionTexto": "Acompañar y orientar a las y los estudiantes de educación superior en Chile en la recuperación consciente de su tiempo, calidad de vida y salud mental. A través del uso de datos reales y herramientas digitales sencillas, transformamos información compleja en experiencias intuitivas, accesibles y personalizadas. Nuestro propósito es visibilizar los desequilibrios cotidianos provocados por la sobrecarga académica, las jornadas laborales y los tiempos de traslado, demostrando cómo la incorporación de pequeños cambios sostenibles en la rutina diaria protege la salud mental, potencia el rendimiento y devuelve horas de valor para lo que verdaderamente importa.",
     "quienes.visionTitulo": "Nuestra visión",
     "quienes.visionTexto": "Consolidarnos como la plataforma digital interactiva de referencia a nivel nacional en bienestar estudiantil y educación de hábitos de vida, impulsando una profunda transformación cultural en los entornos universitarios y técnicos del país. Queremos forjar una comunidad académica donde el descanso, el cuidado de la salud mental y la preservación del tiempo personal dejen de considerarse privilegios o pérdidas de tiempo. Así, que pasen a ser reconocidos activamente como pilares fundamentales y determinantes para el éxito y la sostenibilidad académica y profesional de cada estudiante.",
+    "quienes.datosTitulo": "Nuestros datos",
+        "quienes.datosTexto": "Para construir esta plataforma, analizamos y cruzamos información oficial de tres fuentes principales de Chile:",
+        "quienes.equipoTexto": "Este sitio fue desarrollado por Estudiantes de la Pontificia Universidad Católica de Chile."
 
 },
 
@@ -911,6 +914,9 @@ en: {
     "quienes.misionTexto": "To help students manage their time. Through real data and simple tools, we show how small daily adjustments protect mental health, improve performance, and give them back hours for what truly matters.",
     "quienes.visionTitulo": "Our vision",
     "quienes.visionTexto": "To be the benchmark interactive platform in Chile for student well-being, driving a university culture where rest, mental health, and personal time are recognized as fundamental pillars of academic success.",
+    "quienes.datosTitulo": "Our data",
+        "quienes.datosTexto": "To build this platform, we analyzed and cross-referenced official information from three main sources in Chile:",
+        "quienes.equipoTexto": "This site was developed by students from the Pontificia Universidad Católica de Chile."
     }
 
 };
