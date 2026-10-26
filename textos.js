@@ -29,7 +29,7 @@ es: {
     // --- Dato de contexto ---
     "contexto.intro": "¿Sabías que el",
     "contexto.cifra": "66,8%",
-    "contexto.detalle": "de los jóvenes en Chile pasa más de 4 horas al día en internet?",
+    "contexto.detalle": "de los jóvenes en Chile pasa más de 4 horas al día pegado a una pantalla?",
     "contexto.subtitulo": "¡Eso es más de 2 meses seguidos pegado a una pantalla al año!",
     "contexto.fuente": "Fuente: SUBTEL y Cadem (2024), jóvenes de 16 a 29 años",
     "contexto.minutos": "3 minutos",
@@ -645,7 +645,24 @@ es: {
         titulo: "Trabajo", dato: "3 de 10", texto: "estudiantes estudian y trabajan", fuente: "CASEN 2022",
         mal:  { titulo: "Si trabajas sin ordenar la semana", lista: ["Terminas restando horas de sueño", "Todo se junta al final"] },
         bien: { titulo: "Si fijas bloques en la semana", lista: ["Sabes cuándo estudias y cuándo trabajas", "Baja el estrés"] }
-    }
+    },
+    // --- Sugerencias y Nosotros ---
+    "nav.nosotros": "Nosotros",
+    "nav.sugerencias": "Ayúdanos",
+    "sugerencias.titulo": "Déjanos tus sugerencias",
+    "sugerencias.sub": "Tu opinión nos ayuda a mejorar la experiencia.",
+    "sugerencias.califica": "Califica la página:",
+    "sugerencias.placeholder": "Escribe tus ideas, sugerencias o críticas aquí...",
+    "sugerencias.enviar": "Enviar sugerencia",
+    "sugerencias.exito": "Gracias por ayudarnos a mejorar",
+    "sugerencias.otra": "Dejar otra sugerencia",
+    "quienes.misionTitulo": "Nuestra misión",
+    "quienes.misionTexto": "Acompañar y orientar a las y los estudiantes de educación superior en Chile en la recuperación consciente de su tiempo, calidad de vida y salud mental. A través del uso de datos reales y herramientas digitales sencillas, transformamos información compleja en experiencias intuitivas, accesibles y personalizadas. Nuestro propósito es visibilizar los desequilibrios cotidianos provocados por la sobrecarga académica, las jornadas laborales y los tiempos de traslado, demostrando cómo la incorporación de pequeños cambios sostenibles en la rutina diaria protege la salud mental, potencia el rendimiento y devuelve horas de valor para lo que verdaderamente importa.",
+    "quienes.visionTitulo": "Nuestra visión",
+    "quienes.visionTexto": "Consolidarnos como la plataforma digital interactiva de referencia a nivel nacional en bienestar estudiantil y educación de hábitos de vida, impulsando una profunda transformación cultural en los entornos universitarios y técnicos del país. Queremos forjar una comunidad académica donde el descanso, el cuidado de la salud mental y la preservación del tiempo personal dejen de considerarse privilegios o pérdidas de tiempo. Así, que pasen a ser reconocidos activamente como pilares fundamentales y determinantes para el éxito y la sostenibilidad académica y profesional de cada estudiante.",
+    "quienes.datosTitulo": "Nuestros datos",
+    "quienes.datosTexto": "Para construir esta plataforma, analizamos y cruzamos información oficial de tres fuentes principales de Chile:",
+    "quienes.equipoTexto": "Este sitio fue desarrollado por Estudiantes de la Pontificia Universidad Católica de Chile."
 },
 
 // =====================================================================
@@ -667,7 +684,7 @@ en: {
     // --- Context ---
     "contexto.intro": "Did you know that",
     "contexto.cifra": "66.8%",
-    "contexto.detalle": "of young people in Chile spend more than 4 hours a day online?",
+    "contexto.detalle": "of young people in Chile spend more than 4 hours a day glued to a screen?",
     "contexto.subtitulo": "That's more than 2 straight months glued to a screen every year!",
     "contexto.fuente": "Source: SUBTEL and Cadem (2024), young people aged 16 to 29",
     "contexto.minutos": "3 minutes",
@@ -1278,7 +1295,25 @@ en: {
         titulo: "Work", dato: "3 in 10", texto: "students study and work", fuente: "CASEN 2022",
         mal:  { titulo: "If you work without organizing your week", lista: ["You end up cutting into your sleep", "Everything piles up at the end"] },
         bien: { titulo: "If you set blocks in your week", lista: ["You know when you study and when you work", "Your stress goes down"] }
-    }
+    },
+
+    // --- Feedback & About Us ---
+    "nav.nosotros": "About Us",
+    "nav.sugerencias": "Help Us",
+    "sugerencias.titulo": "Leave us your feedback",
+    "sugerencias.sub": "Your opinion helps us improve the experience.",
+    "sugerencias.califica": "Rate our site:",
+    "sugerencias.placeholder": "Write your ideas, suggestions, or criticisms here...",
+    "sugerencias.enviar": "Submit feedback",
+    "sugerencias.exito": "Thanks for helping us improve",
+    "sugerencias.otra": "Leave another suggestion",
+    "quienes.misionTitulo": "Our mission",
+    "quienes.misionTexto": "To guide and support higher education students in Chile in consciously reclaiming their time, quality of life, and mental health. By using real data and simple digital tools, we transform complex information into intuitive, accessible, and personalized experiences. Our purpose is to bring visibility to everyday imbalances caused by academic overload, long workdays, and commute times, showing how small, sustainable daily changes protect mental health, boost performance, and return meaningful hours for what truly matters.",
+    "quienes.visionTitulo": "Our vision",
+    "quienes.visionTexto": "To establish ourselves as Chile's leading interactive digital platform for student well-being and lifestyle habit education, driving cultural transformation across the country's universities and technical institutes. We aspire to build an academic community where rest, mental health care, and personal time are no longer seen as luxuries or wasted time, but recognized as essential foundations for academic and personal success.",
+    "quienes.datosTitulo": "Our data",
+    "quienes.datosTexto": "To build this platform, we analyzed and cross-referenced official data from three main sources in Chile:",
+    "quienes.equipoTexto": "This platform was developed by students from the Pontificia Universidad Católica de Chile.",
 }
 
 };

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%" fill="none">
+  <!-- Misión: Reloj de arena y brújula hacia el bienestar -->
+  <circle cx="200" cy="150" r="120" fill="#EBF3FF" />
+  <circle cx="200" cy="150" r="95" stroke="#1F3FD1" stroke-width="4" stroke-dasharray="8 6" />
+  <!-- Reloj de arena central -->
+  <path d="M165 95 L235 95 L200 150 L235 205 L165 205 L200 150 Z" fill="#FFFFFF" stroke="#1F3FD1" stroke-width="6" stroke-linejoin="round" />
+  <!-- Arena naranja -->
+  <path d="M185 185 L215 185 L200 160 Z" fill="#FF7A1A" />
+  <circle cx="200" cy="148" r="3" fill="#FF7A1A" />
+  <!-- Base y tope del reloj -->
+  <line x1="155" y1="95" x2="245" y2="95" stroke="#1F3FD1" stroke-width="8" stroke-linecap="round" />
+  <line x1="155" y1="205" x2="245" y2="205" stroke="#1F3FD1" stroke-width="8" stroke-linecap="round" />
+  <!-- Estrellas / destellos de equilibrio -->
+  <path d="M130 110 L135 125 L150 130 L135 135 L130 150 L125 135 L110 130 L125 125 Z" fill="#FF7A1A" />
+  <path d="M270 160 L274 172 L286 176 L274 180 L270 192 L266 180 L254 176 L266 172 Z" fill="#1F3FD1" />
+  <!-- Pequeño libro abierto abajo -->
+  <path d="M170 240 Q200 230 200 245 Q200 230 230 240" stroke="#1F3FD1" stroke-width="4" fill="none" stroke-linecap="round" />
+</svg>
+

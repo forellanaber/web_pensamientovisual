@@ -74,6 +74,12 @@ $(document).ready(function() {
         if ($enlace) $enlace.addClass("activo");
         $("html, body").scrollTop(0);
         $(window).trigger("scroll");
+        if (selector === "#pantalla-explorar" && typeof pintarMapa === "function") {
+            pintarMapa();
+        }
+        if (typeof ScrollTrigger !== "undefined") {
+            setTimeout(function() { ScrollTrigger.refresh(); }, 80);
+        }
     }
 
     $("#link-explorar").click(function(e) {
@@ -83,6 +89,14 @@ $(document).ready(function() {
     $("#link-vive").click(function(e) {
         e.preventDefault();
         mostrarSeccion("#pantalla-vive", $(this));
+    });
+    $("#link-quienes").click(function(e) {
+        e.preventDefault();
+        mostrarSeccion("#pantalla-quienes", $(this));
+    });
+    $("#link-sugerencias").click(function(e) {
+        e.preventDefault();
+        mostrarSeccion("#pantalla-sugerencias", $(this));
     });
     $(".btn-ir-vive").click(function() {
         mostrarSeccion("#pantalla-vive", $("#link-vive"));
@@ -1291,7 +1305,7 @@ $(document).ready(function() {
     const BATERIA = { bien: { duerme: 930, llega: 95 }, mal: { duerme: 1080, llega: 55 } };
 
     const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let paradas = [];
+    let paradas = PARADAS_DIA.concat(PARADAS_NOCHE);
     let modo = "bien";
     let actual = -1;           // parada activa
     let pos = 0;               // posición en el recorrido (índice con decimales)
@@ -1693,8 +1707,15 @@ $(document).ready(function() {
             if (disparador) disparador.disable();
             return;
         }
-        if (!construido) { construir(); return; }
-        if (disparador) { disparador.enable(); ScrollTrigger.refresh(); }
+        if (!construido) {
+            construir();
+            setTimeout(() => { if (typeof ScrollTrigger !== "undefined") ScrollTrigger.refresh(); }, 80);
+            return;
+        }
+        if (disparador) {
+            disparador.enable();
+            setTimeout(() => { if (typeof ScrollTrigger !== "undefined") ScrollTrigger.refresh(); }, 80);
+        }
     }
     new MutationObserver(alMostrar).observe($seccion[0], { attributes: true, attributeFilter: ["class"] });
 
@@ -1707,6 +1728,35 @@ $(document).ready(function() {
     let prueba = new Image();
     prueba.onload = () => { paradas = PARADAS_DIA.slice(0, 4).concat([PARADA_TRABAJO], PARADAS_DIA.slice(4), PARADAS_NOCHE); alMostrar(); };
     prueba.onerror = () => { paradas = PARADAS_DIA.concat(PARADAS_NOCHE); alMostrar(); };
+    // Formulario de sugerencias (Formspree)
+    const $formSugerencias = $("#suggestion-form");
+    if ($formSugerencias.length) {
+        $formSugerencias.on("submit", function(e) {
+            e.preventDefault();
+            const formEl = this;
+            const data = new FormData(formEl);
+            fetch(formEl.action, {
+                method: "POST",
+                body: data,
+                headers: { "Accept": "application/json" }
+            }).then(function(res) {
+                if (res.ok) {
+                    $("#form-container").hide();
+                    $("#success-message").css("display", "flex");
+                    formEl.reset();
+                } else {
+                    alert("Hubo un problema al enviar la sugerencia. Por favor intenta más tarde.");
+                }
+            }).catch(function() {
+                alert("Error de conexión. Verifica tu red e intenta de nuevo.");
+            });
+        });
+    }
+    $("#btn-otra-sugerencia").click(function() {
+        $("#success-message").hide();
+        $("#form-container").show();
+    });
+
     prueba.src = "img/dia-1800.jpg";
 });
 

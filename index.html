@@ -35,8 +35,8 @@
         <nav class="navegacion">
             <a href="#" id="link-explorar" data-t="nav.explorar">Explorar Chile</a>
             <a href="#" id="link-vive" data-t="nav.vive">Vive un día</a>
-            <a href="#" data-t="nav.quienes">Quiénes somos</a>
-            <a href="#" data-t="nav.contacto">Contacto</a>
+            <a href="#" id="link-quienes" data-t="nav.nosotros">Nosotros</a>
+            <a href="#" id="link-sugerencias" data-t="nav.sugerencias">Ayúdanos</a>
         </nav>
         <div class="redes">
             <button type="button" id="btn-idioma" class="btn-idioma" data-t-aria="idioma.aria" aria-label="Cambiar idioma">
@@ -79,7 +79,7 @@
                 <img src="img/personaje-contexto.png" alt="Personaje con celular" class="personaje-contexto-sentado">
                 <p class="contexto-cifra" data-t="contexto.cifra">66,8%</p>
             </div>
-            <p class="contexto-detalle" data-t="contexto.detalle">de los jóvenes en Chile pasa más de 4 horas al día en internet?</p>
+            <p class="contexto-detalle" data-t="contexto.detalle">de los jóvenes en Chile pasa más de 4 horas al día pegado a una pantalla?</p>
             <h2 class="contexto-subtitulo" data-t="contexto.subtitulo">¡Eso es más de 2 meses seguidos pegado a una pantalla al año!</h2>
             <p class="contexto-fuente" data-t="contexto.fuente">Fuente: SUBTEL y Cadem (2024), jóvenes de 16 a 29 años</p>
 
@@ -658,7 +658,7 @@
     <!-- ===== VERSIÓN ANTERIOR (scroll vertical), REEMPLAZADA por el recorrido horizontal de arriba.
          Se deja comentada como referencia. Los comentarios internos se marcaron con <!~~ ~~> para no cortar este bloque.
     <!~~ Pantalla Vive un día: recorrido ilustrado con scroll ~~>
-    <section id="pantalla-vive" class="seccion-oculta modo-bien">
+    <section id="pantalla-vive-anterior" class="seccion-oculta modo-bien">
         <div class="dia-intro">
             <h2 data-t="vive.titulo">Vive un día</h2>
             <p data-t="vive.intro">Recorre un día completo de un estudiante, de la mañana a la madrugada. Elige cómo vivirlo y baja.</p>
@@ -818,6 +818,112 @@
                     <div id="ficha-contenido" hidden>
                         <!-- El contenido de la región se genera dinámicamente desde main.js -->
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pantalla Sugerencias -->
+    <section id="pantalla-sugerencias" class="seccion-oculta">
+        <div class="contenedor contenedor-sugerencias">
+            <div class="centrado encabezado-sugerencias">
+                <h2 data-t="sugerencias.titulo">Déjanos tus sugerencias</h2>
+                <p class="texto-secundario" data-t="sugerencias.sub">Tu opinión nos ayuda a mejorar la experiencia.</p>
+            </div>
+
+            <div class="layout-sugerencias">
+                <div id="form-container" class="caja-formulario">
+                    <form id="suggestion-form" action="https://formspree.io/f/xbgggjwe" method="POST">
+                        
+                        <div class="rating-container">
+                            <span data-t="sugerencias.califica">Califica la página:</span>
+                            <div class="stars">
+                                <input type="radio" id="star5" name="rating" value="5" required />
+                                <label for="star5" title="5">★</label>
+                                <input type="radio" id="star4" name="rating" value="4" />
+                                <label for="star4" title="4">★</label>
+                                <input type="radio" id="star3" name="rating" value="3" />
+                                <label for="star3" title="3">★</label>
+                                <input type="radio" id="star2" name="rating" value="2" />
+                                <label for="star2" title="2">★</label>
+                                <input type="radio" id="star1" name="rating" value="1" />
+                                <label for="star1" title="1">★</label>
+                            </div>
+                        </div>
+
+                        <textarea name="mensaje" id="mensaje-sugerencia" rows="6" data-t-placeholder="sugerencias.placeholder" placeholder="Escribe aquí..." required></textarea>
+                        
+                        <div class="centrado">
+                            <button type="submit" class="btn-naranja" data-t="sugerencias.enviar">Enviar sugerencia</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="success-message" class="caja-exito" style="display: none;">
+                    <h3 data-t="sugerencias.exito">Gracias por ayudarnos a mejorar</h3>
+                    <button id="btn-otra-sugerencia" class="btn-secundario" data-t="sugerencias.otra">Dejar otra sugerencia</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pantalla Quiénes somos / Nosotros -->
+    <section id="pantalla-quienes" class="seccion-oculta">
+        <div class="contenedor">
+            <h2 class="titulo-principal centrado" data-t="nav.nosotros">Nosotros</h2>
+            
+            <!-- Misión: Imagen izquierda, texto derecha -->
+            <div class="bloque-quienes">
+                <div class="quienes-img">
+                    <img src="img/mision.svg" alt="Ilustración de la misión" aria-hidden="true">
+                </div>
+                <div class="quienes-texto">
+                    <h3 data-t="quienes.misionTitulo">Nuestra misión</h3>
+                    <p data-t="quienes.misionTexto">Acompañar y orientar a las y los estudiantes de educación superior en Chile en la recuperación consciente de su tiempo, calidad de vida y salud mental. A través del uso de datos reales y herramientas digitales sencillas, transformamos información compleja en experiencias intuitivas, accesibles y personalizadas. Nuestro propósito es visibilizar los desequilibrios cotidianos provocados por la sobrecarga académica, las jornadas laborales y los tiempos de traslado, demostrando cómo la incorporación de pequeños cambios sostenibles en la rutina diaria protege la salud mental, potencia el rendimiento y devuelve horas de valor para lo que verdaderamente importa.</p>
+                </div>
+            </div>
+
+            <!-- Visión: Texto izquierda, imagen derecha -->
+            <div class="bloque-quienes inverso">
+                <div class="quienes-img">
+                    <img src="img/vision.svg" alt="Ilustración de la visión" aria-hidden="true">
+                </div>
+                <div class="quienes-texto">
+                    <h3 data-t="quienes.visionTitulo">Nuestra visión</h3>
+                    <p data-t="quienes.visionTexto">Consolidarnos como la plataforma digital interactiva de referencia a nivel nacional en bienestar estudiantil y educación de hábitos de vida, impulsando una profunda transformación cultural en los entornos universitarios y técnicos del país. Queremos forjar una comunidad académica donde el descanso, el cuidado de la salud mental y la preservación del tiempo personal dejen de considerarse privilegios o pérdidas de tiempo. Así, que pasen a ser reconocidos activamente como pilares fundamentales y determinantes para el éxito y la sostenibilidad académica y profesional de cada estudiante.</p>
+                </div>
+            </div>
+
+            <!-- Bloque Fuentes de Datos -->
+            <div class="tarjeta-nosotros-visual centrado">
+                <div class="nosotros-icono-visual">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <h3 data-t="quienes.datosTitulo">Nuestros datos</h3>
+                <p data-t="quienes.datosTexto">
+                    Para construir esta plataforma, analizamos y cruzamos información oficial de tres fuentes principales de Chile:
+                </p>
+                <ul class="lista-datos">
+                    <li><strong>ENUT:</strong> Encuesta Nacional sobre el Uso del Tiempo.</li>
+                    <li><strong>CASEN:</strong> Encuesta de Caracterización Socioeconómica Nacional.</li>
+                    <li><strong>ENS:</strong> Encuesta Nacional de Salud.</li>
+                </ul>
+            </div>
+
+            <!-- Bloque Equipo -->
+            <div class="tarjeta-equipo centrado">
+                <div class="logo-universidad">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <p class="texto-universidad" data-t="quienes.equipoTexto">
+                    Este sitio fue desarrollado por Estudiantes de la Pontificia Universidad Católica de Chile.
+                </p>
+                <div class="nombres-equipo">
+                    <span>Maria Antonia Galindo Molina</span> • 
+                    <span>José Domingo García De La Huerta Contreras</span> • 
+                    <span>Emelia Kast Puga</span> • 
+                    <span>Fernando Antonio Orellana Bertti</span> • 
+                    <span>Domingo Valdés Orlandini</span>
                 </div>
             </div>
         </div>
