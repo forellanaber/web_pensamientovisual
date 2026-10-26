@@ -388,20 +388,20 @@ es: {
     // Momentos del día, en el mismo orden que "momentos" en main.js
     "momentos": [
         {
-            titulo: "Traslado", dato: "5 de 10", texto: "estudiantes tardan más de 1 hora en trasladarse", fuente: "ENUT 2023",
-            mal:  { titulo: "Si viajas pegado al celular", lista: ["Llegas con la cabeza saturada", "Sientes que el viaje fue tiempo perdido"] },
-            bien: { titulo: "Si escuchas un podcast", lista: ["El viaje se vuelve un rato útil", "Repasas sin darte cuenta"] }
+            titulo: "Traslado", dato: "5 de 10", texto: "estudiantes tardan más de 1 hora en trasladarse", fuente: "Espinoza Díaz et al. (2025)",
+            mal:  { titulo: "Si pasas todo el viaje pendiente de redes y notificaciones", lista: ["El uso excesivo del celular puede aumentar tu sensación de ansiedad.", "Puedes terminar el trayecto con la sensación de no haber tenido una pausa."] },
+            bien: { titulo: "Si escuchas un podcast y/o lees", lista: ["El tiempo del viaje se vuelve productivo", "Puedes desconectarte por un rato de tus pendientes y convertir el trayecto en un momento para ti"] }
         },
         {
             titulo: "Clases y estudio", dato: "59%", texto: "de los universitarios de un estudio se pone objetivos de estudio",
-            fuente: "Reyes-González, Meneses-Báez y Díaz-Mujica (2022)",
-            mal:  { titulo: "Si estudias con todo abierto", lista: ["Saltas entre pestañas y notificaciones", "Estudiar te toma más tiempo"] },
-            bien: { titulo: "Si planificas la semana", lista: ["Sabes qué hacer y cuándo", "Los que rinden mejor priorizan y descansan"] }
+            fuente: "Zambrano et al. (2021)",
+            mal:  { titulo: "Si estudias con redes y notificaciones abiertas:", lista: ["Las interrupciones dificultan que mantengas la concentración.", "Puedes tardar más en terminar tus tareas"] },
+            bien: { titulo: "Si planificas la semana", lista: ["Divides los objetivos grandes en pasos pequeños y alcanzables.", "Distribuyes tus tareas según sus plazos y el tiempo disponible.", "Puedes reconocer tus avances y sentir que el objetivo está más cerca."] }
         },
         {
             titulo: "Almuerzo y pausa", dato: "1 h", texto: "al día dedican los estudiantes a comer", fuente: "ENUT 2023",
-            mal:  { titulo: "Si comes frente al computador", lista: ["No hay una pausa real", "La tarde se hace más pesada"] },
-            bien: { titulo: "Si almuerzas con otros", lista: ["Recargas energía para la tarde", "Compartes y bajas el estrés"] }
+            mal:  { titulo: "Si sigues estudiando mientras almuerzas", lista: ["Comes con la atención dividida entre la comida y tus tareas", "Pierdes una pausa para descansar y despejar la mente"] },
+            bien: { titulo: "Si almuerzas sin pantallas", lista: ["Te das una pausa para descansar y despejar la mente. ", "Bajas el ritmo del día, lo que puede ayudarte a reducir el estrés."] }
         },
         {
             titulo: "Tareas pendientes", dato: "4 de 6", texto: "áreas del bienestar son más bajas en quienes más postergan",
@@ -412,20 +412,20 @@ es: {
         {
             titulo: "Deporte", dato: "150 min", texto: "de actividad física a la semana recomienda la OMS",
             fuente: "Organización Mundial de la Salud (2020)",
-            mal:  { titulo: "Si pasas todo el día sentado", lista: ["Aumenta el cansancio", "Cuesta más soltar el estrés"] },
-            bien: { titulo: "Si sales a moverte", lista: ["Bastan 20 a 30 minutos al día", "Mejora tu ánimo y tu descanso"] }
+            mal:  { titulo: "Si pasas muchas horas sentado sin hacer pausas", lista: ["Puedes sentir molestias físicas por mantener la misma postura", "Puedes acumular cansancio y sentir más sueño durante la jornada"] },
+            bien: { titulo: "Si haces actividad fisica", lista: ["Mejora tu ánimo y ayuda a dormir mejor.", "Puede favorecer tu concentración y tu memoria."] }
         },
         {
             titulo: "Celular y redes", dato: "66,8%", texto: "de los jóvenes de 16 a 29 años está más de 4 h al día en internet",
             fuente: "SUBTEL y Cadem (2024)",
-            mal:  { titulo: "Si scrolleas sin parar", lista: ["El tiempo se escapa sin darte cuenta", "Se te pasa la hora de dormir"] },
-            bien: { titulo: "Si te pones un límite", lista: ["Recuperas tiempo para lo que te gusta", "Llegas más tranquilo a la hora de dormir"] }
+            mal:  { titulo: "Si revisas redes sin ponerte un límite", lista: ["Puedes perder la noción del tiempo y quedarte más de lo que querías", "Dejas menos tiempo para tus pendientes y las actividades que disfrutas"] },
+            bien: { titulo: "Si te pones un límite", lista: ["Evitas pasar más tiempo del que querías en el celular.", "Recuperas tiempo para descansar o hacer actividades que disfrutas."] }
         },
         {
             titulo: "Antes de dormir", dato: "+59%", texto: "más riesgo de insomnio por cada hora de pantalla en la cama",
             fuente: "Hjetland et al. (2025), Frontiers in Psychiatry",
-            mal:  { titulo: "Si usas el celular", lista: ["Duermes 24 minutos menos", "Te cuesta más concentrarte al otro día"] },
-            bien: { titulo: "Si lo dejas 30 min antes", lista: ["Te duermes más rápido", "Descansas mejor y rindes más"] }
+            mal:  { titulo: "Si sigues usando el celular en la cama", lista: ["Puedes retrasar tu hora de dormir y reducir tu tiempo de descanso", "Puede costarte más conciliar el sueño"] },
+            bien: { titulo: "Si lo dejas 30 min antes", lista: ["Te das un momento para bajar el ritmo y relajarte.", "Puedes conciliar el sueño con más facilidad y descansar mejor."] }
         },
         {
             titulo: "Pasada la medianoche", dato: "−36 min", texto: "de sueño ya perdió quien lleva 1 h y media con el celular en la cama",
@@ -458,9 +458,9 @@ es: {
     "sugerencias.otra": "Dejar otra sugerencia",
     "nav.nosotros": "Nosotros",
     "quienes.misionTitulo": "Nuestra misión",
-    "quienes.misionTexto": "Ayudar a los estudiantes a administrar su tiempo. A través de datos reales y herramientas simples, mostramos como pequeños ajustes en el día a día protegen la salud mental, mejoran su rendimiento y les devuelven horas para lo que realmente les importa.",
+    "quienes.misionTexto": "Acompañar y orientar a las y los estudiantes de educación superior en Chile en la recuperación consciente de su tiempo, calidad de vida y salud mental. A través del uso de datos reales y herramientas digitales sencillas, transformamos información compleja en experiencias intuitivas, accesibles y personalizadas. Nuestro propósito es visibilizar los desequilibrios cotidianos provocados por la sobrecarga académica, las jornadas laborales y los tiempos de traslado, demostrando cómo la incorporación de pequeños cambios sostenibles en la rutina diaria protege la salud mental, potencia el rendimiento y devuelve horas de valor para lo que verdaderamente importa.",
     "quienes.visionTitulo": "Nuestra visión",
-    "quienes.visionTexto": "Ser la plataforma interactiva de referencia en Chile para el bienestar estudiantil, impulsando una cultura universitaria donde el descanso, la salud mental y el tiempo personal sean reconocidos como pilares fundamentales del éxito académico.",
+    "quienes.visionTexto": "Consolidarnos como la plataforma digital interactiva de referencia a nivel nacional en bienestar estudiantil y educación de hábitos de vida, impulsando una profunda transformación cultural en los entornos universitarios y técnicos del país. Queremos forjar una comunidad académica donde el descanso, el cuidado de la salud mental y la preservación del tiempo personal dejen de considerarse privilegios o pérdidas de tiempo. Así, que pasen a ser reconocidos activamente como pilares fundamentales y determinantes para el éxito y la sostenibilidad académica y profesional de cada estudiante.",
 
 },
 
