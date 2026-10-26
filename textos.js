@@ -29,12 +29,12 @@ es: {
     // --- Dato de contexto ---
     "contexto.intro": "¿Sabías que el",
     "contexto.cifra": "66,8%",
-    "contexto.detalle": "de los jóvenes en Chile pasa más de 4 horas al día en internet?",
+    "contexto.detalle": "de los jóvenes en Chile pasa más de 4 horas al día pegado a una pantalla?",
     "contexto.subtitulo": "¡Eso es más de 2 meses seguidos pegado a una pantalla al año!",
     "contexto.fuente": "Fuente: SUBTEL y Cadem (2024), jóvenes de 16 a 29 años",
     "contexto.minutos": "3 minutos",
     "contexto.anonimo": "Anónimo",
-    "contexto.alTiro": "Resultados al tiro",
+    "contexto.alTiro": "Resultados al instante",
     "contexto.empezar": "Empezar el test",
 
     // --- Test: avance ---
@@ -172,6 +172,204 @@ es: {
     "area.movimiento": "Movimiento",
     "area.organizacion": "Organización",
     "area.animo": "Ánimo y energía",
+    "area.descanso": "Descanso",
+    "area.estudio": "Estudio",
+    "area.trabajo": "Trabajo",
+    "area.traslado": "Traslado",
+    "area.ocio": "Ocio",
+    "area.deporte": "Deporte y salud",
+    "res.baseDatos": "Base de datos",
+
+    "tarjetasDiagnostico": {
+        descanso: {
+            titulo: "Descanso",
+            icono: "fa-solid fa-moon",
+            fuentes: [
+                { nombre: "Consenso AASM / SRS", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4442216/" },
+                { nombre: "Sleep Foundation", url: "https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 6.9,
+                    estado: "Deficiente",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Dormir menos de 7 horas de forma habitual deteriora la concentración, la memoria y la función inmunológica. Además, se asocia a un mayor riesgo de fatiga crónica, estrés, accidentes y alteraciones metabólicas."
+                },
+                {
+                    min: 7, max: 9,
+                    estado: "Óptimo / Saludable",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Cumples con el rango recomendado para adultos jóvenes. Dormir entre 7 y 9 horas consolida el aprendizaje diario, regula los estados de ánimo y asegura una óptima recuperación física y mental."
+                },
+                {
+                    min: 9.1, max: 24,
+                    estado: "Excesivo",
+                    nivel: "mejorar",
+                    puntos: 6,
+                    texto: "Aunque puede ser adecuado al recuperarte de deudas acumuladas de sueño o enfermedades, superar de forma crónica las 9 horas puede asociarse a somnolencia diurna excesiva, baja energía o alteraciones del ciclo circadiano."
+                }
+            ]
+        },
+        estudio: {
+            titulo: "Estudio",
+            icono: "fa-solid fa-book-open",
+            fuentes: [
+                { nombre: "Encuesta CASEN (Educación)", url: "https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen" },
+                { nombre: "Athenify Study Research", url: "https://athenify.io/es/blog/cuantas-horas-estudiar-al-dia" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 1.9,
+                    estado: "Bajo",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Dedicar muy poco tiempo al estudio autónomo puede acumular sobrecargas y estrés previo a evaluaciones, afectando negativamente tu rendimiento académico y la asimilación paulatina de materias."
+                },
+                {
+                    min: 2, max: 5.5,
+                    estado: "Equilibrado",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Mantienes un volumen de estudio diario sostenible. Este bloque permite consolidar contenidos académicos sin comprometer tus horas de descanso ni tus actividades personales."
+                },
+                {
+                    min: 5.6, max: 24,
+                    estado: "Riesgo de sobrecarga",
+                    nivel: "atencion",
+                    puntos: 5,
+                    texto: "La investigación muestra que tras 5-6 horas de estudio concentrado diario los rendimientos disminuyen drásticamente. Sobrepasar este umbral eleva el agotamiento mental (burnout) y reduce la retención neta."
+                }
+            ]
+        },
+        trabajo: {
+            titulo: "Trabajo",
+            icono: "fa-solid fa-briefcase",
+            fuentes: [
+                { nombre: "ENUT (INE) - Uso del Tiempo", url: "https://www.ine.gob.cl/estadisticas/sociales/genero/uso-del-tiempo" },
+                { nombre: "Encuesta CASEN", url: "https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.1,
+                    estado: "Dedicación exclusiva",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "No dedicas horas a trabajo remunerado, lo que te permite mayor disponibilidad horaria para organizar tus estudios, ocio y descanso."
+                },
+                {
+                    min: 0.2, max: 4.5,
+                    estado: "Jornada parcial compatible",
+                    nivel: "bien",
+                    puntos: 9,
+                    texto: "Compatibilizas tus estudios con una actividad laboral moderada dentro de los marcos del trabajo juvenil y parcial, sin canibalizar severamente tus horarios de recuperación."
+                },
+                {
+                    min: 4.6, max: 24,
+                    estado: "Alta carga laboral",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Una jornada laboral extensa compite directamente con tus horas de estudio y descanso. En estudiantes de educación superior, jornadas largas elevan significativamente el riesgo de deserción y el agotamiento físico."
+                }
+            ]
+        },
+        traslado: {
+            titulo: "Traslado",
+            icono: "fa-solid fa-bus",
+            fuentes: [
+                { nombre: "Encuesta CASEN", url: "https://www.latercera.com/pulso/noticia/casen-2017-muestra-fuerte-diferencia-tiempos-traslado-santiaguinos-segun-tipo-trabajo/873500/" },
+                { nombre: "ENUT (INE) - Uso del Tiempo", url: "https://www.ine.gob.cl/estadisticas/sociales/genero/uso-del-tiempo" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.9,
+                    estado: "Bajo impacto",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Tus tiempos de viaje son acotados, lo que te deja una mayor reserva de energía diaria y más horas útiles durante la semana."
+                },
+                {
+                    min: 1, max: 2.2,
+                    estado: "Promedio urbano nacional",
+                    nivel: "mejorar",
+                    puntos: 7,
+                    texto: "Te encuentras dentro del promedio de traslado de las principales zonas urbanas en Chile. Aprovechar estos trayectos para \"ocio activo\" (escuchar música o podcasts) ayuda a mitigar la fatiga acumulada en el viaje."
+                },
+                {
+                    min: 2.3, max: 24,
+                    estado: "Excesivo",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Pasas un tiempo excesivo en locomoción. Los trayectos diarios prolongados en transporte público se correlacionan con niveles elevados de estrés, fatiga postural y pérdida crítica de horas de ocio y sueño."
+                }
+            ]
+        },
+        ocio: {
+            titulo: "Ocio",
+            icono: "fa-solid fa-mug-hot",
+            fuentes: [
+                { nombre: "Programa Vida Saludable (UdeC)", url: "https://vidasaludable.udec.cl/node/279" },
+                { nombre: "10ª Encuesta INJUV", url: "https://www.injuv.gob.cl/" },
+                { nombre: "ENUT (INE)", url: "https://www.ine.gob.cl/estadisticas/sociales/genero/uso-del-tiempo" },
+                { nombre: "Sleep Foundation", url: "https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.9,
+                    estado: "Déficit",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Estás sacrificando tu tiempo personal. El ocio no es perder el tiempo, es una necesidad biológica y cognitiva que reduce la ansiedad, estimula la creatividad y previene el colapso por estrés académico."
+                },
+                {
+                    min: 1, max: 4,
+                    estado: "Equilibrado",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Mantienes un espacio saludable para tus intereses personales y relaciones sociales. Este equilibrio fortalece tu sistema inmune, reduce la ansiedad y mejora tu calidad de sueño."
+                },
+                {
+                    min: 4.1, max: 24,
+                    estado: "Sobrecarga de ocio / Pantallas",
+                    nivel: "atencion",
+                    puntos: 5,
+                    texto: "Dedicar un exceso de horas diarias a ocio sedentario o consumo de pantallas puede desplazar horarios de sueño y estudio, aumentando la sensación de procrastinación, fatiga visual y cansancio matutino."
+                }
+            ]
+        },
+        deporte: {
+            titulo: "Deporte y salud",
+            icono: "fa-solid fa-person-running",
+            fuentes: [
+                { nombre: "OMS - Actividad Física", url: "https://www.who.int/es/news-room/fact-sheets/detail/physical-activity" },
+                { nombre: "OPS - Recomendaciones de Salud", url: "https://www.paho.org/es/noticias/9-5-2012-recomendaciones-mundiales-sobre-actividad-fisica-para-salud" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.25,
+                    estado: "Sedentarismo",
+                    nivel: "atencion",
+                    puntos: 3,
+                    texto: "Tu nivel de actividad física es insuficiente respecto a los mínimos médicos recomendados. Moverte al menos 20 minutos al día mejora la función cardiovascular, la memoria y actúa como protector natural contra la depresión y el estrés."
+                },
+                {
+                    min: 0.26, max: 1.25,
+                    estado: "Saludable",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Cumples con la pauta recomendada para adultos jóvenes (150 a 300 minutos semanales). Esta rutina optimiza tu resistencia cardiorrespiratoria, mejora el estado de ánimo y fortalece tu sistema óseo y muscular."
+                },
+                {
+                    min: 1.26, max: 24,
+                    estado: "Alto rendimiento",
+                    nivel: "bien",
+                    puntos: 9,
+                    texto: "Mantienes un volumen de ejercicio muy alto. Asegúrate de compensar esta demanda física con una adecuada hidratación, alimentación y suficientes horas de descanso para evitar sobrecargas articulares o agotamiento físico."
+                }
+            ]
+        }
+    },
 
     "diagnostico": {
         atencion: "Tu día está pidiendo un cambio. No tienes que hacerlo todo de una: parte por una cosa.",
@@ -211,7 +409,7 @@ es: {
             bien: "Terminas el día con energía y buen ánimo."
         }
     },
-    
+
     // --- Mensaje de bienestar ---
     "bien.tituloDerivar": "Hablar con alguien puede ayudarte",
     "bien.tituloConsejo": "Una idea para estos días",
@@ -315,8 +513,8 @@ es: {
     // Paradas de la noche (23:00 a 07:00). "frase" se ve siempre; "detalle" va en la tarjeta.
     "noche": [
         { titulo: "Antes de dormir",
-          bien: { frase: "Deja el celular y lee un rato.", detalle: ["Sin pantalla en la cama, se duerme más rápido.", "Descansa mejor y rinde más al otro día."] },
-          mal:  { frase: "En la cama con el celular.", detalle: ["Cada hora de pantalla en la cama sube un 59% el riesgo de insomnio.", "Y quita unos 24 minutos de sueño."] } },
+          bien: {"frase":"Si dejas el celular antes de dormir:","detalle":["Te das un momento para bajar el ritmo y relajarte.","Puedes conciliar el sueño con más facilidad y descansar mejor."]},
+          mal:  {"frase":"Si sigues usando el celular en la cama:","detalle":["Puedes retrasar tu hora de dormir y reducir tu tiempo de descanso.","Puede costarte más conciliar el sueño."]} },
         { titulo: "Se apaga la luz",
           bien: { frase: "Se duerme.", detalle: ["Empieza el primer ciclo de sueño, de unos 90 minutos."] },
           mal:  { frase: "Sigue en el celular.", detalle: ["Con la cara iluminada por la pantalla."] } },
@@ -324,13 +522,13 @@ es: {
           bien: { frase: "Sueño profundo.", detalle: ["Es la fase más reparadora.", "Se concentra en el primer tercio de la noche."] },
           mal:  { frase: "Sigue despierto.", detalle: ["Cada hora de pantalla en la cama quita unos 24 minutos de sueño."] } },
         { titulo: "Madrugada",
-          bien: { frase: "Va en su segundo ciclo.", detalle: ["Cada ciclo dura unos 90 minutos y pasa por sueño liviano, profundo y REM."] },
+          bien: { frase: "Va en su tercer ciclo.", detalle: ["Cada ciclo dura unos 90 minutos y pasa por sueño liviano, profundo y REM."] },
           mal:  { frase: "Recién se duerme.", detalle: ["Con la alarma a las 07:00, le quedan 5 horas de sueño."] } },
         { titulo: "Antes del amanecer",
           bien: { frase: "Aumenta el sueño REM.", detalle: ["Es la fase de los sueños.", "Se asocia a ordenar lo aprendido."] },
           mal:  { frase: "Va en su primer ciclo de sueño profundo.", detalle: ["Todavía le falta casi todo el REM de la noche."] } },
         { titulo: "Suena la alarma",
-          bien: { frase: "Despierta con 7,5 horas.", detalle: ["Cerca de 5 ciclos completos."] },
+          bien: { frase: "Despierta con 9 horas.", detalle: ["Cerca de 6 ciclos completos."] },
           mal:  { frase: "El despertador lo saca a mitad de ciclo.", detalle: ["Duerme 5 horas, unos 3 ciclos.", "Se pierde gran parte del REM, que se concentra al final de la noche."] } }
     ],
 
@@ -377,9 +575,9 @@ es: {
     "vive.recomendado": "Lo recomendado: 7 a 9 h",
     "vive.finalTitulo": "Así termina el día",
     "vive.finalSub": "Con la alarma a las 07:00, esto es lo que alcanzas a dormir.",
-    "vive.finalBuenas": "7,5 h",
+    "vive.finalBuenas": "9 h",
     "vive.finalMalas": "5 h",
-    "vive.durmio2330": "Te dormiste a las 23:30",
+    "vive.durmio2330": "Te dormiste a las 22:00",
     "vive.durmio0200": "Te dormiste a las 02:00",
     "vive.finalNota": "Lo recomendado: 7 a 9 h. Fuente: National Sleep Foundation (Hirshkowitz et al., 2015)",
     "vive.finalPregunta": "¿Y cómo es tu día?",
@@ -388,20 +586,20 @@ es: {
     // Momentos del día, en el mismo orden que "momentos" en main.js
     "momentos": [
         {
-            titulo: "Traslado", dato: "5 de 10", texto: "estudiantes tardan más de 1 hora en trasladarse", fuente: "Espinoza Díaz et al. (2025)",
-            mal:  { titulo: "Si pasas todo el viaje pendiente de redes y notificaciones", lista: ["El uso excesivo del celular puede aumentar tu sensación de ansiedad.", "Puedes terminar el trayecto con la sensación de no haber tenido una pausa."] },
-            bien: { titulo: "Si escuchas un podcast y/o lees", lista: ["El tiempo del viaje se vuelve productivo", "Puedes desconectarte por un rato de tus pendientes y convertir el trayecto en un momento para ti"] }
+            titulo: "Traslado", dato: "5 de 10", texto: "estudiantes tardan más de 1 hora en trasladarse", fuente: "Espinoza Díaz et al. (2025); Errázuriz y Valdés (2017)",
+            mal:  {"titulo":"Si pasas todo el viaje pendiente de redes y notificaciones:","lista":["El uso excesivo del celular puede aumentar tu sensación de ansiedad.","Puedes terminar el trayecto con la sensación de no haber tenido una pausa."]},
+            bien: {"titulo":"Si escuchas un podcast y/o lees:","lista":["El tiempo del viaje se vuelve productivo","Puedes desconectarte por un rato de tus pendientes y convertir el trayecto en un momento para ti"]}
         },
         {
             titulo: "Clases y estudio", dato: "59%", texto: "de los universitarios de un estudio se pone objetivos de estudio",
             fuente: "Zambrano et al. (2021)",
-            mal:  { titulo: "Si estudias con redes y notificaciones abiertas:", lista: ["Las interrupciones dificultan que mantengas la concentración.", "Puedes tardar más en terminar tus tareas"] },
-            bien: { titulo: "Si planificas la semana", lista: ["Divides los objetivos grandes en pasos pequeños y alcanzables.", "Distribuyes tus tareas según sus plazos y el tiempo disponible.", "Puedes reconocer tus avances y sentir que el objetivo está más cerca."] }
+            mal:  {"titulo":"Si estudias con redes y notificaciones abiertas:","lista":["Las interrupciones dificultan que mantengas la concentración.","Puedes tardar más en terminar tus tareas."]},
+            bien: {"titulo":"Si planificas la semana:","lista":["Divides los objetivos grandes en pasos pequeños y alcanzables.","Distribuyes tus tareas según sus plazos y el tiempo disponible.","Puedes reconocer tus avances y sentir que el objetivo está más cerca."]}
         },
         {
             titulo: "Almuerzo y pausa", dato: "1 h", texto: "al día dedican los estudiantes a comer", fuente: "ENUT 2023",
-            mal:  { titulo: "Si sigues estudiando mientras almuerzas", lista: ["Comes con la atención dividida entre la comida y tus tareas", "Pierdes una pausa para descansar y despejar la mente"] },
-            bien: { titulo: "Si almuerzas sin pantallas", lista: ["Te das una pausa para descansar y despejar la mente. ", "Bajas el ritmo del día, lo que puede ayudarte a reducir el estrés."] }
+            mal:  {"titulo":"Si sigues estudiando mientras almuerzas:","lista":["Comes con la atención dividida entre la comida y tus tareas.","Pierdes una pausa para descansar y despejar la mente."]},
+            bien: {"titulo":"si comes sin pantallas:","lista":["Te das una pausa para descansar y despejar la mente.","Bajas el ritmo del día, lo que puede ayudarte a reducir el estrés."]}
         },
         {
             titulo: "Tareas pendientes", dato: "4 de 6", texto: "áreas del bienestar son más bajas en quienes más postergan",
@@ -412,20 +610,20 @@ es: {
         {
             titulo: "Deporte", dato: "150 min", texto: "de actividad física a la semana recomienda la OMS",
             fuente: "Organización Mundial de la Salud (2020)",
-            mal:  { titulo: "Si pasas muchas horas sentado sin hacer pausas", lista: ["Puedes sentir molestias físicas por mantener la misma postura", "Puedes acumular cansancio y sentir más sueño durante la jornada"] },
-            bien: { titulo: "Si haces actividad fisica", lista: ["Mejora tu ánimo y ayuda a dormir mejor.", "Puede favorecer tu concentración y tu memoria."] }
+            mal:  {"titulo":"Si pasas muchas horas sentado sin hacer pausas:","lista":["Puedes sentir molestias físicas por mantener la misma postura.","Puedes acumular cansancio y sentir más sueño durante la jornada."]},
+            bien: {"titulo":"Si haces deporte o actividad física:","lista":["Mejora tu ánimo y ayuda a dormir mejor.","Puede favorecer tu concentración y tu memoria."]}
         },
         {
             titulo: "Celular y redes", dato: "66,8%", texto: "de los jóvenes de 16 a 29 años está más de 4 h al día en internet",
             fuente: "SUBTEL y Cadem (2024)",
-            mal:  { titulo: "Si revisas redes sin ponerte un límite", lista: ["Puedes perder la noción del tiempo y quedarte más de lo que querías", "Dejas menos tiempo para tus pendientes y las actividades que disfrutas"] },
-            bien: { titulo: "Si te pones un límite", lista: ["Evitas pasar más tiempo del que querías en el celular.", "Recuperas tiempo para descansar o hacer actividades que disfrutas."] }
+            mal:  {"titulo":"Si revisas redes sin ponerte un límite:","lista":["Puedes perder la noción del tiempo y quedarte más de lo que querías.","Dejas menos tiempo para tus pendientes y las actividades que disfrutas."]},
+            bien: {"titulo":"Si limitas tu tiempo en redes:","lista":["Evitas pasar más tiempo del que querías en el celular.","Recuperas tiempo para descansar o hacer actividades que disfrutas."]}
         },
         {
             titulo: "Antes de dormir", dato: "+59%", texto: "más riesgo de insomnio por cada hora de pantalla en la cama",
             fuente: "Hjetland et al. (2025), Frontiers in Psychiatry",
-            mal:  { titulo: "Si sigues usando el celular en la cama", lista: ["Puedes retrasar tu hora de dormir y reducir tu tiempo de descanso", "Puede costarte más conciliar el sueño"] },
-            bien: { titulo: "Si lo dejas 30 min antes", lista: ["Te das un momento para bajar el ritmo y relajarte.", "Puedes conciliar el sueño con más facilidad y descansar mejor."] }
+            mal:  {"titulo":"Si sigues usando el celular en la cama:","lista":["Puedes retrasar tu hora de dormir y reducir tu tiempo de descanso.","Puede costarte más conciliar el sueño."]},
+            bien: {"titulo":"Si dejas el celular antes de dormir:","lista":["Te das un momento para bajar el ritmo y relajarte.","Puedes conciliar el sueño con más facilidad y descansar mejor."]}
         },
         {
             titulo: "Pasada la medianoche", dato: "−36 min", texto: "de sueño ya perdió quien lleva 1 h y media con el celular en la cama",
@@ -448,7 +646,9 @@ es: {
         mal:  { titulo: "Si trabajas sin ordenar la semana", lista: ["Terminas restando horas de sueño", "Todo se junta al final"] },
         bien: { titulo: "Si fijas bloques en la semana", lista: ["Sabes cuándo estudias y cuándo trabajas", "Baja el estrés"] }
     },
-    "nav.sugerencias": "Ayudanos",
+    // --- Sugerencias y Nosotros ---
+    "nav.nosotros": "Nosotros",
+    "nav.sugerencias": "Ayúdanos",
     "sugerencias.titulo": "Déjanos tus sugerencias",
     "sugerencias.sub": "Tu opinión nos ayuda a mejorar la experiencia.",
     "sugerencias.califica": "Califica la página:",
@@ -456,15 +656,13 @@ es: {
     "sugerencias.enviar": "Enviar sugerencia",
     "sugerencias.exito": "Gracias por ayudarnos a mejorar",
     "sugerencias.otra": "Dejar otra sugerencia",
-    "nav.nosotros": "Nosotros",
     "quienes.misionTitulo": "Nuestra misión",
     "quienes.misionTexto": "Acompañar y orientar a las y los estudiantes de educación superior en Chile en la recuperación consciente de su tiempo, calidad de vida y salud mental. A través del uso de datos reales y herramientas digitales sencillas, transformamos información compleja en experiencias intuitivas, accesibles y personalizadas. Nuestro propósito es visibilizar los desequilibrios cotidianos provocados por la sobrecarga académica, las jornadas laborales y los tiempos de traslado, demostrando cómo la incorporación de pequeños cambios sostenibles en la rutina diaria protege la salud mental, potencia el rendimiento y devuelve horas de valor para lo que verdaderamente importa.",
     "quienes.visionTitulo": "Nuestra visión",
     "quienes.visionTexto": "Consolidarnos como la plataforma digital interactiva de referencia a nivel nacional en bienestar estudiantil y educación de hábitos de vida, impulsando una profunda transformación cultural en los entornos universitarios y técnicos del país. Queremos forjar una comunidad académica donde el descanso, el cuidado de la salud mental y la preservación del tiempo personal dejen de considerarse privilegios o pérdidas de tiempo. Así, que pasen a ser reconocidos activamente como pilares fundamentales y determinantes para el éxito y la sostenibilidad académica y profesional de cada estudiante.",
     "quienes.datosTitulo": "Nuestros datos",
-        "quienes.datosTexto": "Para construir esta plataforma, analizamos y cruzamos información oficial de tres fuentes principales de Chile:",
-        "quienes.equipoTexto": "Este sitio fue desarrollado por Estudiantes de la Pontificia Universidad Católica de Chile."
-
+    "quienes.datosTexto": "Para construir esta plataforma, analizamos y cruzamos información oficial de tres fuentes principales de Chile:",
+    "quienes.equipoTexto": "Este sitio fue desarrollado por Estudiantes de la Pontificia Universidad Católica de Chile."
 },
 
 // =====================================================================
@@ -486,7 +684,7 @@ en: {
     // --- Context ---
     "contexto.intro": "Did you know that",
     "contexto.cifra": "66.8%",
-    "contexto.detalle": "of young people in Chile spend more than 4 hours a day online?",
+    "contexto.detalle": "of young people in Chile spend more than 4 hours a day glued to a screen?",
     "contexto.subtitulo": "That's more than 2 straight months glued to a screen every year!",
     "contexto.fuente": "Source: SUBTEL and Cadem (2024), young people aged 16 to 29",
     "contexto.minutos": "3 minutes",
@@ -628,6 +826,203 @@ en: {
     "area.movimiento": "Movement",
     "area.organizacion": "Organization",
     "area.animo": "Mood and energy",
+    "area.descanso": "Rest & Sleep",
+    "area.estudio": "Study",
+    "area.trabajo": "Work",
+    "area.traslado": "Commute",
+    "area.ocio": "Leisure",
+    "area.deporte": "Sports & Health",
+    "res.baseDatos": "Database",
+
+    "tarjetasDiagnostico": {
+        descanso: {
+            titulo: "Rest & Sleep",
+            icono: "fa-solid fa-moon",
+            fuentes: [
+                { nombre: "AASM / SRS Consensus", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4442216/" },
+                { nombre: "Sleep Foundation", url: "https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 6.9,
+                    estado: "Deficient",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Regularly sleeping less than 7 hours impairs concentration, memory and immune function. It is also linked to chronic fatigue and stress."
+                },
+                {
+                    min: 7, max: 9,
+                    estado: "Optimal / Healthy",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "You meet the recommended range for young adults. Sleeping 7 to 9 hours consolidates learning and ensures physical and mental recovery."
+                },
+                {
+                    min: 9.1, max: 24,
+                    estado: "Excessive",
+                    nivel: "mejorar",
+                    puntos: 6,
+                    texto: "Consistently exceeding 9 hours may be associated with daytime sleepiness and circadian rhythm disruption."
+                }
+            ]
+        },
+        estudio: {
+            titulo: "Study",
+            icono: "fa-solid fa-book-open",
+            fuentes: [
+                { nombre: "CASEN Survey (Education)", url: "https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen" },
+                { nombre: "Athenify Study Research", url: "https://athenify.io/es/blog/cuantas-horas-estudiar-al-dia" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 1.9,
+                    estado: "Low",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Dedication of very little autonomous study time can pile up stress before evaluations, harming academic performance."
+                },
+                {
+                    min: 2, max: 5.5,
+                    estado: "Balanced",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "You maintain a sustainable daily study load without sacrificing rest or personal time."
+                },
+                {
+                    min: 5.6, max: 24,
+                    estado: "Overload risk",
+                    nivel: "atencion",
+                    puntos: 5,
+                    texto: "Research shows that after 5-6 hours of intense study, cognitive returns diminish sharply, raising burnout risks."
+                }
+            ]
+        },
+        trabajo: {
+            titulo: "Work",
+            icono: "fa-solid fa-briefcase",
+            fuentes: [
+                { nombre: "ENUT (INE) - Time Use", url: "https://www.ine.gob.cl/estadisticas/sociales/genero/uso-del-tiempo" },
+                { nombre: "CASEN Survey", url: "https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.1,
+                    estado: "Exclusive dedication",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "You do not work paid hours, providing more schedule flexibility for studies, leisure, and sleep."
+                },
+                {
+                    min: 0.2, max: 4.5,
+                    estado: "Compatible part-time",
+                    nivel: "bien",
+                    puntos: 9,
+                    texto: "You balance study with moderate work within youth part-time frameworks, without severely compromising recovery."
+                },
+                {
+                    min: 4.6, max: 24,
+                    estado: "High work load",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "An extensive work schedule directly competes with study and rest, significantly raising burnout risks."
+                }
+            ]
+        },
+        traslado: {
+            titulo: "Commute",
+            icono: "fa-solid fa-bus",
+            fuentes: [
+                { nombre: "CASEN Survey", url: "https://www.latercera.com/pulso/noticia/casen-2017-muestra-fuerte-diferencia-tiempos-traslado-santiaguinos-segun-tipo-trabajo/873500/" },
+                { nombre: "ENUT (INE)", url: "https://www.ine.gob.cl/estadisticas/sociales/genero/uso-del-tiempo" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.9,
+                    estado: "Low impact",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Your travel times are short, leaving more useful hours and energy during the week."
+                },
+                {
+                    min: 1, max: 2.2,
+                    estado: "National urban average",
+                    nivel: "mejorar",
+                    puntos: 7,
+                    texto: "You fall within the average commute of main urban areas in Chile. Using this time for active leisure helps reduce fatigue."
+                },
+                {
+                    min: 2.3, max: 24,
+                    estado: "Excessive",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Extended transit times correlate with elevated stress, posture fatigue, and critical loss of free time."
+                }
+            ]
+        },
+        ocio: {
+            titulo: "Leisure",
+            icono: "fa-solid fa-mug-hot",
+            fuentes: [
+                { nombre: "Vida Saludable (UdeC)", url: "https://vidasaludable.udec.cl/node/279" },
+                { nombre: "INJUV Survey", url: "https://www.injuv.gob.cl/" },
+                { nombre: "Sleep Foundation", url: "https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.9,
+                    estado: "Deficit",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "You are sacrificing personal time. Leisure is a cognitive necessity that lowers anxiety and prevents burnout."
+                },
+                {
+                    min: 1, max: 4,
+                    estado: "Balanced",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "You keep healthy space for personal interests and social relationships, boosting immune health and sleep quality."
+                },
+                {
+                    min: 4.1, max: 24,
+                    estado: "Screen / Leisure overload",
+                    nivel: "atencion",
+                    puntos: 5,
+                    texto: "Excessive sedentary leisure or screen consumption displaces sleep and study, raising procrastination and visual fatigue."
+                }
+            ]
+        },
+        deporte: {
+            titulo: "Sports & Health",
+            icono: "fa-solid fa-person-running",
+            fuentes: [
+                { nombre: "WHO - Physical Activity", url: "https://www.who.int/es/news-room/fact-sheets/detail/physical-activity" },
+                { nombre: "PAHO Recommendations", url: "https://www.paho.org/es/noticias/9-5-2012-recomendaciones-mundiales-sobre-actividad-fisica-para-salud" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.25,
+                    estado: "Sedentary",
+                    nivel: "atencion",
+                    puntos: 3,
+                    texto: "Physical activity is below recommended minimums. 20 minutes a day boosts cardiovascular and memory function."
+                },
+                {
+                    min: 0.26, max: 1.25,
+                    estado: "Healthy",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "You meet the recommended guideline for young adults (150-300 min/week), enhancing mood and fitness."
+                },
+                {
+                    min: 1.26, max: 24,
+                    estado: "High performance",
+                    nivel: "bien",
+                    puntos: 9,
+                    texto: "You maintain very high exercise volume. Compensate with hydration, nutrition, and rest to avoid strain."
+                }
+            ]
+        }
+    },
 
     "diagnostico": {
         atencion: "Your day is asking for a change. You don't have to fix everything at once: start with one thing.",
@@ -779,13 +1174,13 @@ en: {
           bien: { frase: "Deep sleep.", detalle: ["The most restorative stage.", "It is concentrated in the first third of the night."] },
           mal:  { frase: "Still awake.", detalle: ["Every hour of screen time in bed takes away about 24 minutes of sleep."] } },
         { titulo: "Small hours",
-          bien: { frase: "In the second cycle.", detalle: ["Each cycle lasts about 90 minutes and goes through light, deep and REM sleep."] },
+          bien: { frase: "In the third cycle.", detalle: ["Each cycle lasts about 90 minutes and goes through light, deep and REM sleep."] },
           mal:  { frase: "Only now falls asleep.", detalle: ["With the alarm at 07:00, there are 5 hours of sleep left."] } },
         { titulo: "Before dawn",
           bien: { frase: "More REM sleep.", detalle: ["The dreaming stage.", "It is linked to sorting out what was learned."] },
           mal:  { frase: "In the first cycle of deep sleep.", detalle: ["Almost all of the night's REM is still to come."] } },
         { titulo: "The alarm goes off",
-          bien: { frase: "Wakes up after 7.5 hours.", detalle: ["Close to 5 full cycles."] },
+          bien: { frase: "Wakes up after 9 hours.", detalle: ["Close to 6 full cycles."] },
           mal:  { frase: "The alarm cuts a cycle in half.", detalle: ["Sleeps 5 hours, about 3 cycles.", "Misses much of the REM, which is concentrated at the end of the night."] } }
     ],
 
@@ -832,9 +1227,9 @@ en: {
     "vive.recomendado": "Recommended: 7 to 9 h",
     "vive.finalTitulo": "How the day ends",
     "vive.finalSub": "With the alarm set for 07:00, this is how much sleep you get.",
-    "vive.finalBuenas": "7.5 h",
+    "vive.finalBuenas": "9 h",
     "vive.finalMalas": "5 h",
-    "vive.durmio2330": "You fell asleep at 23:30",
+    "vive.durmio2330": "You fell asleep at 22:00",
     "vive.durmio0200": "You fell asleep at 02:00",
     "vive.finalNota": "Recommended: 7 to 9 h. Source: National Sleep Foundation (Hirshkowitz et al., 2015)",
     "vive.finalPregunta": "And what's your day like?",
@@ -901,6 +1296,9 @@ en: {
         mal:  { titulo: "If you work without organizing your week", lista: ["You end up cutting into your sleep", "Everything piles up at the end"] },
         bien: { titulo: "If you set blocks in your week", lista: ["You know when you study and when you work", "Your stress goes down"] }
     },
+
+    // --- Feedback & About Us ---
+    "nav.nosotros": "About Us",
     "nav.sugerencias": "Help Us",
     "sugerencias.titulo": "Leave us your feedback",
     "sugerencias.sub": "Your opinion helps us improve the experience.",
@@ -909,14 +1307,13 @@ en: {
     "sugerencias.enviar": "Submit feedback",
     "sugerencias.exito": "Thanks for helping us improve",
     "sugerencias.otra": "Leave another suggestion",
-    "nav.nosotros": "About Us",
     "quienes.misionTitulo": "Our mission",
-    "quienes.misionTexto": "To help students manage their time. Through real data and simple tools, we show how small daily adjustments protect mental health, improve performance, and give them back hours for what truly matters.",
+    "quienes.misionTexto": "To guide and support higher education students in Chile in consciously reclaiming their time, quality of life, and mental health. By using real data and simple digital tools, we transform complex information into intuitive, accessible, and personalized experiences. Our purpose is to bring visibility to everyday imbalances caused by academic overload, long workdays, and commute times, showing how small, sustainable daily changes protect mental health, boost performance, and return meaningful hours for what truly matters.",
     "quienes.visionTitulo": "Our vision",
-    "quienes.visionTexto": "To be the benchmark interactive platform in Chile for student well-being, driving a university culture where rest, mental health, and personal time are recognized as fundamental pillars of academic success.",
+    "quienes.visionTexto": "To establish ourselves as Chile's leading interactive digital platform for student well-being and lifestyle habit education, driving cultural transformation across the country's universities and technical institutes. We aspire to build an academic community where rest, mental health care, and personal time are no longer seen as luxuries or wasted time, but recognized as essential foundations for academic and personal success.",
     "quienes.datosTitulo": "Our data",
-        "quienes.datosTexto": "To build this platform, we analyzed and cross-referenced official information from three main sources in Chile:",
-        "quienes.equipoTexto": "This site was developed by students from the Pontificia Universidad Católica de Chile."
-    }
+    "quienes.datosTexto": "To build this platform, we analyzed and cross-referenced official data from three main sources in Chile:",
+    "quienes.equipoTexto": "This platform was developed by students from the Pontificia Universidad Católica de Chile.",
+}
 
 };

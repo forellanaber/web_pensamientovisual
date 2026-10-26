@@ -278,14 +278,87 @@ h2 { font-size: 2.2rem; color: var(--azul-oscuro); margin-bottom: 1.5rem;}
     .personaje-marco { height: min(46vh, 460px); height: min(46svh, 460px); }
 }
 
-/* --- Dato de contexto --- */
-.contexto-intro { font-size: 1.3rem; font-weight: 600; color: var(--texto-suave); margin: 0; }
-.contexto-cifra { font-size: clamp(4.5rem, 14vw, 8rem); font-weight: 800; color: var(--azul); line-height: 1; margin: 0.2rem 0; letter-spacing: -2px; }
-.contexto-detalle { font-size: 1.25rem; font-weight: 600; color: var(--texto); margin: 0.4rem 0 0; max-width: 560px; }
-.contexto-subtitulo { font-size: clamp(1.4rem, 3.2vw, 2rem); font-weight: 800; color: var(--azul-oscuro); max-width: 720px; margin: 1.6rem auto 0.6rem; line-height: 1.25; }
-.contexto-fuente { font-size: 0.75rem; color: var(--texto-suave); margin: 0; }
-
-.contexto-iconos { list-style: none; padding: 0; margin: 2.8rem 0; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+/* --- Dato de contexto (compactado para verse completo en pantalla sin scroll) --- */
+#pantalla-contexto .contenedor {
+    min-height: calc(100vh - var(--alto-header, 75px));
+    height: calc(100vh - var(--alto-header, 75px));
+    max-height: 100vh;
+    padding: 1.2rem 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+.contexto-intro {
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    font-weight: 600;
+    color: var(--texto-suave);
+    margin: 0 0 -0.4rem 0;
+    position: relative;
+    z-index: 1;
+}
+.contexto-cifra-contenedor {
+    position: relative;
+    display: inline-block;
+    font-size: clamp(3.8rem, 9.5vw, 6.4rem);
+    margin: 0.9rem auto 0.2rem;
+}
+.contexto-cifra {
+    font-size: 1em;
+    font-weight: 800;
+    color: var(--azul);
+    line-height: 1;
+    margin: 0;
+    letter-spacing: -2px;
+    position: relative;
+    z-index: 1;
+}
+.personaje-contexto-sentado {
+    position: absolute;
+    height: 1.55em;
+    width: auto;
+    /* Sentado arriba a la derecha del número, con piernas colgando sobre el símbolo % */
+    top: -0.82em;
+    right: -0.06em;
+    z-index: 2;
+    pointer-events: none;
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.1));
+    user-select: none;
+}
+.contexto-detalle {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    font-weight: 600;
+    color: var(--texto);
+    margin: 0.35rem auto 0;
+    max-width: 640px;
+    line-height: 1.35;
+}
+.contexto-subtitulo {
+    font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+    font-weight: 800;
+    color: var(--azul-oscuro);
+    max-width: 720px;
+    margin: 0.7rem auto 0.3rem;
+    line-height: 1.25;
+}
+.contexto-fuente {
+    font-size: 0.75rem;
+    color: var(--texto-suave);
+    margin: 0;
+}
+.contexto-iconos {
+    list-style: none;
+    padding: 0;
+    margin: 1.1rem 0;
+    display: flex;
+    justify-content: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+}
+#btn-ir-al-test {
+    margin-top: 0.2rem;
+}
 .contexto-iconos li {
     display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
     width: 8.5rem; font-size: 0.95rem; font-weight: 600; color: var(--texto);
@@ -489,15 +562,31 @@ button { font-family: 'Poppins', sans-serif; font-size: 1.2rem; font-weight: 600
     background: var(--blanco); border-radius: 12px; padding: 1.4rem 1.5rem;
     box-shadow: 0 4px 10px var(--sombra);
     border-top: 5px solid var(--estado-mejorar);
+    display: flex; flex-direction: column;
 }
 .tarjeta-categoria.nivel-atencion { border-top-color: var(--estado-atencion); }
 .tarjeta-categoria.nivel-mejorar { border-top-color: var(--estado-mejorar); }
 .tarjeta-categoria.nivel-bien { border-top-color: var(--estado-bien); }
-.tarjeta-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-.tarjeta-header h4 { margin: 0; font-size: 1.15rem; }
-.tarjeta-header h4 i { color: var(--azul); width: 1.5rem; }
-.nota-cat { font-weight: 800; font-size: 1.05rem; color: var(--texto); white-space: nowrap; }
-.tarjeta-detalle { margin: 0.8rem 0 0; color: var(--texto-suave); font-size: 0.95rem; line-height: 1.5; }
+.tarjeta-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.8rem; }
+.tarjeta-header h4 { margin: 0; font-size: 1.15rem; display: flex; align-items: center; }
+.tarjeta-header h4 i { color: var(--azul); width: 1.5rem; flex-shrink: 0; }
+.nota-cat {
+    font-weight: 700; font-size: 0.82rem; padding: 0.3rem 0.65rem; border-radius: 999px;
+    white-space: normal; text-align: right; line-height: 1.25;
+}
+.tarjeta-categoria.nivel-bien .nota-cat { background: rgba(39, 174, 96, 0.12); color: #1e824c; }
+.tarjeta-categoria.nivel-mejorar .nota-cat { background: rgba(230, 126, 34, 0.12); color: #d35400; }
+.tarjeta-categoria.nivel-atencion .nota-cat { background: rgba(235, 87, 87, 0.12); color: #c0392b; }
+.tarjeta-detalle { margin: 0.8rem 0 0; color: var(--texto-suave); font-size: 0.95rem; line-height: 1.55; flex-grow: 1; }
+.tarjeta-fuente {
+    margin-top: 1.1rem; padding-top: 0.75rem; border-top: 1px dashed var(--borde-suave);
+    font-size: 0.78rem; color: var(--texto-suave); line-height: 1.45;
+}
+.tarjeta-fuente i { color: var(--azul); margin-right: 0.25rem; }
+.tarjeta-fuente strong { color: var(--texto); font-weight: 600; }
+.tarjeta-fuente a { color: var(--azul); text-decoration: underline; text-underline-offset: 2px; }
+.tarjeta-fuente a:hover { color: var(--azul-oscuro); }
+.tarjeta-fuente a i { font-size: 0.7rem; margin-left: 0.15rem; }
 
 @media (max-width: 700px) {
     .resultado-global-box { padding: 2.2rem 1.2rem 1.6rem; }
@@ -1351,26 +1440,27 @@ h4, strong, b { font-weight: 700; }
     .vd-pj-slot, .vd-tarjeta, .vd-hipnograma, .vd-bateria { transition: none; }
     .vd-personaje.caminando .vd-pj-slot.activo, .vd-pista i { animation: none; }
 }
+
+
+/* =====================================================================
+   SECCIONES: SUGERENCIAS Y QUIÉNES SOMOS / NOSOTROS
+   ===================================================================== */
 .contenedor-sugerencias {
     max-width: 800px;
-    margin: 4rem auto;
-    background-color: var(--fondo-off-white, #f8f9fa);
+    margin: 2rem auto 4rem;
+    background-color: var(--fondo, #f8f9fa);
     padding: 3rem;
-    border-radius: 8px;
+    border-radius: 16px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
-
 .encabezado-sugerencias { margin-bottom: 2rem; }
-
 .layout-sugerencias {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
 }
-
 .caja-formulario { width: 100%; }
-
 .rating-container {
     display: flex;
     align-items: center;
@@ -1378,60 +1468,54 @@ h4, strong, b { font-weight: 700; }
     gap: 15px;
     margin-bottom: 1.5rem;
     font-size: 1.2rem;
-    font-weight: 500;
-    color: var(--azul-profundo, #2c3e50);
+    font-weight: 600;
+    color: var(--azul-oscuro);
 }
-
 .stars {
     display: flex;
     flex-direction: row-reverse;
     justify-content: center;
 }
-
 .stars input { display: none; }
 .stars label {
     font-size: 3rem;
-    color: #ccc;
+    color: #cbd5e1;
     cursor: pointer;
     transition: color 0.2s ease;
+    padding: 0 0.15rem;
 }
-
 .stars label:hover,
 .stars label:hover ~ label,
 .stars input:checked ~ label {
-    color: var(--color-naranja, #f39c12);
+    color: var(--naranja, #FF7A1A);
 }
-
 #mensaje-sugerencia {
     width: 100%;
+    box-sizing: border-box;
     padding: 15px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
     margin-bottom: 2rem;
     font-family: inherit;
     font-size: 1rem;
     resize: vertical;
 }
-
 #mensaje-sugerencia:focus {
-    border-color: var(--azul-profundo, #2c3e50);
+    border-color: var(--azul);
     outline: none;
 }
-
 .btn-naranja, .btn-secundario {
     padding: 12px 30px;
     font-size: 1.1rem;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
-    transition: opacity 0.2s;
+    font-weight: 700;
+    transition: transform 0.15s ease, opacity 0.2s ease;
 }
-
-.btn-naranja { background-color: var(--color-naranja, #f39c12); color: #fff; }
-.btn-secundario { background-color: var(--azul-profundo, #2c3e50); color: #fff; margin-top: 1.5rem; }
-.btn-naranja:hover, .btn-secundario:hover { opacity: 0.9; }
-
+.btn-naranja { background-color: var(--naranja, #FF7A1A); color: #fff; }
+.btn-secundario { background-color: var(--azul-oscuro); color: #fff; margin-top: 1.5rem; }
+.btn-naranja:hover, .btn-secundario:hover { opacity: 0.92; transform: translateY(-2px); }
 .caja-exito {
     flex-direction: column;
     align-items: center;
@@ -1439,81 +1523,74 @@ h4, strong, b { font-weight: 700; }
     padding: 3rem 0;
     width: 100%;
 }
-/* --- Sección Quiénes somos --- */
+
+/* --- Sección Quiénes somos / Nosotros --- */
 .bloque-quienes {
     display: flex;
     align-items: center;
     gap: 4rem;
-    margin-top: 4rem;
-    margin-bottom: 4rem;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
 }
-
 .bloque-quienes.inverso {
     flex-direction: row-reverse;
 }
-
 .quienes-img {
     flex: 1;
-    max-width: 50%;
+    max-width: 45%;
     text-align: center;
 }
-
 .quienes-img img {
     width: 100%;
-    max-width: 450px; /* Evita que las imágenes sean gigantes en pantallas anchas */
+    max-width: 380px;
     height: auto;
 }
-
 .quienes-texto {
     flex: 1;
 }
-
 .quienes-texto h3 {
-    font-size: 2.2rem;
-    color: var(--primario); /* Asegúrate de que coincida con tu paleta */
+    font-size: 2rem;
+    color: var(--azul-oscuro);
     margin-bottom: 1rem;
 }
-
 .quienes-texto p {
     font-size: 1.1rem;
-    line-height: 1.6;
+    line-height: 1.65;
     color: var(--texto);
 }
 
-/* Adaptación para pantallas pequeñas (móviles) */
-@media (max-width: 768px) {
-    .bloque-quienes, 
-    .bloque-quienes.inverso {
-        flex-direction: column;
-        gap: 2rem;
-        text-align: center;
-        margin-top: 3rem;
-        margin-bottom: 3rem;
-    }
-    .quienes-img {
-        max-width: 80%;
-    }
+/* Bloque Fuentes de Datos */
+.tarjeta-nosotros-visual {
+    background: var(--blanco);
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    margin: 3rem auto 2rem;
+    max-width: 750px;
+    text-align: center;
 }
-/* --- Nuevos Bloques: Bases de Datos y Equipo --- */
+.nosotros-icono-visual {
+    font-size: 2.5rem;
+    color: var(--azul);
+    margin-bottom: 1rem;
+}
 .lista-datos {
     list-style: none;
     padding: 0;
-    margin-top: 1.5rem;
+    margin: 1.5rem auto 0;
     text-align: left;
     display: inline-block;
 }
-
 .lista-datos li {
-    font-size: 1.1rem;
-    color: var(--texto-secundario, #555);
+    font-size: 1.05rem;
+    color: var(--texto);
     margin-bottom: 0.8rem;
     padding-left: 1.5rem;
     position: relative;
 }
-
 .lista-datos li::before {
     content: "•";
-    color: var(--primario);
+    color: var(--azul);
     font-weight: bold;
     font-size: 1.5rem;
     position: absolute;
@@ -1521,46 +1598,74 @@ h4, strong, b { font-weight: 700; }
     top: -4px;
 }
 
+/* Bloque Equipo */
 .tarjeta-equipo {
     background: transparent;
     padding: 2.5rem;
-    border: 2px dashed var(--primario);
+    border: 2px dashed var(--azul);
     border-radius: 16px;
     text-align: center;
-    margin-top: 2rem;
+    margin: 2rem auto 4rem;
+    max-width: 800px;
 }
-
 .logo-universidad {
     font-size: 2.5rem;
-    color: var(--primario);
+    color: var(--azul);
     margin-bottom: 1rem;
 }
-
 .texto-universidad {
     font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--texto);
+    font-weight: 700;
+    color: var(--azul-oscuro);
     margin-bottom: 1.5rem;
 }
-
 .nombres-equipo {
-    font-size: 1rem;
-    color: var(--texto-secundario, #555);
-    line-height: 1.8;
+    font-size: 1.05rem;
+    color: var(--texto);
+    line-height: 1.9;
 }
-
 .nombres-equipo span {
     display: inline-block;
     margin: 0 0.5rem;
+    font-weight: 600;
 }
 
-/* Adaptación para móviles del equipo */
 @media (max-width: 768px) {
+    .bloque-quienes, 
+    .bloque-quienes.inverso {
+        flex-direction: column;
+        gap: 2rem;
+        text-align: center;
+        margin-top: 2.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .quienes-img {
+        max-width: 80%;
+    }
     .nombres-equipo span {
         display: block;
         margin: 0.5rem 0;
     }
-    .nombres-equipo {
-        line-height: 1.4;
+}
+
+
+@media (max-height: 760px) {
+    #pantalla-contexto .contenedor {
+        padding: 0.6rem 1rem 0.5rem;
+    }
+    .contexto-cifra-contenedor {
+        font-size: clamp(3rem, 7.5vw, 4.4rem);
+        margin: 0.4rem auto 0.15rem;
+    }
+    .contexto-detalle {
+        margin: 0.2rem auto 0;
+    }
+    .contexto-subtitulo {
+        font-size: clamp(1.1rem, 2vw, 1.35rem);
+        margin: 0.35rem auto 0.15rem;
+    }
+    .contexto-iconos {
+        margin: 0.5rem 0;
+        gap: 0.75rem;
     }
 }

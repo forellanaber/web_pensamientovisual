@@ -74,6 +74,12 @@ $(document).ready(function() {
         if ($enlace) $enlace.addClass("activo");
         $("html, body").scrollTop(0);
         $(window).trigger("scroll");
+        if (selector === "#pantalla-explorar" && typeof pintarMapa === "function") {
+            pintarMapa();
+        }
+        if (typeof ScrollTrigger !== "undefined") {
+            setTimeout(function() { ScrollTrigger.refresh(); }, 80);
+        }
     }
 
     $("#link-explorar").click(function(e) {
@@ -84,13 +90,13 @@ $(document).ready(function() {
         e.preventDefault();
         mostrarSeccion("#pantalla-vive", $(this));
     });
-    $("#link-sugerencias").click(function(e) {
-        e.preventDefault();
-        mostrarSeccion("#pantalla-sugerencias", $(this));
-    });
     $("#link-quienes").click(function(e) {
         e.preventDefault();
         mostrarSeccion("#pantalla-quienes", $(this));
+    });
+    $("#link-sugerencias").click(function(e) {
+        e.preventDefault();
+        mostrarSeccion("#pantalla-sugerencias", $(this));
     });
     $(".btn-ir-vive").click(function() {
         mostrarSeccion("#pantalla-vive", $("#link-vive"));
@@ -115,7 +121,7 @@ $(document).ready(function() {
     $("#btn-comenzar").click(function() { revelarYScrollear("#pantalla-bienvenida", "#pantalla-contexto"); });
 
     // El personaje del inicio reacciona cuando el cursor (o el teclado) llega al botón "Sí"
-    $("#btn-comenzar")
+    $("#btn-comenzar, .inicio-personaje")
         .on("mouseenter focus", function() { $(".inicio-contenido").addClass("reacciona"); })
         .on("mouseleave blur", function() { $(".inicio-contenido").removeClass("reacciona"); });
     $("#btn-ir-al-test").click(function() {
@@ -308,46 +314,252 @@ $(document).ready(function() {
     // Referencias para los cortes: sueño de 7 a 9 h (National Sleep Foundation) y
     // 150 min de actividad física a la semana (OMS). Los pesos y cortes son una
     // propuesta del equipo: conviene revisarlos antes de publicar.
-    const PESOS = { sueno: 0.22, carga: 0.12, celular: 0.14, movimiento: 0.14, organizacion: 0.14, animo: 0.24 };
-    const PUNTOS_DIAS_DEPORTE = { 0: 2, 1: 5, 3: 8, 5: 10 };
-    const PUNTOS_PLANIFICAR = { 2: 10, 1: 6, 0: 3 };
-    const PUNTOS_POSTERGAR = { 0: 10, 1: 6, 2: 3 };
+    // =====================================================================
+    // --- Diagnóstico y Puntajes Personalizados (6 Áreas) ---
+    // =====================================================================
+    const AREAS_ORDEN = ["descanso", "estudio", "trabajo", "traslado", "ocio", "deporte"];
+    const CLAVE_HORA = { descanso: "sueno", estudio: "estudio", trabajo: "trabajo", traslado: "traslado", ocio: "ocio", deporte: "deporte" };
+    const PESOS = { descanso: 0.25, estudio: 0.20, trabajo: 0.15, traslado: 0.10, ocio: 0.15, deporte: 0.15 };
     const limitar = n => Math.max(0, Math.min(10, n));
 
-    function puntajeAreas(r) {
-        let h = r.horas;
+    function evaluarArea(k, r) {
+        r = r || {};
+        let hDict = r.horas || {};
+        let h = (hDict[CLAVE_HORA[k]] !== undefined) ? hDict[CLAVE_HORA[k]] : 0;
+        let esEs = (typeof idioma === "undefined" || idioma === "es");
 
-        let sueno = (h.sueno >= 7 && h.sueno <= 9) ? 10
-                  : (h.sueno < 7 ? 10 - (7 - h.sueno) * 2.5 : 10 - (h.sueno - 9) * 2);
-        sueno -= (r.celularCama || 0); // celular en la cama: resta 1 o 2
+        let dict = (typeof TEXTOS !== "undefined" && TEXTOS[idioma] && TEXTOS[idioma].tarjetasDiagnostico)
+            ? TEXTOS[idioma].tarjetasDiagnostico
+            : (typeof TEXTOS !== "undefined" ? TEXTOS.es.tarjetasDiagnostico : {});
+        let data = (dict && dict[k]) || (typeof TEXTOS !== "undefined" && TEXTOS.es && TEXTOS.es.tarjetasDiagnostico && TEXTOS.es.tarjetasDiagnostico[k]);
 
-        let horasCarga = h.estudio + h.trabajo + h.traslado;
-        let carga = horasCarga <= 10 ? 10 : 10 - (horasCarga - 10) * 1.5;
-        if (h.ocio === 0) carga -= 1; // nada de descanso sin pantalla
+        if (!data || !data.rangos) {
+            return { horas: h, estado: "", nivel: "bien", puntos: 10, texto: "", fuentes: [] };
+        }
 
-        let celular = h.celular <= 2 ? 10 : 10 - (h.celular - 2) * 1.5;
+        let rangoEncontrado = data.rangos.find(rg => h >= rg.min && h <= rg.max) || data.rangos[0];
+        let estado = rangoEncontrado.estado;
+        let fuentes = data.fuentes || [];
 
-        let movimiento = PUNTOS_DIAS_DEPORTE[r.diasDeporte] ?? 5;
+        let pts = 10;
+        let oraciones = [rangoEncontrado.texto];
 
-        let organizacion = ((PUNTOS_PLANIFICAR[r.planificar] ?? 6) + (PUNTOS_POSTERGAR[r.postergar] ?? 6)) / 2;
+        if (k === "descanso") {
+            if (h >= 7 && h <= 9) {
+                pts = (h === 8) ? 10.0 : (9.2 + (1 - Math.abs(h - 8)) * 0.8);
+                if (r.celularCama === 0) {
+                    pts = Math.min(10.0, pts + 0.5);
+                    oraciones.push(esEs
+                        ? "Tu hábito de no usar pantallas en la cama favorece la conciliación rápida del sueño profundo y un ritmo circadiano saludable."
+                        : "Avoiding screens in bed supports prompt deep-sleep onset and a healthy circadian rhythm.");
+                } else if (r.celularCama === 1) {
+                    pts -= 0.6;
+                    oraciones.push(esEs
+                        ? "Sin embargo, el uso ocasional del celular en la cama puede retrasar la liberación de melatonina y fragmentar el descanso."
+                        : "However, occasional screen use in bed can delay melatonin release and fragment sleep.");
+                } else if (r.celularCama === 2) {
+                    pts -= 1.3;
+                    oraciones.push(esEs
+                        ? "Señalas que usas frecuentemente el celular en la cama; el consenso médico de la Sleep Foundation advierte que la luz azul suprime la fase REM, intensificando el cansancio al despertar."
+                        : "Frequent screen use in bed suppresses REM sleep due to blue light, increasing morning fatigue according to the Sleep Foundation.");
+                }
+            } else if (h < 7) {
+                pts = Math.max(2.0, 8.5 - (7 - h) * 1.5);
+                if (r.celularCama >= 1) {
+                    pts -= (r.celularCama === 2 ? 1.2 : 0.6);
+                    oraciones.push(esEs
+                        ? "Sumado al déficit de horas, el celular en la cama agrava la fatiga cognitiva y la vulnerabilidad al estrés académico (AASM / Sleep Foundation)."
+                        : "Combined with hour deficit, screens in bed worsen cognitive fatigue and vulnerability to stress (AASM / Sleep Foundation).");
+                }
+                if (r.bateria !== undefined && r.bateria < 35) {
+                    pts -= 0.5;
+                    oraciones.push(esEs
+                        ? "Tu baja reserva de energía al terminar el día (" + r.bateria + "%) es una consecuencia directa de este déficit acumulado."
+                        : "Your low end-of-day battery (" + r.bateria + "%) directly reflects this accumulated sleep debt.");
+                }
+            } else {
+                pts = Math.max(4.0, 8.8 - (h - 9) * 1.2);
+                if (r.bateria !== undefined && r.bateria < 40) {
+                    oraciones.push(esEs
+                        ? "Pese al alto volumen de horas, una baja energía puede indicar sueño poco profundo o fragmentado (Sleep Foundation)."
+                        : "Despite high sleep hours, low reported energy suggests poor sleep quality or fragmentation (Sleep Foundation).");
+                }
+            }
+        } else if (k === "estudio") {
+            if (h >= 2 && h <= 5.5) {
+                pts = (h >= 2.5 && h <= 4.5) ? 10.0 : 9.2;
+                if (r.planificar === 2) {
+                    pts = Math.min(10.0, pts + 0.5);
+                    oraciones.push(esEs
+                        ? "Tu hábito de planificar la semana potencia tu rendimiento sin sobrecargar tus tiempos de descanso."
+                        : "Planning your week maximizes academic efficiency without sacrificing rest.");
+                } else if (r.planificar === 0) {
+                    pts -= 0.7;
+                    oraciones.push(esEs
+                        ? "Aunque tu tiempo de estudio es adecuado, la falta de planificación puede generar picos imprevistos de estrés antes de evaluaciones."
+                        : "While study hours are adequate, lacking weekly planning can trigger pre-exam stress spikes.");
+                }
+                if (r.postergar === 2) {
+                    pts -= 1.0;
+                    oraciones.push(esEs
+                        ? "Procrastinar tareas puede provocarte ansiedad; la técnica Pomodoro (bloques de 25 min) te ayudará a sostener el foco."
+                        : "Frequent procrastination may trigger anxiety; 25-min Pomodoro blocks will help sustain focus.");
+                }
+            } else if (h < 2) {
+                pts = Math.max(2.5, 7.8 - (2 - h) * 2.2);
+                if (r.postergar === 2) {
+                    pts -= 1.0;
+                    oraciones.push(esEs
+                        ? "La postergación frecuente acentúa el riesgo de cramming nocturno de última hora, afectando la retención a largo plazo (Athenify)."
+                        : "Frequent procrastination raises the risk of late-night cramming, harming long-term retention (Athenify).");
+                }
+            } else {
+                pts = Math.max(3.0, 7.5 - (h - 5.5) * 1.2);
+                if (r.planificar === 2) {
+                    pts = Math.min(10.0, pts + 0.6);
+                    oraciones.push(esEs
+                        ? "Una buena planificación te ayuda a gestionar esta alta carga, pero recuerda incluir pausas activas para evitar el agotamiento."
+                        : "Good planning helps manage this load, but remember to schedule active breaks to prevent burnout.");
+                }
+            }
+        } else if (k === "trabajo") {
+            let soloEstudia = (r.ocupacion === "estudia" || h === 0);
+            if (soloEstudia) {
+                pts = 10.0;
+                oraciones = [
+                    esEs
+                        ? "No dedicas horas a trabajo remunerado, lo que te permite mayor disponibilidad horaria para organizar tus estudios, ocio y descanso."
+                        : "You dedicate yourself exclusively to studying, allowing flexible time management for academics, leisure, and rest.",
+                    esEs
+                        ? "Los datos de la Encuesta CASEN e INJUV muestran que los estudiantes de dedicación exclusiva cuentan con mejores condiciones para consolidar hábitos saludables y avance curricular oportuno."
+                        : "CASEN and INJUV data show exclusive students have better flexibility for healthy routines and timely graduation."
+                ];
+            } else {
+                if (h <= 4) {
+                    pts = 9.5 - (h - 1) * 0.4;
+                    oraciones.push(esEs
+                        ? "Según la Encuesta Nacional sobre Uso del Tiempo (ENUT - INE), una jornada laboral moderada entrega autonomía financiera con bajo riesgo de canibalizar el tiempo académico."
+                        : "INE's Time Use Survey (ENUT) shows moderate student work provides financial autonomy with low risk of hurting studies.");
+                } else {
+                    pts = Math.max(3.0, 6.5 - (h - 4) * 1.0);
+                    if (hDict.sueno && hDict.sueno < 7) {
+                        pts -= 1.0;
+                        oraciones.push(esEs
+                            ? "Esta carga laboral ya está comprometiendo tus horas de sueño (" + formatoNumero(hDict.sueno, 1) + " h), elevando el riesgo de sobrecarga según evidencia de CASEN."
+                            : "This heavy workload is already cutting into your sleep hours (" + formatoNumero(hDict.sueno, 1) + " h), raising burnout risk according to CASEN data.");
+                    }
+                }
+            }
+        } else if (k === "traslado") {
+            let esRM = (r.region === "13" || r.region === 13);
+            if (h <= 1.0) {
+                pts = 10.0 - h * 0.8;
+                oraciones.push(esEs
+                    ? "Según la Encuesta CASEN, tus tiempos breves de traslado te otorgan hasta 1,5 horas útiles adicionales al día respecto al promedio de transporte público."
+                    : "According to CASEN data, short commutes grant you up to 1.5 extra useful hours daily compared to public transit averages.");
+            } else if (h <= 2.2) {
+                pts = Math.max(6.0, 8.5 - (h - 1.0) * 1.5);
+                if (esRM) {
+                    oraciones.push(esEs
+                        ? "En la Región Metropolitana, los datos de CASEN sitúan el promedio de traslado urbano entre 50 y 70 minutos por viaje. Convertir estos tramos en descanso auditivo reduce el estrés de la congestión."
+                        : "In the Metropolitan Region, CASEN places daily urban commutes between 50-70 min per trip. Using transit for relaxing audio mitigates congestion stress.");
+                }
+            } else {
+                pts = Math.max(2.5, 5.5 - (h - 2.2) * 1.3);
+                oraciones.push(esEs
+                    ? "La evidencia de CASEN y ENUT confirma que traslados superiores a 2,5 horas diarias conllevan una pérdida crítica de horas de sueño y fatiga postural acumulada."
+                    : "CASEN and ENUT evidence confirms daily commutes over 2.5 hours cause critical loss of sleep and cumulative physical fatigue.");
+            }
+        } else if (k === "ocio") {
+            let cel = hDict.celular || 0;
+            if (h >= 1.5 && h <= 3.5) {
+                pts = (h >= 2 && h <= 3) ? 10.0 : 9.3;
+                oraciones.push(esEs
+                    ? "El Programa Vida Saludable de la UdeC destaca que el ocio sin pantallas actúa como regulador neurobiológico frente a la ansiedad y el estrés."
+                    : "UdeC's Healthy Living Program highlights that screen-free leisure acts as a neurobiological regulator against anxiety.");
+            } else if (h < 1.5) {
+                pts = Math.max(2.5, 8.0 - (1.5 - h) * 3.5);
+                if (cel >= 4) {
+                    pts -= 0.8;
+                    oraciones.push(esEs
+                        ? "Registras " + formatoNumero(cel, 1) + " h de celular frente a solo " + formatoNumero(h, 1) + " h de ocio desconectado. La 10ª Encuesta de Juventudes (INJUV) señala que la navegación en redes no reemplaza el valor reparador del ocio activo."
+                        : "You log " + formatoNumero(cel, 1) + " h of phone use vs " + formatoNumero(h, 1) + " h of offline leisure. INJUV survey shows social feeds do not provide true cognitive recovery.");
+                }
+            } else {
+                pts = Math.max(4.0, 7.8 - (h - 3.5) * 1.1);
+                if (cel >= 5) {
+                    pts -= 1.0;
+                    oraciones.push(esEs
+                        ? "Un volumen muy elevado de ocio ligado a pantallas puede inducir fatiga visual y posponer horarios de estudio y descanso."
+                        : "High screen-dominated leisure may induce eye strain and push back sleep and study schedules.");
+                }
+            }
+        } else if (k === "deporte") {
+            let dias = r.diasDeporte !== undefined ? parseInt(r.diasDeporte, 10) : 1;
+            let minutosDiarios = Math.round(h * 60);
 
-        let animo = (((r.animo ?? 3) - 1) * 2.5 + (r.bateria ?? 50) / 10) / 2;
+            if (minutosDiarios < 18 || dias === 0) {
+                pts = Math.max(2.0, 3.2 + (minutosDiarios / 18) * 1.5);
+                oraciones.push(esEs
+                    ? "La 10ª Encuesta de Juventudes de INJUV alerta que el sedentarismo afecta a más del 60% de los estudiantes. La OMS/OPS aconseja empezar con caminatas ágiles de 15 a 20 minutos al día."
+                    : "INJUV's Youth Survey warns that sedentarism affects over 60% of students. WHO/PAHO guidelines recommend starting with 15-20 min brisk walks.");
+            } else if (minutosDiarios <= 50) {
+                pts = 8.5 + (dias >= 3 ? 1.5 : (dias >= 1 ? 0.7 : 0));
+                if (dias >= 3) {
+                    oraciones.push(esEs
+                        ? "Entrenar " + dias + " o más días por semana cumple a cabalidad con la recomendación de 150 a 300 min semanales de la OMS/OPS, fortaleciendo el sistema cardiovascular y la retención cognitiva."
+                        : "Exercising " + dias + " or more days a week meets WHO/PAHO recommendations of 150-300 min/week, boosting cardiovascular fitness and cognitive retention.");
+                } else {
+                    oraciones.push(esEs
+                        ? "Tu duración por sesión es excelente; la OMS recomienda sumar un día extra a la semana para sostener el beneficio cardiorrespiratorio."
+                        : "Session length is great; WHO recommends adding an extra day per week to maintain cardiorespiratory benefits.");
+                }
+            } else if (minutosDiarios <= 90) {
+                pts = 9.0;
+            } else {
+                pts = 8.0;
+                oraciones.push(esEs
+                    ? "Mantienes una alta exigencia física. La OMS aconseja complementar este nivel con una adecuada hidratación y suficiente descanso muscular."
+                    : "High physical output. WHO recommends balancing this with adequate hydration, nutrition, and rest.");
+            }
+        }
+
+        pts = limitar(Math.round(pts * 10) / 10);
+        let textoFinal = oraciones.join(" ");
+        let nivelArea = (pts < 4.5) ? "atencion" : (pts < 7.0 ? "mejorar" : "bien");
 
         return {
-            sueno: limitar(sueno), carga: limitar(carga), celular: limitar(celular),
-            movimiento: limitar(movimiento), organizacion: limitar(organizacion), animo: limitar(animo)
+            horas: h,
+            estado: estado,
+            nivel: nivelArea,
+            puntos: pts,
+            texto: textoFinal,
+            fuentes: fuentes
         };
+    }
+
+    function puntajeAreas(r) {
+        let res = {};
+        AREAS_ORDEN.forEach(k => {
+            let ev = evaluarArea(k, r);
+            res[k] = ev.puntos;
+        });
+        return res;
     }
 
     function puntajeTotal(r) {
         let areas = puntajeAreas(r);
         let total = 0;
-        for (const k in PESOS) total += areas[k] * PESOS[k];
+        for (const k in PESOS) {
+            if (areas[k] !== undefined) {
+                total += areas[k] * PESOS[k];
+            }
+        }
         return Math.round(total * 10) / 10;
     }
 
-    // Franjas de la barra: atención (0 a 4), puede mejorar (4 a 7), bien (7 a 10)
-    function nivel(p) { return p < 4 ? "atencion" : (p < 7 ? "mejorar" : "bien"); }
+    // Franjas de la barra: atención (0 a 4.5), puede mejorar (4.5 a 7), bien (7 a 10)
+    function nivel(p) { return p < 4.5 ? "atencion" : (p < 7 ? "mejorar" : "bien"); }
 
     // Cambios del simulador: cada uno modifica una copia de las respuestas
     function quitarHoras(h, cantidad, desde) {
@@ -462,8 +674,7 @@ $(document).ready(function() {
 
     function mostrarResultados(animar) {
         let total = puntajeTotal(respuestas);
-        let areas = puntajeAreas(respuestas);
-        let textosAreas = lista("textosAreas");
+        let esEs = (typeof idioma === "undefined" || idioma === "es");
 
         mostrarBienestar();
         pintarReparto();
@@ -486,11 +697,23 @@ $(document).ready(function() {
             $("#frase-adelante").text(t("res.fraseMantener"));
         }
 
-        for (const k in areas) {
-            let $tarjeta = $(`.tarjeta-categoria[data-area="${k}"]`);
-            $tarjeta.removeClass("nivel-atencion nivel-mejorar nivel-bien").addClass("nivel-" + nivel(areas[k]));
-            $tarjeta.find(".nota-cat").text(t("res.puntaje", { nota: formatoNumero(areas[k], 1) }));
-            $tarjeta.find(".tarjeta-detalle").text(textosAreas[k][nivel(areas[k])]);
+        // Renderizado personalizado de las 6 tarjetas de diagnóstico
+        for (const k of AREAS_ORDEN) {
+            let ev = evaluarArea(k, respuestas);
+            let $tarjeta = $('.tarjeta-categoria[data-area="' + k + '"]');
+            $tarjeta.removeClass("nivel-atencion nivel-mejorar nivel-bien").addClass("nivel-" + ev.nivel);
+
+            let badgeTexto = formatoNumero(ev.puntos, 1) + "/10 · " + ev.estado;
+            $tarjeta.find(".nota-cat").text(badgeTexto);
+            $tarjeta.find(".tarjeta-detalle").text(ev.texto);
+
+            let fuentesHtml = "";
+            if (ev.fuentes && ev.fuentes.length > 0) {
+                fuentesHtml = '<i class="fa-solid fa-database"></i> <strong>' + (esEs ? "Bases de datos:" : "Databases:") + '</strong> ';
+                let links = ev.fuentes.map(f => '<a href="' + f.url + '" target="_blank" rel="noopener">' + f.nombre + ' <i class="fa-solid fa-arrow-up-right-from-square"></i></a>');
+                fuentesHtml += links.join(" · ");
+            }
+            $tarjeta.find(".tarjeta-fuente").html(fuentesHtml);
         }
     }
 
@@ -741,117 +964,133 @@ $(document).ready(function() {
 // Los servicios de apoyo estudiantil van en APOYO_ESTUDIANTIL (al inicio de este archivo).
 const DATOS_REGIONES = {
     15: { 
-        estudiantes: 15200, 
+        estudiantes: 17303,
+        porcentajeNacional: 1.5,
         habitoClave: "Aprovechamiento del entorno costero y clima desértico-costero para pausas de estudio al aire libre.", 
         factorRiesgo: "Desplazamientos entre zonas extremas y adaptación al ritmo de la macrozona norte.", 
         tipBienestar: "Aprovechar la luz solar regular para establecer rutinas estables de estudio y descanso.", 
         apoyoEstudiantil: [{ nombre: "DAE Universidad de Tarapacá", url: "https://www.uta.cl" }, { nombre: "Apoyo Estudiantil INACAP Arica", url: "https://www.inacap.cl" }] 
-    }, // Arica y Parinacota
+    }, // Arica y Parinacota (SIES 2025: 17.303 - 1,5%)
     1:  { 
-        estudiantes: 18500, 
+        estudiantes: 20177,
+        porcentajeNacional: 1.8,
         habitoClave: "Uso de los espacios costeros y playas como zonas de desconexión entre jornadas académicas.", 
         factorRiesgo: "Cargas de estudio concentradas en el entorno de zona franca e industrial.", 
         tipBienestar: "Integrar descansos visuales mirando al horizonte marino para mitigar el cansancio acumulado.", 
         apoyoEstudiantil: [{ nombre: "Bienestar Estudiantil UNAP", url: "https://www.unap.cl" }, { nombre: "DAE Santo Tomás Iquique", url: "https://www.santotomas.cl" }, { nombre: "Asuntos Estudiantiles INACAP", url: "https://www.inacap.cl" }] 
-    }, // Tarapacá
+    }, // Tarapacá (SIES 2025: 20.177 - 1,8%)
     2:  { 
-        estudiantes: 34000, 
+        estudiantes: 37214,
+        porcentajeNacional: 3.3,
         habitoClave: "Organización de tiempos de estudio adaptados a la dinámica minero-industrial de la región.", 
         factorRiesgo: "Extensión de jornadas de estudio y trabajo en un entorno predominantemente árido y de alta exigencia.", 
         tipBienestar: "Mantener una alta hidratación y proteger los ambientes nocturnos de descanso.", 
         apoyoEstudiantil: [{ nombre: "DIDE UCN Antofagasta", url: "https://www.ucn.cl" }, { nombre: "DAE Universidad de Antofagasta", url: "https://www.uantof.cl" }] 
-    }, // Antofagasta
+    }, // Antofagasta (SIES 2025: 37.214 - 3,3%)
     3:  { 
-        estudiantes: 9500, 
+        estudiantes: 12819,
+        porcentajeNacional: 1.1,
         habitoClave: "Estudio presencial y colaborador en campus integrados a valles desérticos.", 
         factorRiesgo: "Distancias entre comunas y aislamiento geográfico durante periodos de evaluaciones.", 
         tipBienestar: "Coordinar grupos de apoyo académico presenciales para fortalecer la red comunitaria.", 
         apoyoEstudiantil: [{ nombre: "Bienestar Estudiantil UDA", url: "https://www.uda.cl" }] 
-    }, // Atacama
+    }, // Atacama (SIES 2025: 12.819 - 1,1%)
     4:  { 
-        estudiantes: 32000, 
+        estudiantes: 46796,
+        porcentajeNacional: 4.1,
         habitoClave: "Uso de patios universitarios y campus abiertos gracias al clima semiarido propicio.", 
         factorRiesgo: "Extensión de trayectos interurbanos entre La Serena, Coquimbo y el interior.", 
         tipBienestar: "Aprovechar las áreas verdes del entorno costero o de valles para hacer pausas de estudio.", 
         apoyoEstudiantil: [{ nombre: "DAE Universidad de La Serena", url: "https://www.userena.cl" }, { nombre: "DAE UCN Coquimbo", url: "https://www.ucn.cl" }] 
-    }, // Coquimbo
+    }, // Coquimbo (SIES 2025: 46.796 - 4,1%)
     5:  { 
-        estudiantes: 98000, 
+        estudiantes: 125159,
+        porcentajeNacional: 10.9,
         habitoClave: "Integración académica entre múltiples universidades y la activa vida de ciudad puerto y universitaria.", 
         factorRiesgo: "Complejidad en los trayectos por la geografía de cerros y la alta conectividad costera.", 
         tipBienestar: "Marcar un límite claro entre las actividades académicas y los momentos de recreación regional.", 
         apoyoEstudiantil: [{ nombre: "DAE PUCV", url: "https://www.pucv.cl" }, { nombre: "Dirección de Asuntos Estudiantiles UV", url: "https://www.uv.cl" }, { nombre: "Servicios de Salud UPLA", url: "https://www.upla.cl" }] 
-    }, // Valparaíso
+    }, // Valparaíso (SIES 2025: 125.159 - 10,9%)
     13: { 
-        estudiantes: 380000, 
+        estudiantes: 501447,
+        porcentajeNacional: 43.8,
         habitoClave: "Uso eficiente del transporte metropolitano para la lectura o repaso de contenidos.", 
         factorRiesgo: "Estrés urbano acumulado debido a los largos tiempos de traslado en la gran capital.", 
         tipBienestar: "Aprovechar los traslados diarios para desconectar activamente con música o contenidos auditivos.", 
         apoyoEstudiantil: [{ nombre: "Salud Estudiantil UC", url: "https://www.uc.cl" }, { nombre: "Bienestar Estudiantil U. de Chile", url: "https://uchile.cl" }, { nombre: "DAE USACH", url: "https://www.usach.cl" }, { nombre: "DAE UDP", url: "https://www.udp.cl" }] 
-    }, // Metropolitana
+    }, // Metropolitana (SIES 2025: 501.447 - 43,8%)
     6:  { 
-        estudiantes: 14000, 
+        estudiantes: 31146,
+        porcentajeNacional: 2.7,
         habitoClave: "Aprovechamiento de la calma del entorno agrourbano para jornadas de concentración focalizada.", 
         factorRiesgo: "Desplazamientos diarios entre comunas rurales y la capital regional.", 
         tipBienestar: "Separar espacios definidos en el hogar para evitar la mezcla entre estudio y descanso.", 
         apoyoEstudiantil: [{ nombre: "DAE Universidad de O'Higgins", url: "https://www.uoh.cl" }] 
-    }, // O'Higgins
+    }, // O'Higgins (SIES 2025: 31.146 - 2,7%)
     7:  { 
-        estudiantes: 41000, 
+        estudiantes: 61470,
+        porcentajeNacional: 5.4,
         habitoClave: "Pausas de descanso y estudio en las amplias áreas verdes que caracterizan los campus del centro-sur.", 
-        factorRiesgo: "Fluctuaciones de temperatura estaciónales que alteran el rendimiento o dinamismo diario.", 
+        factorRiesgo: "Fluctuaciones de temperatura estacionales que alteran el rendimiento o dinamismo diario.", 
         tipBienestar: "Caminar periódicamente por zonas arboladas para despejar la mente entre clases.", 
         apoyoEstudiantil: [{ nombre: "DVET Universidad de Talca", url: "https://www.utalca.cl" }, { nombre: "DAE UCM", url: "https://portal.ucm.cl" }] 
-    }, // Maule
+    }, // Maule (SIES 2025: 61.470 - 5,4%)
     16: { 
-        estudiantes: 18000, 
+        estudiantes: 22772,
+        porcentajeNacional: 2.0,
         habitoClave: "Organización de grupos de estudio en una zona de alta cercanía y vida estudiantil de pequeña escala.", 
         factorRiesgo: "Impacto del clima lluvioso e invernal en la movilidad cotidiana.", 
         tipBienestar: "Organizar espacios iluminados y templados para el trabajo académico en época de frío.", 
         apoyoEstudiantil: [{ nombre: "Dir. Desarrollo Estudiantil UBB Chillán", url: "https://www.ubiobio.cl" }] 
-    }, // Ñuble
+    }, // Ñuble (SIES 2025: 22.772 - 2,0%)
     8:  { 
-        estudiantes: 125000, 
+        estudiantes: 124873,
+        porcentajeNacional: 10.9,
         habitoClave: "Intensa vida universitaria integrada a campus con abundante vegetación y tradición académica.", 
         factorRiesgo: "Saturación por alta exigencia académica combinada con el clima húmedo y lluvioso.", 
         tipBienestar: "Mantener horarios de alimentación regulares durante las semanas de alta carga climática.", 
         apoyoEstudiantil: [{ nombre: "Dise Universidad de Concepción", url: "https://www.udec.cl" }, { nombre: "DAE UCSC", url: "https://www.ucsc.cl" }, { nombre: "DDE UBB Concepción", url: "https://www.ubiobio.cl" }] 
-    }, // Biobío
+    }, // Biobío (SIES 2025: 124.873 - 10,9%)
     9:  { 
-        estudiantes: 52000, 
+        estudiantes: 59171,
+        porcentajeNacional: 5.2,
         habitoClave: "Estudio y encuentro estudiantil en recintos cerrados adaptados a la zona sur y multicultural.", 
         factorRiesgo: "Menor exposición a luz natural durante los periodos de otoño-invierno.", 
         tipBienestar: "Asegurar una ventilación adecuada en áreas de estudio con calefacción constante.", 
         apoyoEstudiantil: [{ nombre: "DGE Universidad de La Frontera", url: "https://www.ufro.cl" }, { nombre: "DAE UCT Temuco", url: "https://www.uct.cl" }] 
-    }, // La Araucanía
+    }, // La Araucanía (SIES 2025: 59.171 - 5,2%)
     14: { 
-        estudiantes: 22000, 
+        estudiantes: 28017,
+        porcentajeNacional: 2.4,
         habitoClave: "Aprovechamiento del entorno natural y fluvial para equilibrar el estrés académico.", 
         factorRiesgo: "Continuidad de lluvias prolongadas que dificultan el movimiento al aire libre.", 
         tipBienestar: "Llevar un calendario visual para planificar las entregas durante días con clima adverso.", 
         apoyoEstudiantil: [{ nombre: "DAE Universidad Austral de Chile", url: "https://www.uach.cl" }] 
-    }, // Los Ríos
+    }, // Los Ríos (SIES 2025: 28.017 - 2,4%)
     10: { 
-        estudiantes: 28000, 
+        estudiantes: 44961,
+        porcentajeNacional: 3.9,
         habitoClave: "Rutinas adaptadas al dinamismo insular, norpatagónico y costero de la región.", 
         factorRiesgo: "Aislamiento geográfico temporal por factores meteorológicos y de transporte marítimo/terrestre.", 
         tipBienestar: "Cumplir objetivos diarios graduados para evitar acumulación de tareas de última hora.", 
         apoyoEstudiantil: [{ nombre: "DAE Universidad de Los Lagos", url: "https://www.ulagos.cl" }, { nombre: "DAE UACh Sede Puerto Montt", url: "https://www.uach.cl" }] 
-    }, // Los Lagos
+    }, // Los Lagos (SIES 2025: 44.961 - 3,9%)
     11: { 
-        estudiantes: 2100, 
+        estudiantes: 2795,
+        porcentajeNacional: 0.2,
         habitoClave: "Fuerte trabajo colaborativo en comunidades estudiantiles reducidas y unidas de la Patagonia.", 
         factorRiesgo: "Condiciones climáticas extremas e insularidad que limitan la movilidad regular.", 
         tipBienestar: "Fomentar actividades compartidas para mantener el bienestar emocional en los meses más fríos.", 
         apoyoEstudiantil: [{ nombre: "DAE Universidad de Aysén", url: "https://uaysen.cl" }] 
-    }, // Aysén
+    }, // Aysén (SIES 2025: 2.795 - 0,2%)
     12: { 
-        estudiantes: 6800, 
+        estudiantes: 7675,
+        porcentajeNacional: 0.7,
         habitoClave: "Adaptación de los hábitos de estudio a las variaciones dramáticas de luz diurna durante el año.", 
         factorRiesgo: "Alteración de ciclos circadianos por las pocas horas de luz solar en invierno austral.", 
         tipBienestar: "Sostener horarios estrictos de sueño para regular los niveles de energía corporal.", 
         apoyoEstudiantil: [{ nombre: "DAE Universidad de Magallanes", url: "https://www.umag.cl" }] 
-    }  // Magallanes
+    }  // Magallanes (SIES 2025: 7.675 - 0,7%)
 };
 
 $(document).ready(function() {
@@ -917,7 +1156,11 @@ $(document).ready(function() {
                 <h4><i class="fa-solid fa-user-graduate"></i> Cómo son los estudiantes</h4>
                 <ul class="ficha-datos">
                     <li><span class="ficha-valor">${hayDato(r.estudiantes) ? miles(r.estudiantes) : pendiente()}</span> estudiantes de educación superior</li>
+                    <li><span class="ficha-valor">${r.porcentajeNacional ? formatoNumero(r.porcentajeNacional, 1) + "%" : pendiente()}</span> de la matrícula nacional</li>
                 </ul>
+                <p class="ficha-fuente" style="font-size: 0.74rem; color: var(--texto-suave); margin-top: 0.6rem; margin-bottom: 0;">
+                    <i class="fa-solid fa-book-bookmark"></i> <strong>Fuente oficial:</strong> SIES (Servicio de Información de Educación Superior, 2025) · Mineduc
+                </p>
             </div>
 
             <div class="ficha-bloque">
@@ -977,9 +1220,11 @@ $(document).ready(function() {
     // Tooltip al pasar el cursor: cantidad de estudiantes de la región
     $("#mapa-chile").on("mousemove", ".region-mapa", function(e) {
         let codigo = $(this).data("region");
-        let n = DATOS_REGIONES[codigo].estudiantes;
+        let r = DATOS_REGIONES[codigo];
+        let n = r ? r.estudiantes : null;
+        let pct = r && r.porcentajeNacional ? (" (" + formatoNumero(r.porcentajeNacional, 1) + "% nacional)") : "";
         let texto = hayDato(n)
-            ? t("explorar.tooltip", { region: nombreRegion(codigo), n: miles(n) })
+            ? (nombreRegion(codigo) + ": " + miles(n) + " estudiantes" + pct)
             : `${nombreRegion(codigo)}: ${t("explorar.pendiente")}`;
         let caja = $(".columna-mapa")[0].getBoundingClientRect();
         $("#tooltip-mapa")
@@ -1012,54 +1257,57 @@ $(document).ready(function() {
     // Proporción de cada imagen (ancho, alto). Los rectángulos provisorios usan la misma.
     const TAM = { cordillera: [2400, 800], ciudad: [2400, 800], escenario: [1500, 1000], personaje: [600, 900] };
     const MIN_TOTAL = 1380;   // de 08:00 a 07:00 del día siguiente, en minutos
-    const MIN_NOCHE = 900;    // 23:00
+    const MIN_NOCHE = 810;    // 21:30, preparación para dormir
     const VELOCIDAD = { cordillera: 0.12, ciudad: 0.35, calle: 1 };
 
     // Paradas del día: textos del arreglo "momentos" de textos.js (mismo orden)
     const PARADAS_DIA = [
-        { hora: "08:00", min: 0,   momento: 0, ejemplo: true, iconoBien: "fa-headphones",     iconoMal: "fa-mobile-screen" },
-        { hora: "10:30", min: 150, momento: 1,                iconoBien: "fa-list-check",     iconoMal: "fa-bell" },
-        { hora: "13:30", min: 330, momento: 2, ejemplo: true, iconoBien: "fa-utensils",       iconoMal: "fa-laptop" },
-        { hora: "17:30", min: 570, momento: 4,                iconoBien: "fa-person-running", iconoMal: "fa-couch" },
-        { hora: "21:00", min: 780, momento: 5,                iconoBien: "fa-guitar",         iconoMal: "fa-mobile-screen" }
+        { hora: "08:00", min: 0, momento: 0, ejemplo: true, iconoBien: "fa-headphones", iconoMal: "fa-mobile-screen" },
+        { hora: "10:30", min: 150, momento: 1, iconoBien: "fa-list-check", iconoMal: "fa-bell" },
+        { hora: "13:30", min: 330, momento: 2, ejemplo: true, iconoBien: "fa-utensils", iconoMal: "fa-laptop" },
+        { hora: "16:00", min: 480, momento: 4, iconoBien: "fa-person-running", iconoMal: "fa-couch", horaImagen: "1930" },
+        { hora: "21:00", min: 780, momento: 5, iconoBien: "fa-guitar", iconoMal: "fa-mobile-screen" }
     ];
     // Se agrega solo si existe img/dia-1800.jpg (textos en "momentoTrabajo")
     const PARADA_TRABAJO = { hora: "18:00", min: 600, trabajo: true, ejemplo: true, iconoBien: "fa-calendar-days", iconoMal: "fa-battery-quarter" };
     // Paradas de la noche: textos en "noche" de textos.js. "sueno" = horas dormidas hasta esa hora.
     const PARADAS_NOCHE = [
-        { hora: "23:00", min: 900,  noche: 0, sueno: { bien: 0,   mal: 0 },   fuente: { bien: "",               mal: "vd.fuentePantalla" }, iconoBien: "fa-book-open",  iconoMal: "fa-mobile-screen" },
-        { hora: "23:30", min: 930,  noche: 1, sueno: { bien: 0,   mal: 0 },   fuente: { bien: "vd.fuenteNoche", mal: "vd.fuentePantalla" }, iconoBien: "fa-bed",        iconoMal: "fa-mobile-screen" },
-        { hora: "00:30", min: 990,  noche: 2, sueno: { bien: 1,   mal: 0 },   fuente: { bien: "vd.fuenteNoche", mal: "vd.fuentePantalla" }, iconoBien: "fa-moon",       iconoMal: "fa-mobile-screen" },
-        { hora: "02:00", min: 1080, noche: 3, sueno: { bien: 2.5, mal: 0 },   fuente: { bien: "vd.fuenteNoche", mal: "" },                  iconoBien: "fa-moon",       iconoMal: "fa-bed" },
-        { hora: "04:30", min: 1230, noche: 4, sueno: { bien: 5,   mal: 2.5 }, fuente: { bien: "vd.fuenteNoche", mal: "vd.fuenteNoche" },    iconoBien: "fa-cloud-moon", iconoMal: "fa-bed" },
-        { hora: "07:00", min: 1380, noche: 5, sueno: { bien: 7.5, mal: 5 },   fuente: { bien: "vd.fuenteNoche", mal: "vd.fuenteNoche" },    iconoBien: "fa-sun",        iconoMal: "fa-clock" }
+        { hora: "21:30", min: 810, noche: 0, sueno: {"bien":0,"mal":0}, fuente: {"bien":"","mal":"vd.fuentePantalla"}, iconoBien: "fa-book-open", iconoMal: "fa-mobile-screen", horaImagen: "2300" },
+        { hora: "22:00", min: 840, noche: 1, sueno: {"bien":0,"mal":0}, fuente: {"bien":"vd.fuenteNoche","mal":"vd.fuentePantalla"}, iconoBien: "fa-bed", iconoMal: "fa-mobile-screen", horaImagen: "2330" },
+        { hora: "00:30", min: 990, noche: 2, sueno: {"bien":2.5,"mal":0}, fuente: {"bien":"vd.fuenteNoche","mal":"vd.fuentePantalla"}, iconoBien: "fa-moon", iconoMal: "fa-mobile-screen" },
+        { hora: "02:00", min: 1080, noche: 3, sueno: {"bien":4,"mal":0}, fuente: {"bien":"vd.fuenteNoche","mal":""}, iconoBien: "fa-moon", iconoMal: "fa-bed" },
+        { hora: "04:30", min: 1230, noche: 4, sueno: {"bien":6.5,"mal":2.5}, fuente: {"bien":"vd.fuenteNoche","mal":"vd.fuenteNoche"}, iconoBien: "fa-cloud-moon", iconoMal: "fa-bed" },
+        { hora: "07:00", min: 1380, noche: 5, sueno: {"bien":9,"mal":5}, fuente: {"bien":"vd.fuenteNoche","mal":"vd.fuenteNoche"}, iconoBien: "fa-sun", iconoMal: "fa-clock" }
     ];
 
     // Cielo: colores (variables de :root) en distintas horas; entre ellas se mezclan
-    const CIELO = [[0, "0800"], [330, "1330"], [570, "1730"], [780, "2100"],
+    const CIELO = [[0, "0800"], [330, "1330"], [480, "1600"], [690, "1930"], [780, "2100"],
                    [900, "2300"], [1080, "0200"], [1290, "0530"], [1380, "0700"]];
     // Cuánto se oscurecen la cordillera y la ciudad según la hora (0 = nada)
     const OSCURIDAD = [[0, 0], [690, 0.05], [780, 0.3], [900, 0.5], [1080, 0.62], [1290, 0.45], [1380, 0.05]];
 
-    // Hipnograma (ilustrativo): minutos desde las 23:00. Fases: d despierto, l liviano, r REM, p profundo.
+    // Hipnograma (ilustrativo): minutos desde las 21:30. Fases: d despierto, l liviano, r REM, p profundo.
     const CICLOS = {
         bien: { despierta: 30, ciclos: [
-            [["l", 15], ["p", 45], ["l", 15], ["r", 15]],
-            [["l", 15], ["p", 35], ["l", 20], ["r", 20]],
-            [["l", 20], ["p", 20], ["l", 25], ["r", 25]],
-            [["l", 25], ["p", 10], ["l", 25], ["r", 30]],
-            [["l", 25], ["p", 5],  ["l", 25], ["r", 35]] ] },
-        mal: { despierta: 180, ciclos: [
-            [["l", 15], ["p", 45], ["l", 15], ["r", 15]],
-            [["l", 15], ["p", 35], ["l", 20], ["r", 20]],
-            [["l", 20], ["p", 25], ["l", 20], ["r", 55]] ] }   // el último REM lo corta la alarma de las 07:00
+            [["l",15],["p",45],["l",15],["r",15]],
+            [["l",15],["p",35],["l",20],["r",20]],
+            [["l",20],["p",20],["l",25],["r",25]],
+            [["l",25],["p",10],["l",25],["r",30]],
+            [["l",25],["p",5],["l",25],["r",35]],
+            [["l",25],["p",5],["l",25],["r",35]]
+        ] },
+        mal: { despierta: 270, ciclos: [
+            [["l",15],["p",45],["l",15],["r",15]],
+            [["l",15],["p",35],["l",20],["r",20]],
+            [["l",20],["p",25],["l",20],["r",55]]
+        ] }
     };
     const NIVEL = { d: 0, l: 1, r: 2, p: 3 };
     // Batería (ilustrativa): parte en 20% y se carga mientras duerme
-    const BATERIA = { bien: { duerme: 930, llega: 95 }, mal: { duerme: 1080, llega: 55 } };
+    const BATERIA = { bien: {"duerme":840,"llega":95}, mal: {"duerme":1080,"llega":55} };
 
     const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let paradas = [];
+    let paradas = PARADAS_DIA.concat(PARADAS_NOCHE);
     let modo = "bien";
     let actual = -1;           // parada activa
     let pos = 0;               // posición en el recorrido (índice con decimales)
@@ -1071,7 +1319,7 @@ $(document).ready(function() {
     let hipno = { puntos: [], largos: [], total: 0, animando: false };
 
     const esNoche = p => p.noche !== undefined;
-    const hhmm = p => p.hora.replace(":", "");
+    const hhmm = p => p.horaImagen || p.hora.replace(":", "");
     const limitar01 = n => Math.max(0, Math.min(1, n));
 
     // ---------- Imágenes (o rectángulo provisorio si falta el archivo) ----------
@@ -1282,7 +1530,7 @@ $(document).ready(function() {
     function fasesDe(version) {
         let c = CICLOS[version], fases = [["d", 0]], tiempo = c.despierta;
         c.ciclos.forEach(ciclo => ciclo.forEach(([fase, dur]) => { fases.push([fase, tiempo]); tiempo += dur; }));
-        fases.push(["d", 480]);
+        fases.push(["d", MIN_TOTAL - MIN_NOCHE]);
         return fases;
     }
     function construirHipnograma() {
@@ -1295,7 +1543,7 @@ $(document).ready(function() {
         // Escalera: horizontal hasta el inicio de la fase siguiente, luego vertical
         let fases = fasesDe(modo), puntos = [];
         fases.forEach(([fase, min], k) => {
-            let px = min / 480 * ancho;
+            let px = min / (MIN_TOTAL - MIN_NOCHE) * ancho;
             if (k === 0) puntos.push([px, y(NIVEL[fase])]);
             else { puntos.push([px, puntos[puntos.length - 1][1]]); puntos.push([px, y(NIVEL[fase])]); }
         });
@@ -1310,7 +1558,7 @@ $(document).ready(function() {
     }
     // Largo de la línea hasta cierta hora (para dibujarla a medida que avanza la noche)
     function largoHasta(min) {
-        let px = limitar01((min - MIN_NOCHE) / 480) * hipno.ancho;
+        let px = limitar01((min - MIN_NOCHE) / (MIN_TOTAL - MIN_NOCHE)) * hipno.ancho;
         let p = hipno.puntos, l = hipno.largos;
         for (let i = 1; i < p.length; i++) {
             if (p[i][0] > px) return l[i - 1] + Math.max(0, px - p[i - 1][0]);
@@ -1461,8 +1709,15 @@ $(document).ready(function() {
             if (disparador) disparador.disable();
             return;
         }
-        if (!construido) { construir(); return; }
-        if (disparador) { disparador.enable(); ScrollTrigger.refresh(); }
+        if (!construido) {
+            construir();
+            setTimeout(() => { if (typeof ScrollTrigger !== "undefined") ScrollTrigger.refresh(); }, 80);
+            return;
+        }
+        if (disparador) {
+            disparador.enable();
+            setTimeout(() => { if (typeof ScrollTrigger !== "undefined") ScrollTrigger.refresh(); }, 80);
+        }
     }
     new MutationObserver(alMostrar).observe($seccion[0], { attributes: true, attributeFilter: ["class"] });
 
@@ -1475,46 +1730,36 @@ $(document).ready(function() {
     let prueba = new Image();
     prueba.onload = () => { paradas = PARADAS_DIA.slice(0, 4).concat([PARADA_TRABAJO], PARADAS_DIA.slice(4), PARADAS_NOCHE); alMostrar(); };
     prueba.onerror = () => { paradas = PARADAS_DIA.concat(PARADAS_NOCHE); alMostrar(); };
-    prueba.src = "img/dia-1800.jpg";
-});
-document.addEventListener('DOMContentLoaded', () => {
-    // 2. Lógica del Formulario y Envío
-    const form = document.getElementById('suggestion-form');
-    const formContainer = document.getElementById('form-container');
-    const successMessage = document.getElementById('success-message');
-    const btnOtra = document.getElementById('btn-otra-sugerencia');
-
-    if (form) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-            const data = new FormData(form);
-            
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: data,
-                    headers: { 'Accept': 'application/json' }
-                });
-
-                if (response.ok) {
-                    formContainer.style.display = 'none';
-                    successMessage.style.display = 'flex';
-                    form.reset(); 
+    // Formulario de sugerencias (Formspree)
+    const $formSugerencias = $("#suggestion-form");
+    if ($formSugerencias.length) {
+        $formSugerencias.on("submit", function(e) {
+            e.preventDefault();
+            const formEl = this;
+            const data = new FormData(formEl);
+            fetch(formEl.action, {
+                method: "POST",
+                body: data,
+                headers: { "Accept": "application/json" }
+            }).then(function(res) {
+                if (res.ok) {
+                    $("#form-container").hide();
+                    $("#success-message").css("display", "flex");
+                    formEl.reset();
                 } else {
-                    alert('Hubo un problema al enviar la sugerencia.');
+                    alert("Hubo un problema al enviar la sugerencia. Por favor intenta más tarde.");
                 }
-            } catch (error) {
-                alert('Error de conexión. Verifica tu red.');
-            }
+            }).catch(function() {
+                alert("Error de conexión. Verifica tu red e intenta de nuevo.");
+            });
         });
     }
+    $("#btn-otra-sugerencia").click(function() {
+        $("#success-message").hide();
+        $("#form-container").show();
+    });
 
-    if (btnOtra) {
-        btnOtra.addEventListener('click', () => {
-            successMessage.style.display = 'none';
-            formContainer.style.display = 'block';
-        });
-    }
+    prueba.src = "img/dia-1800.jpg";
 });
 
 /* =====================================================================
