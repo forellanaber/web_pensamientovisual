@@ -1020,8 +1020,7 @@ $(document).ready(function() {
         { hora: "08:00", min: 0,   momento: 0, ejemplo: true, iconoBien: "fa-headphones",     iconoMal: "fa-mobile-screen" },
         { hora: "10:30", min: 150, momento: 1,                iconoBien: "fa-list-check",     iconoMal: "fa-bell" },
         { hora: "13:30", min: 330, momento: 2, ejemplo: true, iconoBien: "fa-utensils",       iconoMal: "fa-laptop" },
-        { hora: "16:00", min: 480, momento: 3,                iconoBien: "fa-list-check",     iconoMal: "fa-hourglass-end" },
-        { hora: "19:30", min: 690, momento: 4,                iconoBien: "fa-person-running", iconoMal: "fa-couch" },
+        { hora: "17:30", min: 570, momento: 4,                iconoBien: "fa-person-running", iconoMal: "fa-couch" },
         { hora: "21:00", min: 780, momento: 5,                iconoBien: "fa-guitar",         iconoMal: "fa-mobile-screen" }
     ];
     // Se agrega solo si existe img/dia-1800.jpg (textos en "momentoTrabajo")
@@ -1037,7 +1036,7 @@ $(document).ready(function() {
     ];
 
     // Cielo: colores (variables de :root) en distintas horas; entre ellas se mezclan
-    const CIELO = [[0, "0800"], [330, "1330"], [480, "1600"], [690, "1930"], [780, "2100"],
+    const CIELO = [[0, "0800"], [330, "1330"], [570, "1730"], [780, "2100"],
                    [900, "2300"], [1080, "0200"], [1290, "0530"], [1380, "0700"]];
     // Cuánto se oscurecen la cordillera y la ciudad según la hora (0 = nada)
     const OSCURIDAD = [[0, 0], [690, 0.05], [780, 0.3], [900, 0.5], [1080, 0.62], [1290, 0.45], [1380, 0.05]];
