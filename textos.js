@@ -172,6 +172,204 @@ es: {
     "area.movimiento": "Movimiento",
     "area.organizacion": "Organización",
     "area.animo": "Ánimo y energía",
+    "area.descanso": "Descanso",
+    "area.estudio": "Estudio",
+    "area.trabajo": "Trabajo",
+    "area.traslado": "Traslado",
+    "area.ocio": "Ocio",
+    "area.deporte": "Deporte y salud",
+    "res.baseDatos": "Base de datos",
+
+    "tarjetasDiagnostico": {
+        descanso: {
+            titulo: "Descanso",
+            icono: "fa-solid fa-moon",
+            fuentes: [
+                { nombre: "Consenso AASM / SRS", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4442216/" },
+                { nombre: "Sleep Foundation", url: "https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 6.9,
+                    estado: "Deficiente",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Dormir menos de 7 horas de forma habitual deteriora la concentración, la memoria y la función inmunológica. Además, se asocia a un mayor riesgo de fatiga crónica, estrés, accidentes y alteraciones metabólicas."
+                },
+                {
+                    min: 7, max: 9,
+                    estado: "Óptimo / Saludable",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Cumples con el rango recomendado para adultos jóvenes. Dormir entre 7 y 9 horas consolida el aprendizaje diario, regula los estados de ánimo y asegura una óptima recuperación física y mental."
+                },
+                {
+                    min: 9.1, max: 24,
+                    estado: "Excesivo",
+                    nivel: "mejorar",
+                    puntos: 6,
+                    texto: "Aunque puede ser adecuado al recuperarte de deudas acumuladas de sueño o enfermedades, superar de forma crónica las 9 horas puede asociarse a somnolencia diurna excesiva, baja energía o alteraciones del ciclo circadiano."
+                }
+            ]
+        },
+        estudio: {
+            titulo: "Estudio",
+            icono: "fa-solid fa-book-open",
+            fuentes: [
+                { nombre: "Encuesta CASEN (Educación)", url: "https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen" },
+                { nombre: "Athenify Study Research", url: "https://athenify.io/es/blog/cuantas-horas-estudiar-al-dia" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 1.9,
+                    estado: "Bajo",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Dedicar muy poco tiempo al estudio autónomo puede acumular sobrecargas y estrés previo a evaluaciones, afectando negativamente tu rendimiento académico y la asimilación paulatina de materias."
+                },
+                {
+                    min: 2, max: 5.5,
+                    estado: "Equilibrado",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Mantienes un volumen de estudio diario sostenible. Este bloque permite consolidar contenidos académicos sin comprometer tus horas de descanso ni tus actividades personales."
+                },
+                {
+                    min: 5.6, max: 24,
+                    estado: "Riesgo de sobrecarga",
+                    nivel: "atencion",
+                    puntos: 5,
+                    texto: "La investigación muestra que tras 5-6 horas de estudio concentrado diario los rendimientos disminuyen drásticamente. Sobrepasar este umbral eleva el agotamiento mental (burnout) y reduce la retención neta."
+                }
+            ]
+        },
+        trabajo: {
+            titulo: "Trabajo",
+            icono: "fa-solid fa-briefcase",
+            fuentes: [
+                { nombre: "ENUT (INE) - Uso del Tiempo", url: "https://www.ine.gob.cl/estadisticas/sociales/genero/uso-del-tiempo" },
+                { nombre: "Encuesta CASEN", url: "https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.1,
+                    estado: "Dedicación exclusiva",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "No dedicas horas a trabajo remunerado, lo que te permite mayor disponibilidad horaria para organizar tus estudios, ocio y descanso."
+                },
+                {
+                    min: 0.2, max: 4.5,
+                    estado: "Jornada parcial compatible",
+                    nivel: "bien",
+                    puntos: 9,
+                    texto: "Compatibilizas tus estudios con una actividad laboral moderada dentro de los marcos del trabajo juvenil y parcial, sin canibalizar severamente tus horarios de recuperación."
+                },
+                {
+                    min: 4.6, max: 24,
+                    estado: "Alta carga laboral",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Una jornada laboral extensa compite directamente con tus horas de estudio y descanso. En estudiantes de educación superior, jornadas largas elevan significativamente el riesgo de deserción y el agotamiento físico."
+                }
+            ]
+        },
+        traslado: {
+            titulo: "Traslado",
+            icono: "fa-solid fa-bus",
+            fuentes: [
+                { nombre: "Encuesta CASEN", url: "https://www.latercera.com/pulso/noticia/casen-2017-muestra-fuerte-diferencia-tiempos-traslado-santiaguinos-segun-tipo-trabajo/873500/" },
+                { nombre: "ENUT (INE) - Uso del Tiempo", url: "https://www.ine.gob.cl/estadisticas/sociales/genero/uso-del-tiempo" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.9,
+                    estado: "Bajo impacto",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Tus tiempos de viaje son acotados, lo que te deja una mayor reserva de energía diaria y más horas útiles durante la semana."
+                },
+                {
+                    min: 1, max: 2.2,
+                    estado: "Promedio urbano nacional",
+                    nivel: "mejorar",
+                    puntos: 7,
+                    texto: "Te encuentras dentro del promedio de traslado de las principales zonas urbanas en Chile. Aprovechar estos trayectos para \"ocio activo\" (escuchar música o podcasts) ayuda a mitigar la fatiga acumulada en el viaje."
+                },
+                {
+                    min: 2.3, max: 24,
+                    estado: "Excesivo",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Pasas un tiempo excesivo en locomoción. Los trayectos diarios prolongados en transporte público se correlacionan con niveles elevados de estrés, fatiga postural y pérdida crítica de horas de ocio y sueño."
+                }
+            ]
+        },
+        ocio: {
+            titulo: "Ocio",
+            icono: "fa-solid fa-mug-hot",
+            fuentes: [
+                { nombre: "Programa Vida Saludable (UdeC)", url: "https://vidasaludable.udec.cl/node/279" },
+                { nombre: "10ª Encuesta INJUV", url: "https://www.injuv.gob.cl/" },
+                { nombre: "ENUT (INE)", url: "https://www.ine.gob.cl/estadisticas/sociales/genero/uso-del-tiempo" },
+                { nombre: "Sleep Foundation", url: "https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.9,
+                    estado: "Déficit",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Estás sacrificando tu tiempo personal. El ocio no es perder el tiempo, es una necesidad biológica y cognitiva que reduce la ansiedad, estimula la creatividad y previene el colapso por estrés académico."
+                },
+                {
+                    min: 1, max: 4,
+                    estado: "Equilibrado",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Mantienes un espacio saludable para tus intereses personales y relaciones sociales. Este equilibrio fortalece tu sistema inmune, reduce la ansiedad y mejora tu calidad de sueño."
+                },
+                {
+                    min: 4.1, max: 24,
+                    estado: "Sobrecarga de ocio / Pantallas",
+                    nivel: "atencion",
+                    puntos: 5,
+                    texto: "Dedicar un exceso de horas diarias a ocio sedentario o consumo de pantallas puede desplazar horarios de sueño y estudio, aumentando la sensación de procrastinación, fatiga visual y cansancio matutino."
+                }
+            ]
+        },
+        deporte: {
+            titulo: "Deporte y salud",
+            icono: "fa-solid fa-person-running",
+            fuentes: [
+                { nombre: "OMS - Actividad Física", url: "https://www.who.int/es/news-room/fact-sheets/detail/physical-activity" },
+                { nombre: "OPS - Recomendaciones de Salud", url: "https://www.paho.org/es/noticias/9-5-2012-recomendaciones-mundiales-sobre-actividad-fisica-para-salud" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.25,
+                    estado: "Sedentarismo",
+                    nivel: "atencion",
+                    puntos: 3,
+                    texto: "Tu nivel de actividad física es insuficiente respecto a los mínimos médicos recomendados. Moverte al menos 20 minutos al día mejora la función cardiovascular, la memoria y actúa como protector natural contra la depresión y el estrés."
+                },
+                {
+                    min: 0.26, max: 1.25,
+                    estado: "Saludable",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Cumples con la pauta recomendada para adultos jóvenes (150 a 300 minutos semanales). Esta rutina optimiza tu resistencia cardiorrespiratoria, mejora el estado de ánimo y fortalece tu sistema óseo y muscular."
+                },
+                {
+                    min: 1.26, max: 24,
+                    estado: "Alto rendimiento",
+                    nivel: "bien",
+                    puntos: 9,
+                    texto: "Mantienes un volumen de ejercicio muy alto. Asegúrate de compensar esta demanda física con una adecuada hidratación, alimentación y suficientes horas de descanso para evitar sobrecargas articulares o agotamiento físico."
+                }
+            ]
+        }
+    },
 
     "diagnostico": {
         atencion: "Tu día está pidiendo un cambio. No tienes que hacerlo todo de una: parte por una cosa.",
@@ -611,6 +809,203 @@ en: {
     "area.movimiento": "Movement",
     "area.organizacion": "Organization",
     "area.animo": "Mood and energy",
+    "area.descanso": "Rest & Sleep",
+    "area.estudio": "Study",
+    "area.trabajo": "Work",
+    "area.traslado": "Commute",
+    "area.ocio": "Leisure",
+    "area.deporte": "Sports & Health",
+    "res.baseDatos": "Database",
+
+    "tarjetasDiagnostico": {
+        descanso: {
+            titulo: "Rest & Sleep",
+            icono: "fa-solid fa-moon",
+            fuentes: [
+                { nombre: "AASM / SRS Consensus", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC4442216/" },
+                { nombre: "Sleep Foundation", url: "https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 6.9,
+                    estado: "Deficient",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Regularly sleeping less than 7 hours impairs concentration, memory and immune function. It is also linked to chronic fatigue and stress."
+                },
+                {
+                    min: 7, max: 9,
+                    estado: "Optimal / Healthy",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "You meet the recommended range for young adults. Sleeping 7 to 9 hours consolidates learning and ensures physical and mental recovery."
+                },
+                {
+                    min: 9.1, max: 24,
+                    estado: "Excessive",
+                    nivel: "mejorar",
+                    puntos: 6,
+                    texto: "Consistently exceeding 9 hours may be associated with daytime sleepiness and circadian rhythm disruption."
+                }
+            ]
+        },
+        estudio: {
+            titulo: "Study",
+            icono: "fa-solid fa-book-open",
+            fuentes: [
+                { nombre: "CASEN Survey (Education)", url: "https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen" },
+                { nombre: "Athenify Study Research", url: "https://athenify.io/es/blog/cuantas-horas-estudiar-al-dia" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 1.9,
+                    estado: "Low",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Dedication of very little autonomous study time can pile up stress before evaluations, harming academic performance."
+                },
+                {
+                    min: 2, max: 5.5,
+                    estado: "Balanced",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "You maintain a sustainable daily study load without sacrificing rest or personal time."
+                },
+                {
+                    min: 5.6, max: 24,
+                    estado: "Overload risk",
+                    nivel: "atencion",
+                    puntos: 5,
+                    texto: "Research shows that after 5-6 hours of intense study, cognitive returns diminish sharply, raising burnout risks."
+                }
+            ]
+        },
+        trabajo: {
+            titulo: "Work",
+            icono: "fa-solid fa-briefcase",
+            fuentes: [
+                { nombre: "ENUT (INE) - Time Use", url: "https://www.ine.gob.cl/estadisticas/sociales/genero/uso-del-tiempo" },
+                { nombre: "CASEN Survey", url: "https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.1,
+                    estado: "Exclusive dedication",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "You do not work paid hours, providing more schedule flexibility for studies, leisure, and sleep."
+                },
+                {
+                    min: 0.2, max: 4.5,
+                    estado: "Compatible part-time",
+                    nivel: "bien",
+                    puntos: 9,
+                    texto: "You balance study with moderate work within youth part-time frameworks, without severely compromising recovery."
+                },
+                {
+                    min: 4.6, max: 24,
+                    estado: "High work load",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "An extensive work schedule directly competes with study and rest, significantly raising burnout risks."
+                }
+            ]
+        },
+        traslado: {
+            titulo: "Commute",
+            icono: "fa-solid fa-bus",
+            fuentes: [
+                { nombre: "CASEN Survey", url: "https://www.latercera.com/pulso/noticia/casen-2017-muestra-fuerte-diferencia-tiempos-traslado-santiaguinos-segun-tipo-trabajo/873500/" },
+                { nombre: "ENUT (INE)", url: "https://www.ine.gob.cl/estadisticas/sociales/genero/uso-del-tiempo" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.9,
+                    estado: "Low impact",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "Your travel times are short, leaving more useful hours and energy during the week."
+                },
+                {
+                    min: 1, max: 2.2,
+                    estado: "National urban average",
+                    nivel: "mejorar",
+                    puntos: 7,
+                    texto: "You fall within the average commute of main urban areas in Chile. Using this time for active leisure helps reduce fatigue."
+                },
+                {
+                    min: 2.3, max: 24,
+                    estado: "Excessive",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "Extended transit times correlate with elevated stress, posture fatigue, and critical loss of free time."
+                }
+            ]
+        },
+        ocio: {
+            titulo: "Leisure",
+            icono: "fa-solid fa-mug-hot",
+            fuentes: [
+                { nombre: "Vida Saludable (UdeC)", url: "https://vidasaludable.udec.cl/node/279" },
+                { nombre: "INJUV Survey", url: "https://www.injuv.gob.cl/" },
+                { nombre: "Sleep Foundation", url: "https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.9,
+                    estado: "Deficit",
+                    nivel: "atencion",
+                    puntos: 4,
+                    texto: "You are sacrificing personal time. Leisure is a cognitive necessity that lowers anxiety and prevents burnout."
+                },
+                {
+                    min: 1, max: 4,
+                    estado: "Balanced",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "You keep healthy space for personal interests and social relationships, boosting immune health and sleep quality."
+                },
+                {
+                    min: 4.1, max: 24,
+                    estado: "Screen / Leisure overload",
+                    nivel: "atencion",
+                    puntos: 5,
+                    texto: "Excessive sedentary leisure or screen consumption displaces sleep and study, raising procrastination and visual fatigue."
+                }
+            ]
+        },
+        deporte: {
+            titulo: "Sports & Health",
+            icono: "fa-solid fa-person-running",
+            fuentes: [
+                { nombre: "WHO - Physical Activity", url: "https://www.who.int/es/news-room/fact-sheets/detail/physical-activity" },
+                { nombre: "PAHO Recommendations", url: "https://www.paho.org/es/noticias/9-5-2012-recomendaciones-mundiales-sobre-actividad-fisica-para-salud" }
+            ],
+            rangos: [
+                {
+                    min: 0, max: 0.25,
+                    estado: "Sedentary",
+                    nivel: "atencion",
+                    puntos: 3,
+                    texto: "Physical activity is below recommended minimums. 20 minutes a day boosts cardiovascular and memory function."
+                },
+                {
+                    min: 0.26, max: 1.25,
+                    estado: "Healthy",
+                    nivel: "bien",
+                    puntos: 10,
+                    texto: "You meet the recommended guideline for young adults (150-300 min/week), enhancing mood and fitness."
+                },
+                {
+                    min: 1.26, max: 24,
+                    estado: "High performance",
+                    nivel: "bien",
+                    puntos: 9,
+                    texto: "You maintain very high exercise volume. Compensate with hydration, nutrition, and rest to avoid strain."
+                }
+            ]
+        }
+    },
 
     "diagnostico": {
         atencion: "Your day is asking for a change. You don't have to fix everything at once: start with one thing.",
