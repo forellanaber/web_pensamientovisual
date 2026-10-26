@@ -34,7 +34,7 @@ es: {
     "contexto.fuente": "Fuente: SUBTEL y Cadem (2024), jóvenes de 16 a 29 años",
     "contexto.minutos": "3 minutos",
     "contexto.anonimo": "Anónimo",
-    "contexto.alTiro": "Resultados al tiro",
+    "contexto.alTiro": "Resultados al instante",
     "contexto.empezar": "Empezar el test",
 
     // --- Test: avance ---
